@@ -44,7 +44,21 @@ const hex = (n, width) => n.toString(16).toUpperCase().padStart(width, "0").slic
 // render it with the session holding range and search: the fixture's ten
 // orders, as many as page n holds, renumbered so every order of the list is
 // its own, and dated in the range's year.
-export function pageHTML({ range = "Last 30 Days", search = "", total = 31, n = 1, per = 10 } = {}) {
+//
+// Each page is built once and kept: building one parses the fixture in a
+// window of its own, and the walk tests ask for the same pages dozens of
+// times.
+const built = new Map();
+
+export function pageHTML(options = {}) {
+  const key = JSON.stringify(options);
+  if (!built.has(key)) {
+    built.set(key, buildPage(options));
+  }
+  return built.get(key);
+}
+
+function buildPage({ range = "Last 30 Days", search = "", total = 31, n = 1, per = 10 } = {}) {
   const doc = fixture();
   for (const option of doc.querySelectorAll("#DateRange option")) {
     if (option.textContent.trim() === range) option.setAttribute("selected", "selected");
@@ -86,7 +100,10 @@ export function pageHTML({ range = "Last 30 Days", search = "", total = 31, n = 
   const pages = Math.ceil(total / per);
   if (pages <= 1) pager.remove();
   else pager.querySelector("a.pageLast").setAttribute("href", "/myaccount/orderhistory?PageNumber=" + pages);
-  return doc.body.innerHTML;
+  const html = doc.body.innerHTML;
+  // The window was only somewhere to build the page in.
+  doc.defaultView.close();
+  return html;
 }
 
 // site is TCGplayer's session: a range and a search, set by setFilter as
