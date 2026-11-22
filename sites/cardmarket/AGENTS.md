@@ -38,13 +38,11 @@ does.
 ## Layout
 
 ```
-manifest.json    MV3; two things matter - the host list and no permissions
 src/rates.js     the currency feed, and the inversion it needs
 src/parse.js     DOM → offers. The volatile half; see SPECIFICATIONS.md §3
 src/pages.js     one page → every page, at Cloudflare's pace; see §6
 src/csv.js       offers → CSV. The contract with mtgban; see §4
 src/content.js   the panel, the download, the handoff
-icons/           the stroopwafel, 128 is the original and the rest are made
 tests/panel.js   stands the content script up in a window; clicks are real
 tests/mutations.json  each guard, the text that breaks it, the test that fails
 tests/           bun + happy-dom, no browser

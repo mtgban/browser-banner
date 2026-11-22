@@ -35,25 +35,8 @@ else.
 
 ## Installing it
 
-The same unpacked folder works in all three browsers.
-
-**Chrome** - `chrome://extensions`, turn on Developer mode, *Load unpacked*,
-pick this folder.
-
-**Firefox** - `about:debugging#/runtime/this-firefox`, *Load Temporary Add-on*,
-pick `manifest.json`. Firefox drops a temporary add-on when it restarts, so
-this needs redoing each session.
-
-**Safari** - Safari runs the same extension but wants an app around it, which
-needs Xcode:
-
-```
-xcrun safari-web-extension-converter .
-```
-
-Run the generated project once, then enable the extension in Safari's settings.
-For an unsigned build, Safari's Develop menu has to have *Allow Unsigned
-Extensions* turned on, which Safari resets when it quits.
+BANner is one extension for all three stores; install it from the
+repository's root, as its README says.
 
 ## Developing
 
