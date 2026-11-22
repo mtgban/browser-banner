@@ -21,4 +21,8 @@ three one extension.
 ```
 bun install
 bun run test
+bun run mutate
 ```
+
+The last breaks each guard a site lists in `tests/mutations.json` and
+checks a test notices.

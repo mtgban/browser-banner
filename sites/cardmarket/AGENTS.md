@@ -46,6 +46,7 @@ src/csv.js       offers → CSV. The contract with mtgban; see §4
 src/content.js   the panel, the download, the handoff
 icons/           the stroopwafel, 128 is the original and the rest are made
 tests/panel.js   stands the content script up in a window; clicks are real
+tests/mutations.json  each guard, the text that breaks it, the test that fails
 tests/           bun + happy-dom, no browser
 ```
 
@@ -54,11 +55,17 @@ tests/           bun + happy-dom, no browser
 ```
 bun install
 bun test tests/
+bun run mutate sites/cardmarket    (from the repository's root)
 ```
 
 That is the whole suite and it runs in CI on every push. It loads the real
 `src/*.js` against a DOM and the fixture - no mocking of the code under
 test.
+
+A guard (a refusal, a fold, a check that keeps the walk honest) lands with
+an entry in `tests/mutations.json`: the text that breaks it and the name of
+the test that must then fail. A guard no test catches is a gap in the tests,
+not in the list: write the test that would.
 
 There is no linter and no build step. The scripts are plain ES5-ish so they
 can be `content_scripts` entries without bundling; keep them that way.
