@@ -4,7 +4,7 @@
 // made from TCGplayer's page. So nothing is posted from here: mtgban serves
 // /upload/handoff, which opens as an ordinary navigation, says when it is
 // listening, takes the rows from the window that opened it, and uploads
-// them itself. The protocol is cm-banner's; SPECIFICATIONS.md section 6.
+// them itself. The protocol is Cardmarket's; SPECIFICATIONS.md section 6.
 
 globalThis.TCGB = globalThis.TCGB || {};
 

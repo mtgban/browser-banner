@@ -1,4 +1,4 @@
-# ck-banner
+# BANner for Card Kingdom
 
 **CK BANner** is a browser extension for Card Kingdom. It does two things:
 

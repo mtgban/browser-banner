@@ -1,4 +1,4 @@
-# cm-banner
+# BANner for Cardmarket
 
 A browser extension that reads the offers listed on a Cardmarket page and
 writes them out as a CSV [mtgban](https://www.mtgban.com)'s `/upload` page can

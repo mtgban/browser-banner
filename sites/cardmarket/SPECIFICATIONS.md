@@ -1,4 +1,4 @@
-# cm-banner - Specification
+# BANner for Cardmarket - Specification
 
 > Written 2026-09-22, from the work that built the extension. Every fact
 > about Cardmarket's markup below was read off real pages rather than

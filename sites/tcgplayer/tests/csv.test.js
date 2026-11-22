@@ -10,7 +10,7 @@ function rowsOf(csv) {
 }
 
 describe("the orders file", () => {
-  test("starts with the columns go-mtgban's tool and ck-banner share", () => {
+  test("starts with the columns go-mtgban's tool and CK share", () => {
     expect(header(TCGB.ordersCSV(orders()))).toBe(
       "Order ID,Order Date,Amount,Kind,Seller,Tax State,Quantity,Subtotal,Shipping,Sales Tax,Refund,Tax Refund (est.),Total,Total Tax"
     );
