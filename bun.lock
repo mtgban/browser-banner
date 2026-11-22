@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "cm-banner",
+      "name": "browser-banner",
       "devDependencies": {
         "happy-dom": "^15.11.7",
       },
