@@ -86,8 +86,8 @@
   {
     "guard": "the name is the link's text",
     "file": "src/parse.js",
-    "find": "cardName: linked || slugToName(nameSlug),",
-    "replace": "cardName: slugToName(nameSlug),",
+    "find": "return linked || slugToName(slug);",
+    "replace": "return slugToName(slug);",
     "expectFailing": "the name is the link's own text, not the slug"
   },
   {
@@ -481,5 +481,96 @@
     "find": "replaced.opened.close();",
     "replace": "",
     "expectFailing": "a second send closes the first tab, which would wait for good"
+  },
+  {
+    "guard": "a purchase's product id is the row's",
+    "file": "src/parse.js",
+    "find": "var mcmID = row.getAttribute(\"data-product-id\") || \"\";",
+    "replace": "var mcmID = \"0\";",
+    "expectFailing": "reads every article in the page's order, as an offer is read"
+  },
+  {
+    "guard": "a purchase's quantity is the row's amount",
+    "file": "src/parse.js",
+    "find": "var quantity = row.getAttribute(\"data-amount\") || \"\";",
+    "replace": "var quantity = \"1\";",
+    "expectFailing": "counts the cards, and asks for nothing until clicked"
+  },
+  {
+    "guard": "an altered, signed or inked purchase is left out",
+    "file": "src/parse.js",
+    "find": "    var titles = titlesOf(row);\n    if (refused(titles)) {\n      return null;\n    }\n    var tail",
+    "replace": "    var titles = titlesOf(row);\n    var tail",
+    "expectFailing": "leaves out an altered, signed or inked card, and a row it cannot read, and counts them"
+  },
+  {
+    "guard": "a purchase row's amount must be a number",
+    "file": "src/parse.js",
+    "find": "!/^[1-9]\\d*$/.test(quantity) || ",
+    "replace": "",
+    "expectFailing": "leaves out an altered, signed or inked card, and a row it cannot read, and counts them"
+  },
+  {
+    "guard": "a purchase's link back carries the attribution",
+    "file": "src/parse.js",
+    "find": "return href + (href.indexOf(\"?\") === -1 ? \"?\" : \"&\") + query.join(\"&\");",
+    "replace": "return href;",
+    "expectFailing": "reads every article in the page's order, as an offer is read"
+  },
+  {
+    "guard": "an article drawn twice is read once",
+    "file": "src/parse.js",
+    "find": "      if (seen[id]) {\n        continue;\n      }\n",
+    "replace": "",
+    "expectFailing": "reads an article once, however many times it is drawn"
+  },
+  {
+    "guard": "a purchase's file is named for its order",
+    "file": "src/orderpage.js",
+    "find": "\"cm-purchase-\" + id + \".csv\"",
+    "replace": "\"cm-purchase.csv\"",
+    "expectFailing": "CSV saves the articles with their prices in dollars, named for the order"
+  },
+  {
+    "guard": "a purchase's prices are converted",
+    "file": "src/orderpage.js",
+    "find": "read.cards[i].priceUSD = MKM.priceUSD(read.cards[i].price, read.cards[i].currency, rates);",
+    "replace": "read.cards[i].priceUSD = \"\";",
+    "expectFailing": "CSV saves the articles with their prices in dollars, named for the order"
+  },
+  {
+    "guard": "a purchase says its prices were left empty",
+    "file": "src/orderpage.js",
+    "find": "if (done.unpriced) {",
+    "replace": "if (false) {",
+    "expectFailing": "with no exchange rate, saves anyway and says the prices are empty"
+  },
+  {
+    "guard": "a purchase says what it left out",
+    "file": "src/orderpage.js",
+    "find": "if (read.skipped) {",
+    "replace": "if (false) {",
+    "expectFailing": "says what was left out"
+  },
+  {
+    "guard": "a purchase of a game BAN does not price gets no send",
+    "file": "src/orderpage.js",
+    "find": "!MKM.handoffURL(game) || ",
+    "replace": "",
+    "expectFailing": "offers no send for a game BAN does not price"
+  },
+  {
+    "guard": "the order panel stays off the purchase lists",
+    "file": "src/orderpage.js",
+    "find": "/^\\/[a-z]{2}\\/([^/]+)\\/Orders\\/(\\d+)\\/?$/",
+    "replace": "/^\\/[a-z]{2}\\/([^/]+)\\/Orders\\/([^/]+)/",
+    "expectFailing": "stays off the purchase lists, and off an order with no articles"
+  },
+  {
+    "guard": "a purchase sends what CSV saves",
+    "file": "src/orderpage.js",
+    "find": "return { csv: written.csv, rows: written.rows };",
+    "replace": "return { csv: \"\", rows: written.rows };",
+    "expectFailing": "Send to BAN opens the game's upload at once and hands it the CSV's rows"
   }
 ]

@@ -183,6 +183,33 @@ globalThis.MKM = globalThis.MKM || {};
     return "";
   };
 
+  // refused says whether a row's tooltips name a card no id of ours names.
+  function refused(titles) {
+    for (var i = 0; i < SKIPPED.length; i++) {
+      if (titles.indexOf(SKIPPED[i]) !== -1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // conditionOf folds the grade a row's tooltips name, or "" for none.
+  function conditionOf(titles) {
+    for (var i = 0; i < titles.length; i++) {
+      if (Object.prototype.hasOwnProperty.call(CONDITIONS, titles[i])) {
+        return CONDITIONS[titles[i]];
+      }
+    }
+    return "";
+  }
+
+  // nameOf is the card's name as its link says it in full, punctuation and
+  // all, or what survived of it in the slug when the link says nothing.
+  function nameOf(link, slug) {
+    var linked = (link.textContent || "").replace(/\s+/g, " ").trim();
+    return linked || slugToName(slug);
+  }
+
   // parseRow reads one offer, or returns null for a row naming no product and
   // for one the catalog cannot be asked about.
   function parseRow(row, languages) {
@@ -209,23 +236,10 @@ globalThis.MKM = globalThis.MKM || {};
 
     var titles = titlesOf(row);
     var language = languageOf(row, href, titles, languages);
-    for (var i = 0; i < SKIPPED.length; i++) {
-      if (titles.indexOf(SKIPPED[i]) !== -1) {
-        return null;
-      }
+    if (refused(titles)) {
+      return null;
     }
-
-    var condition = "";
-    for (var j = 0; j < titles.length; j++) {
-      if (Object.prototype.hasOwnProperty.call(CONDITIONS, titles[j])) {
-        condition = CONDITIONS[titles[j]];
-        break;
-      }
-    }
-
-    // The link says the card's name in full, punctuation and all; the slug
-    // it points at is what survived being made URL-safe.
-    var linked = (link.textContent || "").replace(/\s+/g, " ").trim();
+    var condition = conditionOf(titles);
 
     // The expansion as the page writes it, taken from the row's own link to
     // it rather than from whichever tooltip happens to come first. It is
@@ -254,7 +268,7 @@ globalThis.MKM = globalThis.MKM || {};
 
     return {
       mcmID: firstMatch(row.outerHTML, [IMG_RE, IMG_LEGACY_RE]),
-      cardName: linked || slugToName(nameSlug),
+      cardName: nameOf(link, nameSlug),
       edition: editionSlug.replace(/-/g, " "),
       expansionName: expansionName,
       condition: condition,
@@ -478,6 +492,81 @@ globalThis.MKM = globalThis.MKM || {};
   // a walk that gets past this anyway is still caught by the shortfall.
   MKM.loggedOut = function (root) {
     return !!root.querySelector("#header-login, #offcanvas-login");
+  };
+
+  // productURL is a purchased article's way back: its own product link,
+  // with the attribution on the end.
+  MKM.productURL = function (href) {
+    var query = [];
+    for (var i = 0; i < TRACKING.length; i++) {
+      query.push(TRACKING[i][0] + "=" + TRACKING[i][1]);
+    }
+    return href + (href.indexOf("?") === -1 ? "?" : "&") + query.join("&");
+  };
+
+  // purchaseRow reads one article of the visitor's own order, in the same
+  // shape as an offer, or null. Its product, amount, language and price are
+  // data- attributes; its grade and flags are tooltips, as on an offer. An
+  // altered, signed or inked card is null, as an offer is, and so is a row
+  // whose product, amount or price is not a number.
+  function purchaseRow(row) {
+    var link = row.querySelector('a[href*="/Products/"]');
+    var href = link ? link.getAttribute("href") || "" : "";
+    var product = PRODUCT_RE.exec(href);
+    var mcmID = row.getAttribute("data-product-id") || "";
+    var quantity = row.getAttribute("data-amount") || "";
+    var price = row.getAttribute("data-price") || "";
+    if (!product || !/^\d+$/.test(mcmID) || !/^[1-9]\d*$/.test(quantity) || !/^\d+(\.\d+)?$/.test(price)) {
+      return null;
+    }
+    var titles = titlesOf(row);
+    if (refused(titles)) {
+      return null;
+    }
+    var tail = product[2].split("/");
+    var nameSlug = tail.length > 1 ? tail[1] : tail[0];
+    var editionSlug = tail.length > 1 ? tail[0] : "";
+    var language = row.getAttribute("data-language") || "";
+    var cell = row.querySelector("td.price");
+    return {
+      mcmID: mcmID,
+      cardName: nameOf(link, nameSlug),
+      edition: editionSlug.replace(/-/g, " "),
+      expansionName: row.getAttribute("data-expansion-name") || "",
+      condition: conditionOf(titles),
+      foil: titles.indexOf("Foil") !== -1 ? "foil" : "",
+      quantity: quantity,
+      articleID: row.getAttribute("data-article-id") || "",
+      language: language,
+      languageName: MKM.languageName(language),
+      price: price,
+      currency: cell ? MKM.currencyOf(cell.textContent) : "",
+      url: MKM.productURL(href),
+    };
+  }
+
+  // parsePurchase reads the articles of one of the visitor's own orders
+  // (SPECIFICATIONS.md, section 8) into { cards, skipped }: every article
+  // once, in the page's order, and how many rows were left out.
+  MKM.parsePurchase = function (root) {
+    var rows = root.querySelectorAll("tr[data-article-id]");
+    var seen = Object.create(null);
+    var cards = [];
+    var skipped = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var id = rows[i].getAttribute("data-article-id");
+      if (seen[id]) {
+        continue;
+      }
+      seen[id] = true;
+      var card = purchaseRow(rows[i]);
+      if (card) {
+        cards.push(card);
+      } else {
+        skipped++;
+      }
+    }
+    return { cards: cards, skipped: skipped };
   };
 
   MKM.slugToName = slugToName;

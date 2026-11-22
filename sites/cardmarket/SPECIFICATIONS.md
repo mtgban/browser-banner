@@ -10,8 +10,9 @@
 ## 1. What it is
 
 A browser extension (MV3) that reads the offers on a Cardmarket seller's
-page and gets them to mtgban's upload, either as a CSV file or by handing
-them to the site directly.
+page, or the articles of one of the visitor's own purchases (section 8),
+and gets them to mtgban's upload, either as a CSV file or by handing them
+to the site directly.
 
 It asks for **no permissions** and runs on **one host**. There is no
 background script, no storage, and no extension API call anywhere in the
@@ -24,6 +25,7 @@ src/parse.js     DOM → offers
 src/pages.js     one page → every page
 src/csv.js       offers → CSV text
 src/content.js   the panel, and the two things its buttons do
+src/orderpage.js one purchase's panel: CSV and Send to BAN
 tests/           bun + happy-dom, run in CI
 ```
 
@@ -34,7 +36,12 @@ that is what a manifest's `content_scripts` list can load.
 
 ```
 https://www.cardmarket.com/*/*/Users/*/Offers/*
+https://www.cardmarket.com/*/*/Orders/*
 ```
+
+The second is for one purchase (section 8). Its script returns unless the
+path is `/<language>/<Game>/Orders/<digits>`, so the purchase lists under
+`/Orders/Purchases/` get no panel from it.
 
 on **every game Cardmarket sells** - twenty-two as of 2026-09-22, read
 off the site's own game menu, of which BAN prices eight. The second
@@ -882,3 +889,34 @@ Stated plainly so nobody takes them as tested:
   offers, all 40 with distinct article ids, 39 of 40 with a product id,
   every one priced and graded - and it started from page five and
   correctly went back to page one first.
+
+## 8. One purchase
+
+`/<language>/<Game>/Orders/<id>` is one of the visitor's own orders. Its
+articles are rows of a table, `tr[data-article-id]`, and each row says
+what it is in data- attributes: `data-product-id` is the product, the
+`mcm_id`; `data-amount` the quantity; `data-language` Cardmarket's
+language id; `data-price` the price each, with a decimal point. The grade,
+Foil and the flags are tooltips, as on an offer, in the same words ("Near
+Mint", "Foil", "Signed"), and are read and folded the same way (section
+4.2). The name and the edition slug come from the row's product link, as
+an offer's do, so the CSV is the offers' own, column for column. The
+currency is the symbol in the price cell.
+
+An altered, signed or inked card is left out, as on an offer, and so is a
+row whose product, amount or price is not a number; the panel says how
+many. `mkm_notes` is the article's own product link with the attribution
+on the end: the order is the visitor's private page, and the seller may no
+longer list the card.
+
+There is nothing to walk: the order page holds every article. The panel
+counts the cards and offers *Send to BAN* and *CSV*; the one request either
+makes is the exchange rate (section 4.3), on the click, so *Send to BAN*
+opens its tab at once and hands the rows over once they are written. A
+rate that cannot be read leaves the prices empty and says so. *CSV* saves
+`cm-purchase-<id>.csv`. A game BAN does not price gets *CSV* and no send.
+
+Three saved orders, of 5, 14 and 10 articles, read whole: every row was
+read, the amounts added up to the count in the table's heading (5, 40 and
+11), and price times amount to the page's Article Value, to the cent.
+
