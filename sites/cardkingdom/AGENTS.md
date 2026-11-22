@@ -56,7 +56,7 @@ src/prices.js    the price list: fetch, reduce to arrays by id, look up
 src/store.js     the list kept an hour, in IndexedDB or else in memory
 src/compare.js   a cart line against the list: the spec's two verdict tables
 src/update.js    Update price: the one request, and CK's answer read
-src/handoff.js   BAN: window.open and postMessage to mtgban's /upload/handoff
+src/handoff.js   BAN: core/handoff.js's sender, Magic only, with CK's words
 src/cartpage.js  content script: Load prices, the marks, Update price and all
 src/cart.css     the marks, four classes deep to outrank CK's own reset
 src/ui.js        core/ui.js's panel and download, the panel headed CK

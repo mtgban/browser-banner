@@ -217,8 +217,7 @@ saved page of it (AGENTS.md's one rule).
   mtgban's columns and Scryfall ids; Magic only. No new page to read. It
   changes ck's rule that its scripts name no site but Card Kingdom's, which
   PR 5's root test replaces with "names no other store; `core/` names
-  mtgban". Done: *BAN* beside *CSV*, on TCGplayer's rows-in-hand handoff
-  copied under `CKB`, so PR 8 has three handoffs to fold into one.
+  mtgban". Done: *BAN* beside *CSV*, on the handoff PR 8 made one.
 - **P2, CK invoice pages** (`/myaccount/invoice/<id>`,
   `/myaccount/po_invoice/<id>`): Download CSV of the order's cards and Send
   to BAN, as tcg's single-order view does. Needs saved invoice pages and a

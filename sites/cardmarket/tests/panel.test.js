@@ -527,6 +527,33 @@ describe("nothing under the buttons", () => {
     expect(it.below()).toBe(0);
   });
 
+  test("an upload tab closed while it waits is noticed on coming back", async () => {
+    // No timer: coming back to the page is when it can be seen, and it is
+    // where the person is.
+    const it = mount();
+    it.send().click();
+    await it.settle();
+    it.send().click();
+    it.opened.source.closed = true;
+    it.focus();
+    expect(it.markFailed()).toBe(true);
+    expect(it.tip()).toBe("The upload page was closed; use the CSV");
+    expect(it.send().textContent).toBe("READY");
+  });
+
+  test("a second send closes the first tab, which would wait for good", async () => {
+    const it = mount();
+    it.send().click();
+    await it.settle();
+    it.send().click();
+    it.send().click();
+    expect(it.opened.filter((entry) => entry === "closed").length).toBe(1);
+    expect(it.markFailed()).toBe(false);
+    it.ready();
+    await it.settle();
+    expect(it.posted().length).toBe(1);
+  });
+
   test("so is an upload tab closed before the rows reached it", async () => {
     const it = mount();
     it.send().click();
