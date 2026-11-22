@@ -1,0 +1,464 @@
+[
+  {
+    "guard": "a currency quoted at zero converts nothing",
+    "file": "src/rates.js",
+    "find": "if (typeof rate === \"number\" && rate > 0) {",
+    "replace": "if (typeof rate === \"number\") {",
+    "expectFailing": "a currency quoted at zero is left out, not kept as an infinity"
+  },
+  {
+    "guard": "the feed's quote is inverted",
+    "file": "src/rates.js",
+    "find": "rates[currency] = 1 / rate;",
+    "replace": "rates[currency] = rate;",
+    "expectFailing": "a quote is inverted into the multiplier a price needs"
+  },
+  {
+    "guard": "a currency with no rate converts to nothing",
+    "file": "src/rates.js",
+    "find": "var rate = rates[currency];",
+    "replace": "var rate = rates[currency] || 1;",
+    "expectFailing": "anything that cannot be converted honestly converts to nothing"
+  },
+  {
+    "guard": "an unreadable amount converts to nothing",
+    "file": "src/rates.js",
+    "find": "if (!isFinite(value)) {",
+    "replace": "if (false) {",
+    "expectFailing": "anything that cannot be converted honestly converts to nothing"
+  },
+  {
+    "guard": "a value with a comma is quoted",
+    "file": "src/csv.js",
+    "find": "if (/[\",\\r\\n]/.test(text)) {",
+    "replace": "if (/[\"\\r\\n]/.test(text)) {",
+    "expectFailing": "a comma, a quote and a newline are quoted"
+  },
+  {
+    "guard": "a quote inside a value is doubled",
+    "file": "src/csv.js",
+    "find": "text.replace(/\"/g, '\"\"')",
+    "replace": "text",
+    "expectFailing": "a comma, a quote and a newline are quoted"
+  },
+  {
+    "guard": "the last row ends with a newline",
+    "file": "src/csv.js",
+    "find": "return lines.join(\"\\r\\n\") + \"\\r\\n\";",
+    "replace": "return lines.join(\"\\r\\n\");",
+    "expectFailing": "the last row ends like every other one"
+  },
+  {
+    "guard": "a signed, altered or inked listing is refused",
+    "file": "src/parse.js",
+    "find": "if (titles.indexOf(SKIPPED[i]) !== -1) {",
+    "replace": "if (false) {",
+    "expectFailing": "a signed listing is refused"
+  },
+  {
+    "guard": "Light Played folds to HP",
+    "file": "src/parse.js",
+    "find": "\"Light Played\": \"HP\",",
+    "replace": "\"Light Played\": \"MP\",",
+    "expectFailing": "Light Played is HP, not MP"
+  },
+  {
+    "guard": "a price is read from an element's own text",
+    "file": "src/parse.js",
+    "find": "PRICE_RE.exec(ownText(elements[i]))",
+    "replace": "PRICE_RE.exec((elements[i].textContent || \"\").trim())",
+    "expectFailing": "an element wrapping the quantity and the price is not the price"
+  },
+  {
+    "guard": "a full stop groups thousands",
+    "file": "src/parse.js",
+    "find": "return written.replace(/\\./g, \"\").replace(\",\", \".\");",
+    "replace": "return written.replace(\",\", \".\");",
+    "expectFailing": "a grouped thousand is not read as a decimal"
+  },
+  {
+    "guard": "a row repeated on one page is kept once",
+    "file": "src/parse.js",
+    "find": "if (!offer || seen[offer.articleID]) {",
+    "replace": "if (!offer) {",
+    "expectFailing": "a row is kept once, and only when it names a product"
+  },
+  {
+    "guard": "the name is the link's text",
+    "file": "src/parse.js",
+    "find": "cardName: linked || slugToName(nameSlug),",
+    "replace": "cardName: slugToName(nameSlug),",
+    "expectFailing": "the name is the link's own text, not the slug"
+  },
+  {
+    "guard": "the slug's -s- is an apostrophe",
+    "file": "src/parse.js",
+    "find": ".replace(/-s-/g, \"'s-\")",
+    "replace": ".replace(/-s-/g, \"-s-\")",
+    "expectFailing": "the slug is still the fallback when a link says nothing"
+  },
+  {
+    "guard": "the slug's version suffix goes",
+    "file": "src/parse.js",
+    "find": ".replace(/-V\\d+$/, \"\")",
+    "replace": ".replace(/-V\\d+$/, \"-V\")",
+    "expectFailing": "the slug is still the fallback when a link says nothing"
+  },
+  {
+    "guard": "the flag's tooltip beats the link's ?language=",
+    "file": "src/parse.js",
+    "find": "    if (languages) {\n      for (var i = 0; i < titles.length; i++) {",
+    "replace": "    if (false) {\n      for (var i = 0; i < titles.length; i++) {",
+    "expectFailing": "a listing's flag beats its link's ?language="
+  },
+  {
+    "guard": "a listing naming no language is not foreign",
+    "file": "src/parse.js",
+    "find": "if (offers[i].language && offers[i].language !== MKM.ENGLISH) {",
+    "replace": "if (offers[i].language !== MKM.ENGLISH) {",
+    "expectFailing": "foreignCount counts what the upload would misread"
+  },
+  {
+    "guard": "an option's trailing count is not part of the name",
+    "file": "src/parse.js",
+    "find": "var named = String(label || \"\").trim().replace(COUNT_RE, \"\");",
+    "replace": "var named = String(label || \"\").trim();",
+    "expectFailing": "a count belongs to the seller, not to the name"
+  },
+  {
+    "guard": "an expansion the filter does not name is left off the link",
+    "file": "src/parse.js",
+    "find": "if (expansionID) {",
+    "replace": "if (offer.expansionName) {",
+    "expectFailing": "an expansion the filter does not name is left out, not guessed"
+  },
+  {
+    "guard": "a foil link asks for foils",
+    "file": "src/parse.js",
+    "find": "query.push(\"isFoil=\" + (offer.foil ? \"Y\" : \"N\"));",
+    "replace": "query.push(\"isFoil=N\");",
+    "expectFailing": "a foil says so, and a language says so when the row knew one"
+  },
+  {
+    "guard": "the name in a link is encoded",
+    "file": "src/parse.js",
+    "find": "[\"name=\" + encodeURIComponent(offer.cardName)]",
+    "replace": "[\"name=\" + offer.cardName]",
+    "expectFailing": "accents, commas and a version suffix survive the trip"
+  },
+  {
+    "guard": "a row with no name gets no link",
+    "file": "src/parse.js",
+    "find": "if (!base || !offer || !offer.cardName) {",
+    "replace": "if (!base || !offer) {",
+    "expectFailing": "a row with no name has no way back"
+  },
+  {
+    "guard": "a signed-out page is told apart",
+    "file": "src/parse.js",
+    "find": "return !!root.querySelector(\"#header-login, #offcanvas-login\");",
+    "replace": "return false;",
+    "expectFailing": "the whole list is not on offer"
+  },
+  {
+    "guard": "a disabled next link is the last page",
+    "file": "src/pages.js",
+    "find": "if (!href || links[i].classList.contains(\"disabled\")) {",
+    "replace": "if (!href) {",
+    "expectFailing": "a disabled control ends it even with an href on it"
+  },
+  {
+    "guard": "a relative next link is resolved against its page",
+    "file": "src/pages.js",
+    "find": "return new URL(href, base).href;",
+    "replace": "return href;",
+    "expectFailing": "the server's relative href is resolved against the page it came from"
+  },
+  {
+    "guard": "the first page drops the site parameter",
+    "file": "src/pages.js",
+    "find": "url.searchParams.delete(\"site\");",
+    "replace": "",
+    "expectFailing": "the first page is the list without a site"
+  },
+  {
+    "guard": "a page with no site parameter is already the first",
+    "file": "src/pages.js",
+    "find": "if (!url.searchParams.has(\"site\")) {",
+    "replace": "if (false) {",
+    "expectFailing": "a page already at the top answers with nothing to fetch"
+  },
+  {
+    "guard": "a plus on the hit count is a capped listing",
+    "file": "src/pages.js",
+    "find": "return totalSaid(root).indexOf(\"+\") !== -1;",
+    "replace": "return false;",
+    "expectFailing": "a capped listing ends the walk and says it was capped"
+  },
+  {
+    "guard": "grouped thousands are read as one number",
+    "file": "src/pages.js",
+    "find": "var digits = (counted.textContent || \"\").replace(/\\D/g, \"\");",
+    "replace": "var digits = (counted.textContent || \"\");",
+    "expectFailing": "grouped thousands are read whichever way they are grouped"
+  },
+  {
+    "guard": "a Cloudflare challenge is not an ordinary refusal",
+    "file": "src/pages.js",
+    "find": "if (challenged(response)) {",
+    "replace": "if (false) {",
+    "expectFailing": "a Cloudflare challenge is told apart from an ordinary refusal"
+  },
+  {
+    "guard": "an ordinary refusal names its status",
+    "file": "src/pages.js",
+    "find": "throw new Error(\"Cardmarket answered \" + response.status);",
+    "replace": "throw new Error(\"Cardmarket refused\");",
+    "expectFailing": "an ordinary refusal says what it was"
+  },
+  {
+    "guard": "a timeout is said in words",
+    "file": "src/pages.js",
+    "find": "if (err && err.name === \"TimeoutError\") {",
+    "replace": "if (false) {",
+    "expectFailing": "a read that timed out says so in words"
+  },
+  {
+    "guard": "every page is fetched with a deadline",
+    "file": "src/pages.js",
+    "find": "signal: deadline(),",
+    "replace": "signal: undefined,",
+    "expectFailing": "every page is asked for with a deadline on it"
+  },
+  {
+    "guard": "a page already visited ends the walk",
+    "file": "src/pages.js",
+    "find": "if (!next || visited[next]) {",
+    "replace": "if (!next) {",
+    "expectFailing": "a pager pointing back at a page already read ends the walk"
+  },
+  {
+    "guard": "a fetched page with no rows ends the walk",
+    "file": "src/pages.js",
+    "find": "if (MKM.countRows(fetched) === 0) {",
+    "replace": "if (false) {",
+    "expectFailing": "a page with no rows on it ends the walk"
+  },
+  {
+    "guard": "the walk waits before each page",
+    "file": "src/pages.js",
+    "find": "return after(pace)",
+    "replace": "return after(0)",
+    "expectFailing": "it waits between pages"
+  },
+  {
+    "guard": "no page is fetched after a stop during the wait",
+    "file": "src/pages.js",
+    "find": "return cancelled() ? null : get(next);",
+    "replace": "return get(next);",
+    "expectFailing": "a stop that comes during the wait asks for nothing"
+  },
+  {
+    "guard": "a page that lands after a stop is dropped",
+    "file": "src/pages.js",
+    "find": "if (!fetched || cancelled()) {",
+    "replace": "if (!fetched) {",
+    "expectFailing": "a page already in flight is dropped, not counted"
+  },
+  {
+    "guard": "a row seen on two pages is kept once",
+    "file": "src/pages.js",
+    "find": "if (seen[found[i].articleID]) {",
+    "replace": "if (false) {",
+    "expectFailing": "a row seen twice is carried once"
+  },
+  {
+    "guard": "the walk starts at page one",
+    "file": "src/pages.js",
+    "find": "var first = firstPageURL(href);",
+    "replace": "var first = \"\";",
+    "expectFailing": "it starts at page one however far in the seller's page was left"
+  },
+  {
+    "guard": "a refused page is reported",
+    "file": "src/pages.js",
+    "find": "            stopped = err && err.message ? err.message : String(err);",
+    "replace": "            stopped = \"\";",
+    "expectFailing": "a walk that is refused keeps what it read and says it stopped"
+  },
+  {
+    "guard": "the first page's size is kept for the shortfall",
+    "file": "src/pages.js",
+    "find": "perPage = here;",
+    "replace": "perPage = 0;",
+    "expectFailing": "it reports how big a page was, for measuring a shortfall in pages"
+  },
+  {
+    "guard": "only an https mtgban origin is heard",
+    "file": "src/content.js",
+    "find": "parsed.protocol === \"https:\" &&",
+    "replace": "true &&",
+    "expectFailing": "but not one answering from anywhere but BAN"
+  },
+  {
+    "guard": "only a host under mtgban.com is heard",
+    "file": "src/content.js",
+    "find": "parsed.hostname.slice(-11) === \".mtgban.com\"",
+    "replace": "true",
+    "expectFailing": "but not one answering from anywhere but BAN"
+  },
+  {
+    "guard": "only the tab that was opened is heard",
+    "file": "src/content.js",
+    "find": "event.source !== opened ||",
+    "replace": "false ||",
+    "expectFailing": "nor a window it did not open"
+  },
+  {
+    "guard": "a walk a page or more short is refused",
+    "file": "src/content.js",
+    "find": "missing >= walked.perPage",
+    "replace": "missing > 1000000",
+    "expectFailing": "is refused rather than written out short"
+  },
+  {
+    "guard": "a part-read list stays marked short after the handoff",
+    "file": "src/content.js",
+    "find": "partial: !!(walked.stopped || walked.capped),",
+    "replace": "partial: false,",
+    "expectFailing": "and a list handed over part-read says so, without a tick"
+  },
+  {
+    "guard": "a blocked pop-up is said",
+    "file": "src/content.js",
+    "find": "    if (!opened) {",
+    "replace": "    if (false) {",
+    "expectFailing": "a blocked pop-up is a cross, with the rows still in hand"
+  },
+  {
+    "guard": "a tab closed before the rows arrived is said",
+    "file": "src/content.js",
+    "find": "if (opened.closed) {",
+    "replace": "if (false) {",
+    "expectFailing": "so is an upload tab closed before the rows reached it"
+  },
+  {
+    "guard": "rows are spent only once a tab takes them",
+    "file": "src/content.js",
+    "find": "      use(panel);\n      handOff(panel, Promise.resolve(armed));",
+    "replace": "      var held = armed;\n      disarm(panel);\n      handOff(panel, Promise.resolve(held));",
+    "expectFailing": "keeps the rows, and the pulse, in hand"
+  },
+  {
+    "guard": "an abandoned read says nothing",
+    "file": "src/content.js",
+    "find": "return mine !== generation;",
+    "replace": "return false;",
+    "expectFailing": "it stops a read and puts the panel back"
+  },
+  {
+    "guard": "Escape does nothing with nothing to stop",
+    "file": "src/content.js",
+    "find": "if (!panel.classList.contains(\"cm-banner-busy\") && !armed) {",
+    "replace": "if (false) {",
+    "expectFailing": "it is inert when there is nothing of ours to stop"
+  },
+  {
+    "guard": "the page is held only while something would be lost",
+    "file": "src/content.js",
+    "find": "if (unused || panel.classList.contains(\"cm-banner-busy\")) {",
+    "replace": "if (true) {",
+    "expectFailing": "but not once READY has used them"
+  },
+  {
+    "guard": "a CSV read leaves nothing unused",
+    "file": "src/content.js",
+    "find": "unused = calling;",
+    "replace": "unused = true;",
+    "expectFailing": "and never after a CSV read, which used its rows as it wrote them"
+  },
+  {
+    "guard": "a signed-out heading is not a control",
+    "file": "src/content.js",
+    "find": "if (locked) {\n        return;",
+    "replace": "if (false) {\n        return;",
+    "expectFailing": "and the heading stops being a control"
+  },
+  {
+    "guard": "a signed-out page opens on this page only",
+    "file": "src/content.js",
+    "find": "scope = hereScope();",
+    "replace": "scope = 0;",
+    "expectFailing": "the whole list is not on offer"
+  },
+  {
+    "guard": "the heading does not switch scope mid-read",
+    "file": "src/content.js",
+    "find": "if (panel.classList.contains(\"cm-banner-busy\")) {\n        return;\n      }\n      // Nowhere",
+    "replace": "if (false) {\n        return;\n      }\n      // Nowhere",
+    "expectFailing": "and clicking it mid-read neither switches scope nor writes over the count"
+  },
+  {
+    "guard": "a changed table drops the rows in hand",
+    "file": "src/content.js",
+    "find": "if (tableState() === shown) {",
+    "replace": "if (true) {",
+    "expectFailing": "rows in hand are dropped when the same-sized table changes under them"
+  },
+  {
+    "guard": "a table is told apart by its rows, not its size",
+    "file": "src/content.js",
+    "find": "return rows.length + \":\" + rows[0].id + \":\" + rows[rows.length - 1].id;",
+    "replace": "return String(rows.length);",
+    "expectFailing": "rows in hand are dropped when the same-sized table changes under them"
+  },
+  {
+    "guard": "a game BAN does not price gets no send button",
+    "file": "src/content.js",
+    "find": "panel.querySelector(\".cm-banner-send\").hidden = true;",
+    "replace": "",
+    "expectFailing": "and on one it cannot send anywhere, minus the sending"
+  },
+  {
+    "guard": "a read never arms a send button that is not there",
+    "file": "src/content.js",
+    "find": "if (send && sendable()) {",
+    "replace": "if (send) {",
+    "expectFailing": "and a read there never arms the button that is not on the panel"
+  },
+  {
+    "guard": "a refused read says why",
+    "file": "src/content.js",
+    "find": "if (walked.stopped) {\n            return",
+    "replace": "if (false) {\n            return",
+    "expectFailing": "a read that was refused says why, not how many rows it did not get"
+  },
+  {
+    "guard": "a hover pulses only a button with rows behind it",
+    "file": "src/content.js",
+    "find": "if (panel.classList.contains(\"cm-banner-armed\") && !calledBy) {",
+    "replace": "if (!calledBy) {",
+    "expectFailing": "and a hover does nothing to a button with nothing to send"
+  },
+  {
+    "guard": "losing focus stops only a pulse the cursor started",
+    "file": "src/content.js",
+    "find": "if (calledBy === \"hover\") {",
+    "replace": "if (true) {",
+    "expectFailing": "while a Send read's pulse outlasts the page losing focus"
+  },
+  {
+    "guard": "the rows name the page they were read from",
+    "file": "src/content.js",
+    "find": "source: location.href,",
+    "replace": "source: \"\",",
+    "expectFailing": "the rows say which page they were read from"
+  },
+  {
+    "guard": "the game is read case-blind from the path",
+    "file": "src/content.js",
+    "find": "parts[2].toLowerCase()",
+    "replace": "parts[2]",
+    "expectFailing": "and sends from a game Cardmarket added after this was written"
+  }
+]

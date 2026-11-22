@@ -22,3 +22,14 @@ test("every site keeps its own rules and specification", () => {
   );
   expect(missing).toEqual([]);
 });
+
+test("CI runs the guards of every site that has them, and no others", () => {
+  const ci = readFileSync(new URL(".github/workflows/ci.yml", root), "utf8");
+  const listed = /^\s*site: \[([^\]]*)\]$/m.exec(ci);
+  expect(listed).not.toBeNull();
+  const ran = listed[1].split(",").map((site) => site.trim()).filter(Boolean).sort();
+  const guarded = readdirSync(new URL("sites/", root))
+    .filter((site) => existsSync(new URL("sites/" + site + "/tests/mutations.json", root)))
+    .sort();
+  expect(ran).toEqual(guarded);
+});

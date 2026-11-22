@@ -24,9 +24,20 @@ What holds for the whole repository:
 ```
 bun install
 bun run test
+bun run mutate
 ```
 
-runs every site's suite and the repository's own tests, as CI does.
+runs every site's suite and the repository's own tests, then breaks each
+guard in every site's `tests/mutations.json` in turn, as CI does. `bun run
+mutate sites/<store>` runs one site's guards.
+
+A guard (a refusal, a strict shape, a check that keeps a walk honest) lands
+with an entry in its site's `tests/mutations.json`: the text that breaks it
+and the name of the test that must then fail. The run fails if that test
+does not fail, if no test file names it, or if the text no longer appears
+exactly once. A site that gains a `mutations.json` goes into the `mutate`
+job's list in `.github/workflows/ci.yml`; `tests/repo.test.js` checks it is
+there.
 
 ## Commits
 

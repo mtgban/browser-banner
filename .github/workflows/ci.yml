@@ -43,3 +43,23 @@ jobs:
                   sys.exit(path + " names missing files: " + ", ".join(missing))
               print(f"{path} names {len(named)} files, all present")
           EOF
+
+  # Every guard in a site's tests/mutations.json broken in turn, each of which
+  # must fail the test it names. One job per site, since each runs alone;
+  # tests/repo.test.js holds this list to the sites that have guards.
+  mutate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [cardmarket]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: bun install
+        run: bun install --frozen-lockfile
+
+      - name: bun run mutate
+        run: bun run mutate sites/${{ matrix.site }}
