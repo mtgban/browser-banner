@@ -287,6 +287,13 @@
     "expectFailing": "a walk that is refused keeps what it read and says it stopped"
   },
   {
+    "guard": "a refused first page is reported",
+    "file": "src/pages.js",
+    "find": "      .catch(function (err) {\n        stopped = err && err.message ? err.message : String(err);",
+    "replace": "      .catch(function (err) {\n        stopped = \"\";",
+    "expectFailing": "a walk refused at page one says it stopped"
+  },
+  {
     "guard": "the first page's size is kept for the shortfall",
     "file": "src/pages.js",
     "find": "perPage = here;",
