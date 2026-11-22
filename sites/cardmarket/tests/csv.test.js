@@ -46,6 +46,10 @@ describe("the writing", () => {
       '1,"Bob, the ""Builder""","Set\nTwo",NM,,2,1.50,German,9,' +
         "https://www.cardmarket.com/en/Magic/Users/S/Offers/Singles?name=Bob"
     );
+    // A comma alone is enough, with no quote beside it to force the issue.
+    expect(MKM.toCSV([{ cardName: "Borrowing 100,000 Arrows" }]).split("\r\n")[1]).toBe(
+      ',"Borrowing 100,000 Arrows",,,,,,,,'
+    );
   });
 
   test("a row whose price could not be converted carries an empty one", () => {
