@@ -11,7 +11,7 @@ function source(name) {
 }
 
 globalThis.TCGB = globalThis.TCGB || {};
-for (const name of ["money.js", "csv.js", "read.js", "net.js", "walk.js", "../../../core/handoff.js", "handoff.js"]) {
+for (const name of ["../../../core/net.js", "../../../core/csv.js", "money.js", "csv.js", "read.js", "net.js", "walk.js", "../../../core/handoff.js", "handoff.js"]) {
   new Function("globalThis", source(name))(globalThis);
 }
 

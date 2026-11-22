@@ -29,23 +29,23 @@
   },
   {
     "guard": "a value with a comma is quoted",
-    "file": "src/csv.js",
+    "file": "../../core/csv.js",
     "find": "if (/[\",\\r\\n]/.test(text)) {",
     "replace": "if (/[\"\\r\\n]/.test(text)) {",
     "expectFailing": "a comma, a quote and a newline are quoted"
   },
   {
     "guard": "a quote inside a value is doubled",
-    "file": "src/csv.js",
+    "file": "../../core/csv.js",
     "find": "text.replace(/\"/g, '\"\"')",
     "replace": "text",
     "expectFailing": "a comma, a quote and a newline are quoted"
   },
   {
     "guard": "the last row ends with a newline",
-    "file": "src/csv.js",
-    "find": "return lines.join(\"\\r\\n\") + \"\\r\\n\";",
-    "replace": "return lines.join(\"\\r\\n\");",
+    "file": "../../core/csv.js",
+    "find": "out += lines[i].map(BAN.csvField).join(\",\") + eol;",
+    "replace": "out += (i ? eol : \"\") + lines[i].map(BAN.csvField).join(\",\");",
     "expectFailing": "the last row ends like every other one"
   },
   {
@@ -204,29 +204,29 @@
   },
   {
     "guard": "a Cloudflare challenge is not an ordinary refusal",
-    "file": "src/pages.js",
-    "find": "if (challenged(response)) {",
+    "file": "../../core/net.js",
+    "find": "if (net.challenged(response)) {",
     "replace": "if (false) {",
     "expectFailing": "a Cloudflare challenge is told apart from an ordinary refusal"
   },
   {
     "guard": "an ordinary refusal names its status",
-    "file": "src/pages.js",
-    "find": "throw new Error(\"Cardmarket answered \" + response.status);",
-    "replace": "throw new Error(\"Cardmarket refused\");",
+    "file": "../../core/net.js",
+    "find": "throw new Error(store + \" answered \" + response.status);",
+    "replace": "throw new Error(store + \" refused\");",
     "expectFailing": "an ordinary refusal says what it was"
   },
   {
     "guard": "a timeout is said in words",
-    "file": "src/pages.js",
+    "file": "../../core/net.js",
     "find": "if (err && err.name === \"TimeoutError\") {",
     "replace": "if (false) {",
     "expectFailing": "a read that timed out says so in words"
   },
   {
     "guard": "every page is fetched with a deadline",
-    "file": "src/pages.js",
-    "find": "signal: deadline(),",
+    "file": "../../core/net.js",
+    "find": "signal: net.deadline(),",
     "replace": "signal: undefined,",
     "expectFailing": "every page is asked for with a deadline on it"
   },

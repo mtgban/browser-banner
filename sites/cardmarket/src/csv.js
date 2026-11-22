@@ -24,7 +24,7 @@
 
 globalThis.MKM = globalThis.MKM || {};
 
-(function (MKM) {
+(function (MKM, BAN) {
   "use strict";
 
   var COLUMNS = [
@@ -40,39 +40,22 @@ globalThis.MKM = globalThis.MKM || {};
     ["mkm_notes", "url"],
   ];
 
-  // field quotes what has to be quoted and nothing else.
-  function field(value) {
-    var text = value === undefined || value === null ? "" : String(value);
-    if (/[",\r\n]/.test(text)) {
-      return '"' + text.replace(/"/g, '""') + '"';
-    }
-    return text;
-  }
-
-  function row(values) {
-    var quoted = [];
-    for (var i = 0; i < values.length; i++) {
-      quoted.push(field(values[i]));
-    }
-    return quoted.join(",");
-  }
-
   MKM.toCSV = function (offers) {
     var header = [];
     for (var i = 0; i < COLUMNS.length; i++) {
       header.push(COLUMNS[i][0]);
     }
 
-    var lines = [row(header)];
+    var lines = [header];
     for (var j = 0; j < offers.length; j++) {
       var values = [];
       for (var k = 0; k < COLUMNS.length; k++) {
         values.push(offers[j][COLUMNS[k][1]]);
       }
-      lines.push(row(values));
+      lines.push(values);
     }
-    // A trailing newline: the last row ends like every other one.
-    return lines.join("\r\n") + "\r\n";
+    // Quoted by core/csv.js, every row ended by CRLF, the last one too.
+    return BAN.csv(lines, "\r\n");
   };
 
   MKM.csvColumns = function () {
@@ -82,4 +65,4 @@ globalThis.MKM = globalThis.MKM || {};
     }
     return names;
   };
-})(globalThis.MKM);
+})(globalThis.MKM, globalThis.BAN);

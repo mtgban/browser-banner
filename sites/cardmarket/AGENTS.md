@@ -41,7 +41,7 @@ does.
 src/rates.js     the currency feed, and the inversion it needs
 src/parse.js     DOM → offers. The volatile half; see SPECIFICATIONS.md §3
 src/pages.js     one page → every page, at Cloudflare's pace; see §6
-src/csv.js       offers → CSV. The contract with mtgban; see §4
+src/csv.js       offers → CSV, quoted by core/csv.js; the mtgban contract, §4
 src/ui.js        core/ui.js's panel and download, the panel headed CM
 src/handoff.js   core/handoff.js's sender, every game BAN prices, "use the CSV"
 src/content.js   what the panel does, and when it sends

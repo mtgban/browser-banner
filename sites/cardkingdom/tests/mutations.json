@@ -15,14 +15,14 @@
   },
   {
     "guard": "a Cloudflare challenge is not read as a refusal",
-    "file": "src/net.js",
-    "find": "if (challenged(response)) {",
+    "file": "../../core/net.js",
+    "find": "if (net.challenged(response)) {",
     "replace": "if (false) {",
     "expectFailing": "a Cloudflare challenge is told apart from an ordinary refusal"
   },
   {
     "guard": "a value with a comma is quoted",
-    "file": "src/csv.js",
+    "file": "../../core/csv.js",
     "find": "if (/[\",\\r\\n]/.test(text)) {",
     "replace": "if (/[\"\\r\\n]/.test(text)) {",
     "expectFailing": "a comma is quoted"
