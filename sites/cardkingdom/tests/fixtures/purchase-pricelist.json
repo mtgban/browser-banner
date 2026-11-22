@@ -1,0 +1,176 @@
+{
+ "meta": {
+  "created_at": "2026-11-22 10:10:40",
+  "base_url": "https://www.cardkingdom.com/"
+ },
+ "data": [
+  {
+   "id": 208808,
+   "sku": "KLD-067",
+   "scryfall_id": "d52868cb-087e-4f91-91bc-455f2e2e7cd7",
+   "url": "mtg/kaladesh/torrential-gearhulk",
+   "name": "Torrential Gearhulk",
+   "variation": "",
+   "edition": "Kaladesh",
+   "is_foil": "false",
+   "price_retail": "1.29",
+   "qty_retail": 12,
+   "price_buy": "0.33",
+   "qty_buying": 21,
+   "condition_values": {
+    "nm_price": "1.29",
+    "nm_qty": 3,
+    "ex_price": "1.03",
+    "ex_qty": 8,
+    "vg_price": "0.90",
+    "vg_qty": 1,
+    "g_price": "0.65",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 212627,
+   "sku": "CMA-216",
+   "scryfall_id": "d5439677-d3db-4083-8dd9-0d654016bd79",
+   "url": "mtg/commander-anthology/eldrazi-monument",
+   "name": "Eldrazi Monument",
+   "variation": "",
+   "edition": "Commander Anthology",
+   "is_foil": "false",
+   "price_retail": "15.99",
+   "qty_retail": 7,
+   "price_buy": "7.25",
+   "qty_buying": 5,
+   "condition_values": {
+    "nm_price": "15.99",
+    "nm_qty": 5,
+    "ex_price": "13.59",
+    "ex_qty": 2,
+    "vg_price": "11.19",
+    "vg_qty": 0,
+    "g_price": "8.00",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 233901,
+   "sku": "J20-009",
+   "scryfall_id": "3bd56d8b-fcb9-42fb-b2fd-65b7fa852378",
+   "url": "mtg/promotional/sterling-grove-judge-foil",
+   "name": "Sterling Grove",
+   "variation": "Judge Foil",
+   "edition": "Promotional",
+   "is_foil": "true",
+   "price_retail": "9.99",
+   "qty_retail": 9,
+   "price_buy": "4.00",
+   "qty_buying": 5,
+   "condition_values": {
+    "nm_price": "9.99",
+    "nm_qty": 5,
+    "ex_price": "7.99",
+    "ex_qty": 3,
+    "vg_price": "6.99",
+    "vg_qty": 1,
+    "g_price": "5.00",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 263608,
+   "sku": "F2X2-268",
+   "scryfall_id": "12259d86-f610-47c7-bb81-0da9bb6a2795",
+   "url": "mtg/double-masters-2022/rafiq-of-the-many-foil",
+   "name": "Rafiq of the Many",
+   "variation": "",
+   "edition": "Double Masters 2022",
+   "is_foil": "true",
+   "price_retail": "0.79",
+   "qty_retail": 5,
+   "price_buy": "0.16",
+   "qty_buying": 10,
+   "condition_values": {
+    "nm_price": "0.79",
+    "nm_qty": 5,
+    "ex_price": "0.63",
+    "ex_qty": 0,
+    "vg_price": "0.47",
+    "vg_qty": 0,
+    "g_price": "0.32",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 278212,
+   "sku": "LTR-0077",
+   "scryfall_id": "e4b83aa1-33ce-4b8d-ae5a-72f64eef5f09",
+   "url": "mtg/the-lord-of-the-rings-tales-of-middle-earth/bitter-downfall",
+   "name": "Bitter Downfall",
+   "variation": "",
+   "edition": "The Lord of the Rings: Tales of Middle-earth",
+   "is_foil": "false",
+   "price_retail": "0.35",
+   "qty_retail": 20,
+   "price_buy": "0.01",
+   "qty_buying": 0,
+   "condition_values": {
+    "nm_price": "0.35",
+    "nm_qty": 20,
+    "ex_price": "0.28",
+    "ex_qty": 0,
+    "vg_price": "0.25",
+    "vg_qty": 0,
+    "g_price": "0.18",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 313182,
+   "sku": "FIN-0031",
+   "scryfall_id": "bdb5452e-d97f-409b-91d0-2664f39b09b8",
+   "url": "mtg/final-fantasy/sidequest-catch-a-fish",
+   "name": "Sidequest: Catch a Fish",
+   "variation": "",
+   "edition": "Final Fantasy",
+   "is_foil": "false",
+   "price_retail": "0.35",
+   "qty_retail": 20,
+   "price_buy": "0.01",
+   "qty_buying": 10,
+   "condition_values": {
+    "nm_price": "0.35",
+    "nm_qty": 20,
+    "ex_price": "0.28",
+    "ex_qty": 0,
+    "vg_price": "0.25",
+    "vg_qty": 0,
+    "g_price": "0.18",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 320389,
+   "sku": "FTLE-0210",
+   "scryfall_id": "f369827d-e4cd-4bc7-8c5e-72882eff0908",
+   "url": "mtg/avatar-the-last-airbender-eternal-legal/aang-air-nomad-foil",
+   "name": "Aang, Air Nomad",
+   "variation": "",
+   "edition": "Avatar: The Last Airbender Eternal-Legal",
+   "is_foil": "true",
+   "price_retail": "0.49",
+   "qty_retail": 8,
+   "price_buy": "0.08",
+   "qty_buying": 0,
+   "condition_values": {
+    "nm_price": "0.49",
+    "nm_qty": 8,
+    "ex_price": "0.39",
+    "ex_qty": 0,
+    "vg_price": "0.29",
+    "vg_qty": 0,
+    "g_price": "0.20",
+    "g_qty": 0
+   }
+  }
+ ]
+}

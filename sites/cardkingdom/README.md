@@ -23,10 +23,12 @@ pages:
   Status, Order Date, Completed on and Amount. A year's file is kept, so
   asking again while the history has not changed downloads it at once; the
   last days are read afresh each time.
-- **On a sell invoice** (`/myaccount/po_invoice/<id>`, from your selling
-  history) it saves the order's cards as a CSV, or sends them to BAN, each
-  with its Scryfall id from the price list. The tooltip says how many cards
-  the list did not have; they go with no id.
+- **On an invoice**, a sale's (`/myaccount/po_invoice/<id>`, from your
+  selling history) or a purchase's (`/myaccount/invoice/<id>`, from your
+  order history), it saves the order's cards as a CSV, or sends them to
+  BAN, each with its Scryfall id from the price list. The tooltip says how
+  many cards the list did not have, graded ones among them; they go with
+  no id.
 
 It is in development, and the features land in the order `SPECIFICATIONS.md`
 gives.

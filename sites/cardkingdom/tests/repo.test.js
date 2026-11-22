@@ -43,13 +43,14 @@ describe("the manifest", () => {
     expect(named.filter((name) => !existsSync(new URL(name, root)))).toEqual([]);
   });
 
-  test("runs on the history pages, the two carts and a sell invoice, and nowhere else", () => {
+  test("runs on the history pages, the two carts and the two invoices, and nowhere else", () => {
     expect(manifest.content_scripts.flatMap((cs) => cs.matches)).toEqual([
       "https://www.cardkingdom.com/myaccount/order_history*",
       "https://www.cardkingdom.com/myaccount/selling_history*",
       "https://www.cardkingdom.com/sellcart*",
       "https://www.cardkingdom.com/cart*",
       "https://www.cardkingdom.com/myaccount/po_invoice/*",
+      "https://www.cardkingdom.com/myaccount/invoice/*",
     ]);
   });
 });

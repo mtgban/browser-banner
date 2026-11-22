@@ -97,7 +97,8 @@
     },
     {
       "matches": [
-        "https://www.cardkingdom.com/myaccount/po_invoice/*"
+        "https://www.cardkingdom.com/myaccount/po_invoice/*",
+        "https://www.cardkingdom.com/myaccount/invoice/*"
       ],
       "js": [
         "core/net.js",

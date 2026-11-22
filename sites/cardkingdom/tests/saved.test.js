@@ -5,6 +5,7 @@
 //   CK_SAVED_SELLCART=<saved sell cart.html> \
 //   CK_SAVED_BUYCART=<saved buy cart.html> \
 //   CK_SAVED_SELLINVOICE=<saved sell invoice.html> \
+//   CK_SAVED_PURCHASEINVOICE=<saved purchase invoice.html> \
 //   CK_PRICELIST=<CK's price list, as published> bun test tests/
 //
 // A saved page carries an account's data and never enters the repository, so
@@ -110,5 +111,24 @@ describe("the saved sell invoice", () => {
     const list = CKB.reducePrices(JSON.parse(readFileSync(process.env.CK_PRICELIST, "utf8")), Date.now());
     const missing = CKB.readSellInvoice(savedPage(path)).lines.filter((l) => !CKB.invoiceRow(l, list));
     expect(missing.map((l) => l.edition + ": " + l.name)).toEqual([]);
+  });
+});
+
+describe("the saved purchase invoice", () => {
+  const path = process.env.CK_SAVED_PURCHASEINVOICE;
+
+  test.skipIf(!path)("reads every line whole, and they add up to its Subtotal", () => {
+    const doc = savedPage(path);
+    const read = CKB.readPurchaseInvoice(doc);
+    expect(read.unreadable).toBe(0);
+    expect(read.lines.length).toBe(doc.querySelectorAll("table.orderContents td.Description").length);
+    const subtotal = [...doc.querySelectorAll("table.orderContents tr")].find((tr) => /^\s*Subtotal/.test(tr.textContent));
+    expect(read.lines.reduce((sum, l) => sum + l.total, 0)).toBe(CKB.cents("$" + subtotal.lastElementChild.textContent.trim()));
+  });
+
+  test.skipIf(!path || !process.env.CK_PRICELIST)("finds every line in the price list but a graded one", () => {
+    const list = CKB.reducePrices(JSON.parse(readFileSync(process.env.CK_PRICELIST, "utf8")), Date.now());
+    const missing = CKB.readPurchaseInvoice(savedPage(path)).lines.filter((l) => l.condition && !CKB.purchaseRow(l, list));
+    expect(missing.map((l) => l.card)).toEqual([]);
   });
 });

@@ -130,3 +130,37 @@ describe("the sell invoice's panel", () => {
     expect(none.panel).toBe(null);
   });
 });
+
+describe("the purchase invoice's panel", () => {
+  const BOUGHT = "/myaccount/invoice/4000001";
+  const purchaseBody = () => JSON.parse(text("purchase-pricelist.json"));
+  const mountPurchase = (options = {}) =>
+    mountCart({ path: BOUGHT, body: text("purchase-invoice.html"), prices: purchaseBody(), ...options });
+
+  test("says how many lines the list has, and saves them named for the order", async () => {
+    const it = await mountPurchase();
+    expect(it.csv().disabled).toBe(true);
+    it.button().click();
+    await it.idle();
+    expect(it.heading()).toBe("CK BANner - 7 lines✓");
+    expect(it.tip()).toBe("6 of 7 lines found in the price list; 1 line not in the price list, with no Scryfall id");
+    it.csv().click();
+    const file = await it.file();
+    expect(file.name).toBe("ck-purchase-4000001.csv");
+    expect(file.text.trimEnd().split("\n").length).toBe(8);
+  });
+
+  test("BAN hands the CSV's rows to mtgban", async () => {
+    const it = await mountPurchase();
+    it.button().click();
+    await it.idle();
+    it.ban().click();
+    it.ready();
+    await it.settle();
+    const posted = it.tabs[0].posted[0];
+    expect(posted.data.rows).toBe(7);
+    expect(posted.data.csv).toBe(
+      CKB.purchaseCSV(CKB.readPurchaseInvoice(it.window.document).lines, CKB.reducePrices(purchaseBody(), Date.now())),
+    );
+  });
+});

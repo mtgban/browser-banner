@@ -39,6 +39,7 @@ CK_SAVED_SALES=<saved selling history.html> \
 CK_SAVED_SELLCART=<saved sell cart.html> \
 CK_SAVED_BUYCART=<saved buy cart.html> \
 CK_SAVED_SELLINVOICE=<saved sell invoice.html> \
+CK_SAVED_PURCHASEINVOICE=<saved purchase invoice.html> \
 CK_PRICELIST=<CK's price list, as published> bun test tests/
 ```
 
@@ -63,8 +64,8 @@ src/cartpage.js  content script: Load prices, the marks, Update price and all
 src/cart.css     the marks, four classes deep to outrank CK's own reset
 src/ui.js        core/ui.js's panel and download, the panel headed CK
 src/historypage.js  content script: range picker (core/ranges.js), Download CSV
-src/invoice.js   a sell invoice's lines, and each one's row in the price list
-src/invoicepage.js  content script: Load prices, CSV and BAN on a sell invoice
+src/invoice.js   both invoices' lines, and each one's row in the price list
+src/invoicepage.js  content script: Load prices, CSV and BAN on an invoice
 src/panel.css    what this panel adds to core/panel.css; src/history.css
 scripts/cut-fixtures.py  cuts tests/fixtures/ from saved pages, locally only
 tests/mutations.json  each guard, the text that breaks it, the test that fails
