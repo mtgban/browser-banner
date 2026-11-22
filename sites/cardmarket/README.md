@@ -266,10 +266,15 @@ for s in 16 32 48; do sips -Z $s icons/icon-128.png --out icons/icon-$s.png; don
 
 ## Development
 
+From the repository's root:
+
 ```
 bun install
-bun test tests/
+bun run test
 ```
+
+`bun test tests/` here runs this site's suite alone, without the
+repository's own tests.
 
 The suite runs the real content scripts against a DOM (`happy-dom`) and a
 fixture shaped like a saved Cardmarket page: both tooltip spellings, the
