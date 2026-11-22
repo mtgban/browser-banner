@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "description": "Browser extensions that get a card store's lists to mtgban",
   "scripts": {
-    "test": "bun test sites/ tests/"
+    "test": "bun test sites/ tests/",
+    "mutate": "bun scripts/mutate.mjs"
   },
   "devDependencies": {
     "happy-dom": "^21.0.4"
