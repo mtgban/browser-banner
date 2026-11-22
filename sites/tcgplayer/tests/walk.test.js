@@ -119,7 +119,7 @@ describe("refusals", () => {
       totals: { 2025: 23 },
       change: (html, n, state) => {
         if (state.range !== "2025" || n !== 2) return html;
-        return html.replace("261120-000B", "261120-0001");
+        return html.replace("251120-000B", "251120-0001");
       },
     }));
     await expect(walk("2025")).rejects.toThrow(TCGB.MOVED);
@@ -235,5 +235,67 @@ describe("refusals", () => {
     on(s);
     const result = await walk("2025");
     expect(result.restore).toBe("The order list was left on 2025; pick Last 30 Days again");
+  });
+});
+
+describe("every year", () => {
+  // Every year the fixture's dropdown lists, 2026 back to 2016, none of
+  // them holding an order unless named.
+  const YEARS = Array.from({ length: 11 }, (_, i) => String(2026 - i));
+  const only = (named) => Object.fromEntries(YEARS.map((y) => [y, named[y] ?? 0]));
+
+  test("sets each listed year in turn, newest first, and puts the range back once", async () => {
+    const s = on(site({ totals: only({ 2026: 3, 2025: 12 }) }));
+    const result = await walk(TCGB.ALL);
+    expect(s.asked).toEqual([
+      "GET 1",
+      "POST 2026||true", "GET 1",
+      "POST 2025||true", "GET 1", "GET 2",
+      ...YEARS.slice(2).flatMap((y) => ["POST " + y + "||true", "GET 1"]),
+      "POST Last 30 Days||true",
+      "GET 1",
+    ]);
+    expect(s.state).toEqual({ range: "Last 30 Days", search: "" });
+    expect(result.orders.length).toBe(15);
+    expect(result.orders.slice(0, 3).every((o) => o.date.year === 2026)).toBe(true);
+    expect(result.orders.slice(3).every((o) => o.date.year === 2025)).toBe(true);
+    expect(result.pages).toBe(12);
+    expect(result.restore).toBe("");
+    // Each year's own part, so a year asked for later needs no walk.
+    expect(result.years["2025"].orders.length).toBe(12);
+    expect(result.years["2025"].pages).toBe(2);
+    expect(result.years["2019"]).toEqual({ orders: [], pending: 0, pages: 1 });
+  });
+
+  test("costs as many requests as the tooltip says, when no year is more than a page", async () => {
+    const s = on(site({ totals: only({ 2026: 3 }) }));
+    await walk(TCGB.ALL);
+    expect(s.asked.length).toBe(TCGB.allYearsCost(["Last 30 Days", ...YEARS]));
+    expect(TCGB.allYearsCost(["Last 30 Days", ...YEARS])).toBe(25);
+  });
+
+  test("checks every page against the year it is on", async () => {
+    // Synthetic: 2024's page dated 2023.
+    on(site({ totals: only({ 2024: 4 }), change: (html, n, state) => (state.range === "2024" ? html.replaceAll(", 2024", ", 2023") : html) }));
+    await expect(walk(TCGB.ALL)).rejects.toThrow("is not from 2024");
+  });
+
+  test("a refusal part way still puts the range back", async () => {
+    const s = on(site({ totals: only({ 2025: 4 }), change: (html, n, state) => (state.range === "2023" ? new Error("TCGplayer answered 500") : html) }));
+    const err = await walk(TCGB.ALL).catch((e) => e);
+    expect(err.message).toBe("TCGplayer answered 500");
+    expect(err.restore).toBe("");
+    expect(s.state).toEqual({ range: "Last 30 Days", search: "" });
+    expect(s.asked).not.toContain("POST 2022||true");
+  });
+
+  test("a refusal that cannot put the range back names the year it was left on", async () => {
+    on(site({
+      totals: only({}),
+      change: (html, n, state) => (state.range === "2020" ? new Error("TCGplayer answered 500") : html),
+      failPost: (range) => range === "Last 30 Days",
+    }));
+    const err = await walk(TCGB.ALL).catch((e) => e);
+    expect(err.restore).toBe("The order list was left on 2020; pick Last 30 Days again");
   });
 });

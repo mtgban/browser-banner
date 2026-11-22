@@ -271,6 +271,9 @@ globalThis.TCGB = globalThis.TCGB || {};
     if (isYear(range)) {
       return "tcg-orders-" + range + ".csv";
     }
+    if (range === TCGB.ALL) {
+      return "tcg-orders-all.csv";
+    }
     var d = new Date();
     var day = [d.getFullYear(), d.getMonth() + 1, d.getDate()]
       .map(function (n) {
@@ -281,31 +284,57 @@ globalThis.TCGB = globalThis.TCGB || {};
   }
 
   function rangePanel() {
-    panel.hint("Save a range of orders as CSV");
+    // The pace the walk keeps, as the page was given it.
+    var spacing = TCGB.PACE / 1000;
 
-    // TCGplayer's own ranges in its own order: the relative ones, then the
-    // years. "Last 120 Days" is shown as "120 days" to fit the box.
+    // hintFor is what the tooltip says a range will cost. Every year is a
+    // walk of each in turn, so its cost is said before it starts.
+    function hintFor(range) {
+      if (range !== TCGB.ALL) {
+        return "Save a range of orders as CSV";
+      }
+      var years = TCGB.yearsListed(filter.ranges);
+      return (
+        "Save every order of every year TCGplayer lists, " + years[0] + " to " + years[years.length - 1] +
+        ", as one CSV: " + years.length + " years read in turn, at least " + TCGB.allYearsCost(filter.ranges) +
+        " requests " + spacing + " s apart"
+      );
+    }
+
+    // TCGplayer's own ranges in its own order: the relative ones, then
+    // every year at once, then the years. "Last 120 Days" is shown as "120
+    // days" to fit the box.
     var year = document.createElement("select");
     year.className = "tcg-banner-year";
     year.setAttribute("aria-label", "Range");
-    for (var y = 0; y < filter.ranges.length; y++) {
+    var ranges = filter.ranges.slice();
+    var years = TCGB.yearsListed(ranges);
+    if (years.length) {
+      ranges.splice(ranges.indexOf(years[0]), 0, TCGB.ALL);
+    }
+    for (var y = 0; y < ranges.length; y++) {
       var option = document.createElement("option");
-      option.value = filter.ranges[y];
-      option.textContent = filter.ranges[y].replace(/^Last (\d+) Days$/, "$1 days");
+      option.value = ranges[y];
+      option.textContent = ranges[y].replace(/^Last (\d+) Days$/, "$1 days");
       year.appendChild(option);
     }
     year.value = filter.range;
+    panel.hint(hintFor(year.value));
     panel.actions.appendChild(year);
     goButton("Download CSV", function () {
       save();
     });
 
-    // Years walked on this page, so asking for one again costs no second
-    // walk. Not a relative range, which moves on as the days do.
+    // Years walked on this page, every year's walk included, so asking for
+    // one again costs no second walk. Not a relative range, which moves on
+    // as the days do.
     var walked = {};
     var stopped = false;
 
-    year.addEventListener("change", idle);
+    year.addEventListener("change", function () {
+      panel.hint(hintFor(year.value));
+      idle();
+    });
 
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && panel.working()) {
@@ -317,8 +346,9 @@ globalThis.TCGB = globalThis.TCGB || {};
       var name = fileName(chosen);
       var restore = result.restore ? [result.restore] : [];
       if (!result.orders.length) {
+        var placed = chosen === TCGB.ALL ? "any year TCGplayer lists" : TCGB.placedIn(chosen);
         panel.word("no orders");
-        panel.fail(["No orders were placed in " + TCGB.placedIn(chosen) + (result.pending ? " that have shipped" : "")].concat(restore, spoken()).join("\n"));
+        panel.fail(["No orders were placed in " + placed + (result.pending ? " that have shipped" : "")].concat(restore, spoken()).join("\n"));
         return;
       }
       TCGB.download(TCGB.ordersCSV(result.orders), name);
@@ -351,8 +381,8 @@ globalThis.TCGB = globalThis.TCGB || {};
       panel.clear();
       panel.busy(true);
       TCGB.walkRange(chosen, {
-        step: function (n, of) {
-          panel.word("page " + n + (of ? " of " + of : ""));
+        step: function (n, of, range) {
+          panel.word((chosen === TCGB.ALL ? range + ": " : "") + "page " + n + (of ? " of " + of : ""));
         },
         stopped: function () {
           return stopped;
@@ -363,8 +393,14 @@ globalThis.TCGB = globalThis.TCGB || {};
       }).then(
         function (result) {
           panel.busy(false);
-          if (isYear(chosen)) {
+          if (isYear(chosen) || chosen === TCGB.ALL) {
             walked[chosen] = result;
+          }
+          // Every year's walk read each year whole, so each is kept too.
+          if (chosen === TCGB.ALL) {
+            for (var y in result.years) {
+              walked[y] = result.years[y];
+            }
           }
           write(chosen, result);
         },

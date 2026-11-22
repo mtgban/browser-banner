@@ -5,11 +5,11 @@ import { mount } from "./panel.js";
 import { TCGB, docOf, pageHTML } from "./helpers.js";
 
 describe("the panel", () => {
-  test("offers TCGplayer's ranges, the last days then the years, and nothing under its buttons", () => {
+  test("offers TCGplayer's ranges, the last days, All years, then the years, and nothing under its buttons", () => {
     const p = mount();
     const options = [...p.year().options];
-    expect(options.map((o) => o.value).slice(0, 4)).toEqual(["Last 30 Days", "Last 90 Days", "Last 120 Days", "2026"]);
-    expect(options.map((o) => o.textContent).slice(0, 4)).toEqual(["30 days", "90 days", "120 days", "2026"]);
+    expect(options.map((o) => o.value).slice(0, 5)).toEqual(["Last 30 Days", "Last 90 Days", "Last 120 Days", "All years", "2026"]);
+    expect(options.map((o) => o.textContent).slice(0, 5)).toEqual(["30 days", "90 days", "120 days", "All years", "2026"]);
     expect(options.at(-1).value).toBe("2016");
     // The range the page shows.
     expect(p.year().value).toBe("Last 30 Days");
@@ -191,6 +191,74 @@ describe("Download CSV", () => {
     p.window.dispatchEvent(event);
     expect(event.defaultPrevented).toBe(true);
     await p.idle();
+  });
+});
+
+describe("All years", () => {
+  // Every year the fixture's dropdown lists, none holding an order unless
+  // named.
+  const YEARS = Array.from({ length: 11 }, (_, i) => String(2026 - i));
+  const only = (named) => Object.fromEntries(YEARS.map((y) => [y, named[y] ?? 0]));
+
+  test("says what it costs before it starts", () => {
+    const p = mount();
+    p.choose("All years");
+    expect(p.tip()).toBe(
+      "Save every order of every year TCGplayer lists, 2026 to 2016, as one CSV: 11 years read in turn, at least 25 requests 1.2 s apart"
+    );
+    p.choose("2025");
+    expect(p.tip()).toBe("Save a range of orders as CSV");
+  });
+
+  test("walks every year in turn into one file, and puts the range back", async () => {
+    const p = mount({ totals: only({ 2026: 3, 2025: 12 }) });
+    p.choose("All years");
+    p.button("Download CSV").click();
+    await p.idle();
+    const file = await p.file();
+    expect(file.name).toBe("tcg-orders-all.csv");
+    expect(file.text.trimEnd().split("\n").length).toBe(1 + 15);
+    expect(p.word()).toBe("15 orders");
+    expect(p.done()).toBe(true);
+    expect(p.tip()).toContain("Saved tcg-orders-all.csv from 12 pages");
+    expect(p.session.state).toEqual({ range: "Last 30 Days", search: "" });
+  });
+
+  test("names the year it is reading", async () => {
+    let release;
+    const held = new Promise((done) => (release = done));
+    const p = mount({ totals: only({ 2025: 12 }), change: (html, n, state) => (state.range === "2025" && n === 2 ? held.then(() => html) : html) });
+    p.choose("All years");
+    p.button("Download CSV").click();
+    await new Promise((done) => setTimeout(done, 20));
+    expect(p.word()).toBe("2025: page 2 of 2");
+    release();
+    await p.idle();
+  });
+
+  test("keeps each year it read, so one asked for after needs no walk", async () => {
+    const p = mount({ totals: only({ 2025: 12 }) });
+    p.choose("All years");
+    p.button("Download CSV").click();
+    await p.idle();
+    const asked = p.session.asked.length;
+    p.choose("2025");
+    p.button("Download CSV").click();
+    await p.idle();
+    expect(p.session.asked.length).toBe(asked);
+    const file = await p.file(1);
+    expect(file.name).toBe("tcg-orders-2025.csv");
+    expect(file.text.trimEnd().split("\n").length).toBe(1 + 12);
+  });
+
+  test("no orders in any year is said, and no file", async () => {
+    const p = mount({ totals: only({}) });
+    p.choose("All years");
+    p.button("Download CSV").click();
+    await p.idle();
+    expect(p.saved).toEqual([]);
+    expect(p.failed()).toBe(true);
+    expect(p.tip()).toStartWith("No orders were placed in any year TCGplayer lists");
   });
 });
 

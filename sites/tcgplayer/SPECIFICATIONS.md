@@ -172,11 +172,11 @@ offer, or whose date did not read, keeps the range selected.
 
 ## 4. The walk
 
-The panel offers every range `#DateRange` lists, in its order: the last 30,
-90 and 120 days (shown as `30 days` and so on, to fit), then the years. It
-starts on the range the page shows. *Download CSV* walks the chosen range,
-here called the year, since a relative range is walked the same way but
-for one check, the date's, in step 3:
+The panel offers every range `#DateRange` lists, in its order: the last 30, 90
+and 120 days (shown as `30 days` and so on, to fit), then *All years*, its
+own, then the years. It starts on the range the page shows. *Download CSV*
+walks the chosen range, here called the year, since a relative range is walked
+the same way but for one check, the date's, in step 3:
 
 1. **Read the state fresh**: GET page 1 and take the range and search the
    session holds, and the token, from it.
@@ -201,6 +201,16 @@ for one check, the date's, in step 3:
    a challenge it sends nothing, since anything sent meets the same check:
    the tooltip says to reload, pass the check, and pick that range again.
 
+*All years* is steps 2 and 3 for each year the dropdown lists, newest
+first, with step 1 once before them and step 4 once after: one POST and a
+walk a year, so at least two requests a year and three more, 25 for the
+eleven years listed today. The tooltip says so when it is chosen, before
+anything is sent, and the word names the year being read (`2025: page 2 of
+3`). Every year's pages are checked as that year's, an order is seen once
+across all of them, and a refusal in any year puts the range back as
+usual, naming the year the list was left on. Orders older than the oldest
+year listed are out of reach, as they are on the page itself.
+
 A year with no orders is an empty result, said on the tooltip, and no file.
 A refused or stopped walk writes nothing.
 
@@ -214,8 +224,8 @@ own dropdown. That is the one side effect, and the same POST the dropdown
 makes.
 
 A finished year is kept for the page's life, so asking for it again costs
-no second walk. A relative range is walked each time, since it moves on
-as the days do.
+no second walk; so is *All years*, and each year it read. A relative range
+is walked each time, since it moves on as the days do.
 
 ## 5. The CSVs
 
@@ -226,9 +236,9 @@ leading `'` when it starts with `=`, `+`, `-`, `@`, a tab or a CR, which a
 spreadsheet would run as a formula; a seller names their own store. The
 cards file of section 6 goes to mtgban alone and is written as read.
 
-**`tcg-orders-<year>.csv`**, or `tcg-orders-last-30-days-<yyyy-mm-dd>.csv`
-for a relative range, dated the day it was read, one row per order, in
-TCGplayer's order. The
+**`tcg-orders-<year>.csv`**, `tcg-orders-all.csv` for every year, or
+`tcg-orders-last-30-days-<yyyy-mm-dd>.csv` for a relative range, dated the
+day it was read, one row per order, in TCGplayer's order. The
 first three are the columns go-mtgban's `tcgHistory` wrote and ck-banner's
 history file shares, under the same names and meaning:
 

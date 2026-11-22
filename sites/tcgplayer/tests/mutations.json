@@ -303,7 +303,7 @@
   {
     "guard": "a relative range is not kept for a second Download",
     "file": "src/page.js",
-    "find": "          if (isYear(chosen)) {\n            walked[chosen] = result;",
+    "find": "          if (isYear(chosen) || chosen === TCGB.ALL) {\n            walked[chosen] = result;",
     "replace": "          if (true) {\n            walked[chosen] = result;",
     "expectFailing": "the last days are walked again each time, as they move on"
   },
@@ -320,5 +320,82 @@
     "find": "write(chosen, Object.assign({}, walked[chosen], { restore: \"\" }));",
     "replace": "write(chosen, walked[chosen]);",
     "expectFailing": "a year asked for again does not repeat its walk's put-back note"
+  },
+  {
+    "guard": "every year walks each year the dropdown lists",
+    "file": "src/walk.js",
+    "find": "ranges = TCGB.yearsListed(page.filter.ranges);",
+    "replace": "ranges = TCGB.yearsListed(page.filter.ranges).slice(0, 1);",
+    "expectFailing": "sets each listed year in turn, newest first, and puts the range back once"
+  },
+  {
+    "guard": "each year is set before its pages are read",
+    "file": "src/walk.js",
+    "find": "return TCGB.setFilter(token, range, \"\", true);",
+    "replace": "return null;",
+    "expectFailing": "sets each listed year in turn, newest first, and puts the range back once"
+  },
+  {
+    "guard": "each year's pages are checked against that year",
+    "file": "src/walk.js",
+    "find": "      year = /^\\d{4}$/.test(range) ? range : \"\";",
+    "replace": "      year = \"\";",
+    "expectFailing": "checks every page against the year it is on"
+  },
+  {
+    "guard": "each year's page count starts afresh",
+    "file": "src/walk.js",
+    "find": "      per = 0;\n      total = 0;\n      pages = 0;\n",
+    "replace": "",
+    "expectFailing": "sets each listed year in turn, newest first, and puts the range back once"
+  },
+  {
+    "guard": "each year's own part is kept",
+    "file": "src/walk.js",
+    "find": "          if (year) {\n            years[year] = mine;\n          }\n",
+    "replace": "",
+    "expectFailing": "keeps each year it read, so one asked for after needs no walk"
+  },
+  {
+    "guard": "every year's cost counts page 1 and the put-back",
+    "file": "src/walk.js",
+    "find": "return 2 * TCGB.yearsListed(ranges).length + 3;",
+    "replace": "return 2 * TCGB.yearsListed(ranges).length + 2;",
+    "expectFailing": "costs as many requests as the tooltip says, when no year is more than a page"
+  },
+  {
+    "guard": "All years is offered ahead of the years",
+    "file": "src/page.js",
+    "find": "      ranges.splice(ranges.indexOf(years[0]), 0, TCGB.ALL);\n",
+    "replace": "",
+    "expectFailing": "offers TCGplayer's ranges, the last days, All years, then the years, and nothing under its buttons"
+  },
+  {
+    "guard": "every year's file is named for all",
+    "file": "src/page.js",
+    "find": "    if (range === TCGB.ALL) {\n      return \"tcg-orders-all.csv\";\n    }\n",
+    "replace": "",
+    "expectFailing": "walks every year in turn into one file, and puts the range back"
+  },
+  {
+    "guard": "All years says its cost before it starts",
+    "file": "src/page.js",
+    "find": "      if (range !== TCGB.ALL) {\n        return \"Save a range of orders as CSV\";",
+    "replace": "      if (true) {\n        return \"Save a range of orders as CSV\";",
+    "expectFailing": "says what it costs before it starts"
+  },
+  {
+    "guard": "the years read for All years are kept",
+    "file": "src/page.js",
+    "find": "            for (var y in result.years) {\n              walked[y] = result.years[y];\n            }\n",
+    "replace": "",
+    "expectFailing": "keeps each year it read, so one asked for after needs no walk"
+  },
+  {
+    "guard": "All years names the year it is reading",
+    "file": "src/page.js",
+    "find": "(chosen === TCGB.ALL ? range + \": \" : \"\")",
+    "replace": "(\"\")",
+    "expectFailing": "names the year it is reading"
   }
 ]
