@@ -59,9 +59,9 @@ src/update.js    Update price: the one request, and CK's answer read
 src/handoff.js   BAN: window.open and postMessage to mtgban's /upload/handoff
 src/cartpage.js  content script: Load prices, the marks, Update price and all
 src/cart.css     the marks, four classes deep to outrank CK's own reset
-src/ui.js        the panel both pages share, and the file download
+src/ui.js        core/ui.js's panel and download, the panel headed CK
 src/historypage.js  content script: year picker and Download CSV
-src/panel.css, src/history.css
+src/panel.css    what this panel adds to core/panel.css; src/history.css
 scripts/cut-fixtures.py  cuts tests/fixtures/ from saved pages, locally only
 tests/mutations.json  each guard, the text that breaks it, the test that fails
 tests/           bun + happy-dom, no browser

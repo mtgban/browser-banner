@@ -387,8 +387,8 @@
   {
     "guard": "a signed-out heading is not a control",
     "file": "src/content.js",
-    "find": "if (locked) {\n        return;",
-    "replace": "if (false) {\n        return;",
+    "find": "    if (!locked) {\n      ui.jump(",
+    "replace": "    if (true) {\n      ui.jump(",
     "expectFailing": "and the heading stops being a control"
   },
   {
@@ -401,8 +401,8 @@
   {
     "guard": "the heading does not switch scope mid-read",
     "file": "src/content.js",
-    "find": "if (panel.classList.contains(\"ban-busy\")) {\n        return;\n      }\n      // Nowhere",
-    "replace": "if (false) {\n        return;\n      }\n      // Nowhere",
+    "find": "        if (panel.classList.contains(\"ban-busy\")) {\n          return;\n        }\n        scope = ",
+    "replace": "        if (false) {\n          return;\n        }\n        scope = ",
     "expectFailing": "and clicking it mid-read neither switches scope nor writes over the count"
   },
   {

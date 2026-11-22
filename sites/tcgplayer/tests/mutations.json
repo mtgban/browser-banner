@@ -197,7 +197,7 @@
   },
   {
     "guard": "the dash is hidden until there is a word",
-    "file": "src/ui.js",
+    "file": "../../core/ui.js",
     "find": "<span class=\"ban-sep\" hidden>",
     "replace": "<span class=\"ban-sep\">",
     "expectFailing": "is ready, with a tick and no dangling dash, until asked for something"

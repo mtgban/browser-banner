@@ -42,7 +42,9 @@ src/rates.js     the currency feed, and the inversion it needs
 src/parse.js     DOM → offers. The volatile half; see SPECIFICATIONS.md §3
 src/pages.js     one page → every page, at Cloudflare's pace; see §6
 src/csv.js       offers → CSV. The contract with mtgban; see §4
-src/content.js   the panel, the download, the handoff
+src/ui.js        core/ui.js's panel and download, the panel headed CM
+src/content.js   what the panel does, the handoff
+src/content.css  what this panel adds to core/panel.css
 tests/panel.js   stands the content script up in a window; clicks are real
 tests/mutations.json  each guard, the text that breaks it, the test that fails
 tests/           bun + happy-dom, no browser

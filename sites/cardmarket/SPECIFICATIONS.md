@@ -668,12 +668,13 @@ site until they stopped answering.
 
 ### 6.4 The scope is the visitor's to choose
 
-The panel's heading is the control. It reads **CM BANner - *all offers*** and
-clicking it reads **CM BANner - *this page only***, the emphasised word being both the
-thing that changes and the thing worth reading twice. Naming the
-wrong scope is how a twentieth of a collection gets uploaded as all of it,
-so the scope is never anywhere but in the sentence that describes what the
-buttons beneath it will do.
+The panel's heading is the control: the shared panel's heading (`core/ui.js`),
+made one with its `jump`, so a click, Enter or Space moves it. It reads **CM
+BANner - *all offers*** and clicking it reads **CM BANner - *this page
+only***, the emphasised word being both the thing that changes and the thing
+worth reading twice. Naming the wrong scope is how a twentieth of a collection
+gets uploaded as all of it, so the scope is never anywhere but in the sentence
+that describes what the buttons beneath it will do.
 
 A checkbox beside the heading said the same thing twice, in two places
 that could disagree.

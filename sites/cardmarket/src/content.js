@@ -15,6 +15,7 @@
 (function (MKM) {
   "use strict";
 
+  // The shared panel's id (core/ui.js).
   var PANEL_ID = "ban-panel";
   // What the two halves of the handoff say to each other.
   // The protocol the site's handoff page speaks.
@@ -111,21 +112,6 @@
     return now.getFullYear() + "-" + month + "-" + day;
   }
 
-  function download(text, filename) {
-    var blob = new Blob([text], { type: "text/csv;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
-    var anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    // Firefox needs the object to outlive the click it was created for.
-    setTimeout(function () {
-      URL.revokeObjectURL(url);
-    }, 30000);
-  }
-
   // say reports what went wrong as a red cross beside the heading's count,
   // with the reason on its tooltip; nothing is written under the buttons.
   // "" clears both.
@@ -147,26 +133,13 @@
   // It takes the heading's tooltip while it is up, and `label()` puts the
   // heading's own hint back when it clears this.
   function recap(panel, text) {
-    recapped = text;
-    tip(panel);
+    ui.recap(text);
   }
 
-  // The heading's tooltip is drawn by the panel rather than left to a title,
-  // which the browser shows only after a second or so. One element, so
-  // there is only ever one thing on it: the recap while there is one, the
-  // hint otherwise.
-  var hinted = "";
-  var recapped = "";
-
-  // No hint while a read runs: the heading holds the count then, and a
-  // click on it does nothing.
-  function tip(panel) {
-    var box = panel.querySelector(".ban-tip");
-    if (box) {
-      var reading = panel.classList.contains("ban-busy");
-      box.textContent = recapped || (reading ? "" : hinted);
-    }
-  }
+  // ui is the shared panel (core/ui.js) that build() makes: its tooltip is
+  // the recap while there is one and the hint otherwise, and no hint while
+  // a read runs, since the heading holds the count then.
+  var ui = null;
 
   // mark is the sign beside the count: a tick when a file was written, a
   // cross when a read came to nothing. One element rather than two, since
@@ -176,13 +149,7 @@
   // clicked and nothing here hears about it; what the tick says is that
   // the rows were read and handed over to it.
   function mark(panel, how) {
-    var at = panel.querySelector(".ban-mark");
-    if (!at) {
-      return;
-    }
-    at.hidden = !how;
-    at.textContent = how === "failed" ? "\u2717" : "\u2713";
-    at.classList.toggle("ban-failed", how === "failed");
+    ui.mark(how);
   }
 
   // counting puts the read's progress where the scope word usually is.
@@ -193,10 +160,7 @@
   // there while the spinner is, which is the one moment the scope word is
   // not worth reading.
   function counting(panel, text) {
-    var says = panel.querySelector(".ban-scope");
-    if (says) {
-      says.textContent = text;
-    }
+    ui.word(text);
   }
 
   // hold asks the browser to confirm before the page goes anywhere.
@@ -259,10 +223,10 @@
   //
   // It is also where the page is held while the read runs; see guard.
   function busy(panel, working) {
-    panel.classList.toggle("ban-busy", working);
-    // The two that do something. The heading is left alone: it is holding
-    // the count, and a disabled button is a dimmed one in every browser's
-    // own stylesheet, so disabling it would dim the progress.
+    ui.busy(working);
+    // The two that do something, Send again only where it can send. The
+    // heading is left alone: it is holding the count, and is not in the row
+    // the panel takes away.
     buttons(panel, working);
     guard(panel);
     if (!working) {
@@ -540,7 +504,7 @@
 
   function exportOffers(panel) {
     function write(done) {
-      download(done.csv, filename(gameFromPath(location.pathname)));
+      MKM.download(done.csv, filename(gameFromPath(location.pathname)));
       mark(panel, "done");
       recap(panel, done.note ? "saved, " + done.note : "saved");
     }
@@ -805,67 +769,62 @@
 
   function label(panel) {
     var count = MKM.countRows(document);
-    var says = panel.querySelector(".ban-scope");
-    if (says) {
-      // Naming the wrong scope is how a twentieth of a collection gets
-      // uploaded as all of it, so the button says which it means.
-      says.textContent = SCOPES[scope].says;
-    }
-    var button = panel.querySelector(".ban-label");
-    if (button) {
-      // The number lives here rather than in the label, which now names a
-      // scope instead of a count. It is written the way Cardmarket wrote
-      // it: a seller past the paging limit reads "2000+", and rounding
-      // that to 2000 promises an exact figure that is not one.
-      var listed = MKM.totalSaid(document) || String(count);
-      hinted = locked
+    // Naming the wrong scope is how a twentieth of a collection gets
+    // uploaded as all of it, so the heading says which it means.
+    ui.word(SCOPES[scope].says);
+    // The number lives on the hover rather than in the heading, which names
+    // a scope instead of a count. It is written the way Cardmarket wrote it:
+    // a seller past the paging limit reads "2000+", and rounding that to
+    // 2000 promises an exact figure that is not one.
+    var listed = MKM.totalSaid(document) || String(count);
+    ui.hint(
+      locked
         ? SIGN_IN + " - it shows a visitor this page and no more"
         : hereOnly()
           ? count + " offers on this page - click for the whole list"
-          : listed + " offers listed - click for this page only";
-    }
+          : listed + " offers listed - click for this page only"
+    );
     recap(panel, "");
     panel.hidden = count === 0;
     shown = tableState();
     return count;
   }
 
-  function build() {
-    var panel = document.createElement("div");
-    panel.id = PANEL_ID;
-    panel.innerHTML =
-      '<button type="button" class="ban-label" aria-describedby="ban-tip">' +
-      'CM BAN<i class="ban-ner">ner</i> - ' +
-      '<span class="ban-spin" aria-hidden="true"></span>' +
-      '<b class="ban-scope"></b>' +
-      '<span class="ban-mark" aria-hidden="true" hidden>\u2713</span>' +
-      "</button>" +
-      '<span class="ban-tip" id="ban-tip" role="tooltip"></span>' +
-      '<div class="ban-actions">' +
-      '<button type="button" class="ban-send">' + SEND + "</button>" +
-      '<button type="button" class="ban-save">' + SAVE + "</button>" +
-      "</div>";
+  function button(className, text) {
+    var made = document.createElement("button");
+    made.type = "button";
+    made.className = className;
+    made.textContent = text;
+    ui.actions.appendChild(made);
+    return made;
+  }
 
-    // Changing what will be taken makes whatever the last export said
-    // about the other scope stale, so the note goes with it.
-    panel.querySelector(".ban-label").addEventListener("click", function () {
-      // Not while a read is running: this line is showing the count, and
-      // switching scope would write over it and abandon a read that was
-      // asked for under the other one.
-      if (panel.classList.contains("ban-busy")) {
-        return;
-      }
-      // Nowhere to move between; the heading says why on its hover.
-      if (locked) {
-        return;
-      }
-      scope = (scope + 1) % SCOPES.length;
-      // Rows read for the other scope are not the rows now being asked
-      // for, and the note about them is stale too.
-      disarm(panel);
-      say(panel, "");
-      label(panel);
-    });
+  function build() {
+    ui = MKM.panel();
+    var panel = ui.root;
+    button("ban-send", SEND);
+    button("ban-save", SAVE);
+
+    // The heading is the scope control. Changing what will be taken makes
+    // whatever the last export said about the other scope stale, so the
+    // note goes with it. Signed out, there is nowhere to move between, so
+    // the heading is not a control at all; it says why on its hover.
+    if (!locked) {
+      ui.jump(function () {
+        // Not while a read is running: this line is showing the count, and
+        // switching scope would write over it and abandon a read that was
+        // asked for under the other one.
+        if (panel.classList.contains("ban-busy")) {
+          return;
+        }
+        scope = (scope + 1) % SCOPES.length;
+        // Rows read for the other scope are not the rows now being asked
+        // for, and the note about them is stale too.
+        disarm(panel);
+        say(panel, "");
+        label(panel);
+      });
+    }
     panel.querySelector(".ban-send").addEventListener("click", function () {
       sendToBan(panel);
     });

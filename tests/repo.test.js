@@ -59,9 +59,11 @@ describe("the manifest", () => {
     expect(named.filter((path) => !existsSync(new URL(path, root)))).toEqual([]);
   });
 
-  test("gives each entry one site's files, on that site's host", () => {
+  test("gives each entry one site's files and core's, on that site's host", () => {
     const mixed = manifest.content_scripts.filter((cs) => {
-      const owners = new Set([...(cs.js || []), ...(cs.css || [])].map((path) => path.split("/").slice(0, 2).join("/")));
+      const owners = new Set(
+        [...(cs.js || []), ...(cs.css || [])].filter((path) => !path.startsWith("core/")).map((path) => path.split("/").slice(0, 2).join("/"))
+      );
       if (owners.size !== 1) return true;
       const site = [...owners][0].replace(/^sites\//, "");
       return !cs.matches.every((match) => new URL(match.replace(/\*/g, "x")).host === HOSTS[site]);
@@ -84,6 +86,22 @@ describe("the sites", () => {
     // in would need one.
     const sources = [...files("core"), ...sites.flatMap((site) => files("sites/" + site + "/src"))];
     expect(sources.filter((path) => /\b(chrome|browser)\.\w/.test(read(path)))).toEqual([]);
+  });
+
+  test("core binds nothing of a store's, and keeps to BAN", () => {
+    // A factory every store binds onto its own global: core touching
+    // MKM, CKB or TCGB would be state one store's tests could leave behind
+    // for another's.
+    const touching = files("core")
+      .filter((path) => path.endsWith(".js"))
+      .filter((path) => /\b(MKM|CKB|TCGB)\b/.test(read(path)) || /globalThis\.(?!BAN\b)\w+/.test(read(path)));
+    expect(touching).toEqual([]);
+  });
+
+  test("core names no store", () => {
+    const names = [...Object.values(HOSTS).map((host) => host.replace(/^(www|store)\./, "")), "Cardmarket", "Card Kingdom", "TCGplayer"];
+    const naming = files("core").flatMap((path) => names.filter((name) => read(path).includes(name)).map((name) => path + " names " + name));
+    expect(naming).toEqual([]);
   });
 
   test("name no store but their own", () => {
