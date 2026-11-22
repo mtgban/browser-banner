@@ -765,8 +765,8 @@
   {
     "guard": "a Scryfall id is given only for the line's own card",
     "file": "src/csv.js",
-    "find": "    return list ? CKB.rowFor(l, list).row || null : null;",
-    "replace": "    return list && l.productID !== null ? CKB.lookup(list, l.productID) : null;",
+    "find": "      var row = list ? CKB.rowFor(l, list).row : null;",
+    "replace": "      var row = list && l.productID !== null ? CKB.lookup(list, l.productID) : null;",
     "expectFailing": "leaves the Scryfall id out with no list, or a row naming another card"
   },
   {
@@ -786,7 +786,7 @@
   {
     "guard": "a signed-out line's CK ID is its card's",
     "file": "src/csv.js",
-    "find": "      return row ? row.id : l.productID;",
+    "find": "      return found ? found.row.id : l.productID;",
     "replace": "      return l.productID;",
     "expectFailing": "gives a line with no product id both ids from its card"
   },
@@ -1083,5 +1083,131 @@
     "find": "games.indexOf(game) >= 0 && ",
     "replace": "",
     "expectFailing": "is Magic's, and no other game has one"
+  },
+  {
+    "guard": "a heading's Foil makes its lines foil",
+    "file": "src/invoice.js",
+    "find": "foil = / Foil$/.test(heading);",
+    "replace": "foil = false;",
+    "expectFailing": "reads every line under its edition, foil from the heading"
+  },
+  {
+    "guard": "a heading's Foil is not part of the edition",
+    "file": "src/invoice.js",
+    "find": "edition = foil ? heading.slice(0, -\" Foil\".length) : heading;",
+    "replace": "edition = heading;",
+    "expectFailing": "reads every line under its edition, foil from the heading"
+  },
+  {
+    "guard": "a line whose total is not its quantity times its price is not kept",
+    "file": "src/invoice.js",
+    "find": " || total !== Number(m[1]) * each",
+    "replace": "",
+    "expectFailing": "counts a line it cannot read whole, and keeps the rest"
+  },
+  {
+    "guard": "a foil said only by the variation is looked for as a foil",
+    "file": "src/invoice.js",
+    "find": "row = CKB.findCard(list, CKB.cardKey(line.edition + \": \" + line.name, true));",
+    "replace": "row = null;",
+    "expectFailing": "finds every line, a foil said only by its variation as a foil"
+  },
+  {
+    "guard": "a variation's Non-Foil is not a Foil",
+    "file": "src/invoice.js",
+    "find": "var SAYS_FOIL = /(^|[^-])\\bFoil\\b/;",
+    "replace": "var SAYS_FOIL = /\\bFoil\\b/;",
+    "expectFailing": "does not take a variation's Non-Foil for a foil"
+  },
+  {
+    "guard": "a foil found by its variation is written as a foil",
+    "file": "src/invoice.js",
+    "find": "return { row: row, foil: true };",
+    "replace": "return { row: row, foil: line.foil };",
+    "expectFailing": "is the cart's columns, each line with its Scryfall id, CK id and real foil"
+  },
+  {
+    "guard": "the invoice's CSV takes each line's row from the list",
+    "file": "src/csv.js",
+    "find": "return list ? CKB.invoiceRow(l, list) : null;",
+    "replace": "return null;",
+    "expectFailing": "is the cart's columns, each line with its Scryfall id, CK id and real foil"
+  },
+  {
+    "guard": "the Foil column is the found row's",
+    "file": "src/csv.js",
+    "find": "return (found ? found.foil : l.foil) ? \"Yes\" : \"No\";",
+    "replace": "return l.foil ? \"Yes\" : \"No\";",
+    "expectFailing": "is the cart's columns, each line with its Scryfall id, CK id and real foil"
+  },
+  {
+    "guard": "an invoice's CSV and BAN wait for a list",
+    "file": "src/invoicepage.js",
+    "find": "    csv.disabled = true;\n    ban.disabled = true;\n",
+    "replace": "",
+    "expectFailing": "offers Load prices, with CSV and BAN greyed out until a list is in hand"
+  },
+  {
+    "guard": "an invoice says how many lines the list lacks",
+    "file": "src/invoicepage.js",
+    "find": "if (found < invoice.lines.length) {",
+    "replace": "if (false) {",
+    "expectFailing": "says how many lines the list does not have, and how many it could not read"
+  },
+  {
+    "guard": "an invoice says how many lines it could not read",
+    "file": "src/invoicepage.js",
+    "find": "if (invoice.unreadable) {",
+    "replace": "if (false) {",
+    "expectFailing": "says how many lines the list does not have, and how many it could not read"
+  },
+  {
+    "guard": "an invoice uses a fresh kept list",
+    "file": "src/invoicepage.js",
+    "find": "if (kept && !list && !reading) {",
+    "replace": "if (false) {",
+    "expectFailing": "uses a fresh kept list at once, with no request"
+  },
+  {
+    "guard": "an invoice keeps the list it read",
+    "file": "src/invoicepage.js",
+    "find": "return CKB.keepList(s, fetched);",
+    "replace": "return null;",
+    "expectFailing": "reads the list once, keeps it, and says every line was found"
+  },
+  {
+    "guard": "an invoice's file is named for its order",
+    "file": "src/invoicepage.js",
+    "find": "\"ck-sale-\" + id[1] + \".csv\"",
+    "replace": "\"ck-sale.csv\"",
+    "expectFailing": "CSV saves the lines with their ids, named for the order"
+  },
+  {
+    "guard": "Escape stops an invoice's read",
+    "file": "src/invoicepage.js",
+    "find": "      if (event.key === \"Escape\") {\n        cancel();\n",
+    "replace": "      if (event.key === \"Escape\") {\n",
+    "expectFailing": "Escape stops the read and leaves the panel as it was"
+  },
+  {
+    "guard": "an invoice's failed read says why",
+    "file": "src/invoicepage.js",
+    "find": "        panel.fail(err && err.message ? err.message : String(err));\n",
+    "replace": "",
+    "expectFailing": "a read that fails says why, and keeps CSV greyed out"
+  },
+  {
+    "guard": "an invoice sends what CSV saves",
+    "file": "src/invoicepage.js",
+    "find": "CKB.handOff(\"magic\", CKB.invoiceCSV(lines, list), lines.length,",
+    "replace": "CKB.handOff(\"magic\", \"\", lines.length,",
+    "expectFailing": "BAN hands the CSV's rows to mtgban once it is listening"
+  },
+  {
+    "guard": "no panel on an invoice with no lines",
+    "file": "src/invoicepage.js",
+    "find": "!(invoice.lines.length || invoice.unreadable)",
+    "replace": "false",
+    "expectFailing": "stays off a page with no invoice lines, or no invoice"
   }
 ]

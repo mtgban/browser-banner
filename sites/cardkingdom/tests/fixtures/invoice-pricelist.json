@@ -1,0 +1,152 @@
+{
+ "meta": {
+  "created_at": "2026-11-22 10:10:40",
+  "base_url": "https://www.cardkingdom.com/"
+ },
+ "data": [
+  {
+   "id": 52031,
+   "sku": "FAPC-032",
+   "scryfall_id": "c575e2cb-3990-4c73-b81c-e16311ec6bbb",
+   "url": "mtg/apocalypse/unnatural-selection-foil",
+   "name": "Unnatural Selection",
+   "variation": "",
+   "edition": "Apocalypse",
+   "is_foil": "true",
+   "price_retail": "34.99",
+   "qty_retail": 6,
+   "price_buy": "17.50",
+   "qty_buying": 4,
+   "condition_values": {
+    "nm_price": "34.99",
+    "nm_qty": 0,
+    "ex_price": "27.99",
+    "ex_qty": 1,
+    "vg_price": "20.99",
+    "vg_qty": 5,
+    "g_price": "14.00",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 65095,
+   "sku": "PTK-105",
+   "scryfall_id": "3e4f0005-4f19-4352-9cd2-3993ae6db879",
+   "url": "mtg/portal-3k/control-of-the-court",
+   "name": "Control of the Court",
+   "variation": "",
+   "edition": "Portal 3K",
+   "is_foil": "false",
+   "price_retail": "21.99",
+   "qty_retail": 1,
+   "price_buy": "14.00",
+   "qty_buying": 3,
+   "condition_values": {
+    "nm_price": "21.99",
+    "nm_qty": 0,
+    "ex_price": "18.69",
+    "ex_qty": 1,
+    "vg_price": "15.39",
+    "vg_qty": 0,
+    "g_price": "11.00",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 65154,
+   "sku": "PTK-011",
+   "scryfall_id": "b804c879-fe23-4d7f-9e7d-1da41b5c0973",
+   "url": "mtg/portal-3k/liu-bei-lord-of-shu",
+   "name": "Liu Bei, Lord of Shu",
+   "variation": "",
+   "edition": "Portal 3K",
+   "is_foil": "false",
+   "price_retail": "32.99",
+   "qty_retail": 2,
+   "price_buy": "19.00",
+   "qty_buying": 3,
+   "condition_values": {
+    "nm_price": "32.99",
+    "nm_qty": 0,
+    "ex_price": "28.04",
+    "ex_qty": 2,
+    "vg_price": "24.74",
+    "vg_qty": 0,
+    "g_price": "21.44",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 244371,
+   "sku": "FESTA-096",
+   "scryfall_id": "9b8f466f-83ec-4d72-90de-0e30069f7ecd",
+   "url": "mtg/strixhaven-mystical-archive-jpn/tainted-pact-foil-etched-096-jpn-alternate-art",
+   "name": "Tainted Pact",
+   "variation": "Foil Etched - 096 - JPN Alternate Art",
+   "edition": "Strixhaven Mystical Archive JPN",
+   "is_foil": "false",
+   "price_retail": "47.99",
+   "qty_retail": 8,
+   "price_buy": "24.00",
+   "qty_buying": 5,
+   "condition_values": {
+    "nm_price": "47.99",
+    "nm_qty": 8,
+    "ex_price": "40.79",
+    "ex_qty": 0,
+    "vg_price": "35.99",
+    "vg_qty": 0,
+    "g_price": "31.19",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 248128,
+   "sku": "AFR-388",
+   "scryfall_id": "0b8e32bc-33b4-447c-a99d-295d10ef2aeb",
+   "url": "mtg/adventures-in-the-forgotten-realms-variants/orcus-prince-of-undeath-extended-art",
+   "name": "Orcus, Prince of Undeath",
+   "variation": "Extended Art",
+   "edition": "Adventures in the Forgotten Realms Variants",
+   "is_foil": "false",
+   "price_retail": "0.99",
+   "qty_retail": 4,
+   "price_buy": "0.30",
+   "qty_buying": 11,
+   "condition_values": {
+    "nm_price": "0.99",
+    "nm_qty": 3,
+    "ex_price": "0.79",
+    "ex_qty": 1,
+    "vg_price": "0.69",
+    "vg_qty": 0,
+    "g_price": "0.50",
+    "g_qty": 0
+   }
+  },
+  {
+   "id": 313459,
+   "sku": "FSLD-2050",
+   "scryfall_id": "1b07edb8-4ba9-44b4-a8c7-da0447e4d1b9",
+   "url": "mtg/secret-lair/rift-bolt-2050-foil",
+   "name": "Rift Bolt",
+   "variation": "2050 - Foil",
+   "edition": "Secret Lair",
+   "is_foil": "true",
+   "price_retail": "3.49",
+   "qty_retail": 3,
+   "price_buy": "1.60",
+   "qty_buying": 5,
+   "condition_values": {
+    "nm_price": "3.49",
+    "nm_qty": 3,
+    "ex_price": "2.79",
+    "ex_qty": 0,
+    "vg_price": "2.44",
+    "vg_qty": 0,
+    "g_price": "1.75",
+    "g_qty": 0
+   }
+  }
+ ]
+}

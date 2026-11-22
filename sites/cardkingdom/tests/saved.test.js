@@ -3,7 +3,9 @@
 //   CK_SAVED_ORDERS=<saved order history.html> \
 //   CK_SAVED_SALES=<saved selling history.html> \
 //   CK_SAVED_SELLCART=<saved sell cart.html> \
-//   CK_SAVED_BUYCART=<saved buy cart.html> bun test tests/
+//   CK_SAVED_BUYCART=<saved buy cart.html> \
+//   CK_SAVED_SELLINVOICE=<saved sell invoice.html> \
+//   CK_PRICELIST=<CK's price list, as published> bun test tests/
 //
 // A saved page carries an account's data and never enters the repository, so
 // without the variables these tests skip.
@@ -90,3 +92,23 @@ for (const side of ["sell", "buy"]) {
     });
   });
 }
+
+describe("the saved sell invoice", () => {
+  const path = process.env.CK_SAVED_SELLINVOICE;
+
+  test.skipIf(!path)("reads every line whole, and they add up to its Subtotal", () => {
+    const doc = savedPage(path);
+    const read = CKB.readSellInvoice(doc);
+    expect(read.unreadable).toBe(0);
+    expect(read.lines.length).toBe(doc.querySelectorAll("table.orderContents td.Description").length);
+    expect(read.lines.every((l) => l.edition && l.name)).toBe(true);
+    const subtotal = CKB.cents(doc.querySelector("#subtotal").textContent.trim());
+    expect(read.lines.reduce((sum, l) => sum + l.total, 0)).toBe(subtotal);
+  });
+
+  test.skipIf(!path || !process.env.CK_PRICELIST)("finds every line in the price list", () => {
+    const list = CKB.reducePrices(JSON.parse(readFileSync(process.env.CK_PRICELIST, "utf8")), Date.now());
+    const missing = CKB.readSellInvoice(savedPage(path)).lines.filter((l) => !CKB.invoiceRow(l, list));
+    expect(missing.map((l) => l.edition + ": " + l.name)).toEqual([]);
+  });
+});

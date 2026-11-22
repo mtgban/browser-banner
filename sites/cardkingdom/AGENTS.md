@@ -37,7 +37,9 @@ checks that none of their order ids reached a fixture:
 CK_SAVED_ORDERS=<saved order history.html> \
 CK_SAVED_SALES=<saved selling history.html> \
 CK_SAVED_SELLCART=<saved sell cart.html> \
-CK_SAVED_BUYCART=<saved buy cart.html> bun test tests/
+CK_SAVED_BUYCART=<saved buy cart.html> \
+CK_SAVED_SELLINVOICE=<saved sell invoice.html> \
+CK_PRICELIST=<CK's price list, as published> bun test tests/
 ```
 
 Without the variables it skips. A test that needs a row the saved pages do
@@ -61,6 +63,8 @@ src/cartpage.js  content script: Load prices, the marks, Update price and all
 src/cart.css     the marks, four classes deep to outrank CK's own reset
 src/ui.js        core/ui.js's panel and download, the panel headed CK
 src/historypage.js  content script: range picker (core/ranges.js), Download CSV
+src/invoice.js   a sell invoice's lines, and each one's row in the price list
+src/invoicepage.js  content script: Load prices, CSV and BAN on a sell invoice
 src/panel.css    what this panel adds to core/panel.css; src/history.css
 scripts/cut-fixtures.py  cuts tests/fixtures/ from saved pages, locally only
 tests/mutations.json  each guard, the text that breaks it, the test that fails

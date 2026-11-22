@@ -26,6 +26,9 @@ row of buttons):
 - **History** (`/myaccount/order_history`, `/myaccount/selling_history`): a
   year picker and *Download CSV*, writing every paid purchase that shipped or
   every paid sale that was completed.
+- **Sell invoice** (`/myaccount/po_invoice/<id>`): the order's cards saved as
+  a CSV, or handed to mtgban's upload with *BAN*, each with its Scryfall id
+  from the price list (section 17).
 
 Both carts work for a visitor who is not signed in: such a cart has no *Save
 for Later*, and with it no product ids, so each line is found in the price
@@ -40,6 +43,7 @@ Manifest V3, no `permissions`, `host_permissions`, `background` or
 unless `location.pathname` is `/sellcart` or `/cart`, with or without a
 trailing slash, so it never runs on the carts' form targets
 (`/sellcart/lineitem/...`, `/cart/lineitem/...`, `/sellcart/empty_cart`).
+The invoice script returns unless the path is `/myaccount/po_invoice/<id>`.
 
 ## 3. The sell cart
 
@@ -481,8 +485,11 @@ line's shape and condition, with line ids renumbered, every `_token`
 replaced, and the item count and Subtotal recomputed. The sell cart keeps its
 sidebar's Checkout and Empty Cart buttons and none of its figures. The
 script checks its own output for an id, an address line or a link it should
-have removed, and writes nothing if it finds one. `tests/repo.test.js` scans every
-fixture for what a cut must never keep.
+have removed, and writes nothing if it finds one. A sell invoice is cut the
+same way: CK's table, each group and line refilled with an item drawn from a
+price list, the order id renumbered and the totals recomputed, and nothing
+above the table kept; its items' rows are `invoice-pricelist.json`.
+`tests/repo.test.js` scans every fixture for what a cut must never keep.
 
 ## 15. Build order
 
@@ -526,3 +533,42 @@ that day, which CI never has.
   "Not updated" and the cart locks (section 7).
 - Sealed lines in either cart.
 - Whether CK reprices a buy cart line on its own.
+- The purchase invoice (`/myaccount/invoice/<id>`). Its lines put the edition
+  inside the card's brackets, "Name (Edition Foil CGC 8.5) #0000", and the one
+  saved page held graded cards alone, which the price list does not carry. It
+  waits for a saved invoice of ordinary singles.
+- A sell invoice once CK has graded the order: whether its lines keep the
+  "2 NM @ $19.00" shape. Until then a line of another shape is unreadable.
+
+## 17. The sell invoice
+
+`/myaccount/po_invoice/<id>`, linked from the selling history (section 8),
+holds one table, `table.orderContents`. Its lines are grouped under a heading
+row, one cell spanning three columns, naming the edition, with " Foil" after
+a foil group's: "Apocalypse Foil". A line is a row whose first cell has class
+`Description` and holds the card as CK titles it, variation in brackets
+("Orcus, Prince of Undeath (Extended Art)"), then "2 NM @ $19.00" and the
+line's total. Subtotal, the store-credit bonus and "Total (before grading)"
+follow. A line of any other shape, or whose total is not its quantity times
+its price, is unreadable: left out of the file and counted.
+
+The invoice names no product, so each line is found in the price list by its
+edition, name and foil, as a signed-out cart line is (section 6): the one row
+of that card, or none. The list writes no edition with Foil, and some foils
+say so only in the variation ("Judge Foil", "2050 - Foil") under a heading
+without it. Such a line, not found as it is, is looked for as a foil too: no
+printing whose variation says Foil is listed both ways (2026-11-22, 154,942
+rows), so the one row found is that card. "Non-Foil" is never taken for Foil,
+and "Foil Etched", which the list has as not foil, is found as it is.
+
+The panel offers *Load prices*, *CSV* and *BAN*, the last two greyed out
+until a list is in hand, read on the click or kept from the last hour
+(section 5). With one, the word counts the lines and the tooltip says how
+many were found in the list, how many were not, written with no Scryfall id
+or CK ID, and how many were unreadable. *CSV* saves `ck-sale-<id>.csv` with
+the cart file's columns (section 11), Foil being the found row's; *BAN* hands
+the same rows to mtgban's upload, Magic's, as the carts do. Escape stops a
+read.
+
+A saved invoice of 36 lines read whole, added up to its Subtotal, and was
+found line for line in that day's list.
