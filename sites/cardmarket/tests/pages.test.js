@@ -265,6 +265,17 @@ describe("walking the list", () => {
     expect(walked.stopped).toBe("Cardmarket answered 429");
   });
 
+  test("a walk refused at page one says it stopped", async () => {
+    // Started mid-list, page one is the first fetch; refused, nothing is read.
+    const walked = await MKM.walkPages(pageOf({ next: BASE + "?site=3", total: 42 }), BASE + "?site=2", {
+      fetchPage: () => Promise.reject(new Error("Cardmarket answered 429")),
+      pace: 0,
+    });
+    expect(walked.pages).toBe(0);
+    expect(walked.offers).toEqual([]);
+    expect(walked.stopped).toBe("Cardmarket answered 429");
+  });
+
   test("a page with no rows on it ends the walk", async () => {
     const empty = docOf(text("pager-next.html"));
     const walked = await MKM.walkPages(pageOf({ next: BASE + "?site=2", total: 42 }), BASE, {
