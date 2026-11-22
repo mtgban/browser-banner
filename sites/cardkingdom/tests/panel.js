@@ -162,7 +162,9 @@ export function pricelist(edits = {}, drop = []) {
 // list already in the page's IndexedDB when the page loads. writes(url,
 // options) answers every other request the page sends (Update price and
 // putting a quantity back); a page reload is recorded instead of made.
-export async function mountCart({ side = "sell", path, body, prices = pricelist(), respond, kept, writes, idb = new IDBFactory() } = {}) {
+// window.open answers with a stand-in for mtgban's handoff tab, or with
+// nothing when blockPopups is set.
+export async function mountCart({ side = "sell", path, body, prices = pricelist(), respond, kept, writes, blockPopups, idb = new IDBFactory() } = {}) {
   if (kept) {
     await CKB.keepList(await CKB.openStore(idb), kept);
   }
@@ -216,6 +218,23 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
     return element;
   };
 
+  // The handoff tab: what was opened, and what was posted to it.
+  const tabs = [];
+  window.open = (url) => {
+    if (blockPopups) return null;
+    const tab = {
+      url,
+      closed: false,
+      posted: [],
+      postMessage: (data, origin) => tab.posted.push({ data, origin }),
+      close: () => {
+        tab.closed = true;
+      },
+    };
+    tabs.push(tab);
+    return tab;
+  };
+
   for (const script of scriptsFor(at.replace(/\?.*$/, ""))) {
     window.eval(source(script));
   }
@@ -263,11 +282,18 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
     label: () => at$(".ck-banner-label"),
     all: () => doc.querySelector(".ck-banner-all"),
     csv: () => at$(".ck-banner-csv"),
+    ban: () => at$(".ck-banner-ban"),
+    tabs,
+    // ready is mtgban's handoff page saying it is listening, from tab i.
+    ready: (i = 0, origin = "https://mtgban.com") =>
+      window.dispatchEvent(new window.MessageEvent("message", { data: { type: "mtgban-handoff-ready" }, origin, source: tabs[i] })),
+    focus: () => window.dispatchEvent(new window.Event("focus")),
     file: async (i = 0) => ({ name: saved[i].name, text: await saved[i].blob.text() }),
     saved: () => saved,
     focused: () => doc.activeElement,
     busy: () => panel.classList.contains("ck-banner-busy"),
     failed: () => !at$(".ck-banner-mark").hidden && at$(".ck-banner-mark").classList.contains("ck-banner-failed"),
+    ticked: () => !at$(".ck-banner-mark").hidden && !at$(".ck-banner-mark").classList.contains("ck-banner-failed"),
     titled: () => doc.querySelectorAll("#ck-banner [title], .ck-banner-line [title]").length,
     below: () => {
       const children = [...panel.children];

@@ -21,6 +21,8 @@ row of buttons):
 - **Buy cart** (`/cart`): the same comparison the other way round, against the
   list's retail price for the line's condition. Where the list now charges
   less than the cart, a price reduction, the line is marked.
+- **Either cart** can be saved as a CSV, or handed to mtgban's upload with
+  *BAN* (section 11).
 - **History** (`/myaccount/order_history`, `/myaccount/selling_history`): a
   year picker and *Download CSV*, writing every paid purchase that shipped or
   every paid sale that was completed.
@@ -377,6 +379,21 @@ A line the page could not read whole is written with what was read. On
 every line of four saved carts, `Edition: Name` was the line's image text,
 " Foil" aside.
 
+*BAN* hands those same rows to mtgban's upload instead of saving them, and
+is greyed out with *CSV*. It opens `https://mtgban.com/upload/handoff`, the
+Magic deployment's, in a tab of its own straight from the click, since
+`window.open` needs one. That page says when it is listening
+(`mtgban-handoff-ready`), and the rows go to it with `postMessage`
+(`mtgban-handoff-rows`: the CSV, its row count, and the cart's address as
+`source`), answered to the origin that spoke. It is the protocol Cardmarket's
+and TCGplayer's sends speak: only an `https` origin that is `mtgban.com` or
+under it, from the tab this page opened, is heard. Until it speaks the
+tooltip says the cart is waiting for it; sent, a tick and `Sent 12 lines to
+BAN`. A blocked tab, or one closed before it listened (seen on coming back
+to the cart), is a red cross saying so. A second click retires the first
+tab. Nothing is sent from the cart page itself: mtgban's page does the
+upload, with the reader's own mtgban session.
+
 ## 12. The CSV cache
 
 A saved file is kept in IndexedDB beside the price list (section 5), one per
@@ -426,7 +443,8 @@ the year changes. At these addresses a page without the history table (a
 sign-in page) gets no panel.
 
 On the carts the row is *Load prices*, then *Refresh* once the cart is
-marked, and *CSV* (section 11), greyed out until a list is in hand. The
+marked, then *CSV* and *BAN* (section 11), both greyed out until a list is
+in hand. The
 whole list is read only on that click, or before an update when CK has a
 newer one (section 7), and *Refresh* is greyed out while the list in hand is
 fresh, since reading it again would change nothing, until the hour runs out

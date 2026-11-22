@@ -147,8 +147,10 @@
   cursor: pointer;
 }
 
-/* The carts' CSV shares the row and takes only the room its word needs. */
-#ck-banner .ck-banner-csv {
+/* The carts' CSV and BAN share the row and take only the room their words
+   need. */
+#ck-banner .ck-banner-csv,
+#ck-banner .ck-banner-ban {
   flex: none;
 }
 

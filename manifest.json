@@ -67,6 +67,7 @@
         "sites/cardkingdom/src/store.js",
         "sites/cardkingdom/src/compare.js",
         "sites/cardkingdom/src/update.js",
+        "sites/cardkingdom/src/handoff.js",
         "sites/cardkingdom/src/cartpage.js"
       ],
       "css": [
