@@ -65,8 +65,17 @@ export function mountHistory({ kind = "purchases", total = 210, change = {}, bod
     return "blob:none";
   };
   window.URL.revokeObjectURL = () => {};
-  window.HTMLAnchorElement.prototype.click = function () {
-    saved[saved.length - 1].name = this.download;
+  // Each anchor the page makes records its own click: happy-dom shares
+  // element prototypes across windows, so patching one reaches every site.
+  const create = window.document.createElement.bind(window.document);
+  window.document.createElement = (name, options) => {
+    const element = create(name, options);
+    if (String(name).toLowerCase() === "a") {
+      element.click = function () {
+        saved[saved.length - 1].name = this.download;
+      };
+    }
+    return element;
   };
 
   for (const script of scriptsFor(path)) {
@@ -193,8 +202,17 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
     return "blob:none";
   };
   window.URL.revokeObjectURL = () => {};
-  window.HTMLAnchorElement.prototype.click = function () {
-    saved[saved.length - 1].name = this.download;
+  // Each anchor the page makes records its own click: happy-dom shares
+  // element prototypes across windows, so patching one reaches every site.
+  const create = window.document.createElement.bind(window.document);
+  window.document.createElement = (name, options) => {
+    const element = create(name, options);
+    if (String(name).toLowerCase() === "a") {
+      element.click = function () {
+        saved[saved.length - 1].name = this.download;
+      };
+    }
+    return element;
   };
 
   for (const script of scriptsFor(at.replace(/\?.*$/, ""))) {
