@@ -5,17 +5,18 @@
 //
 // With no site named, it runs every site that has a mutations.json.
 //
-// It works on a copy of the site in a temporary directory, so the working
-// tree is never touched. The copy holds what git would track (ignored files,
-// saved pages among them, stay put), with the root's node_modules linked in.
-// The site's whole suite runs once, unmutated; each mutation then runs only
-// the test it names, in the files that hold it, since no other test can
-// report it.
+// It works on a copy of the repository in a temporary directory, so the
+// working tree is never touched; a site's tests read the root manifest, so the
+// copy is the whole repository rather than the site. It holds what git would
+// track (ignored files, saved pages among them, stay put), with node_modules
+// linked in. The site's whole suite runs once, unmutated; each mutation then
+// runs only the test it names, in the files that hold it, since no other test
+// can report it.
 
 import { spawnSync } from "child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
-import { basename, dirname, join, resolve } from "path";
+import { basename, dirname, join, relative, resolve } from "path";
 import { fileURLToPath } from "url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -82,14 +83,15 @@ function mutate(site) {
   // holding is the test files whose source names a test.
   const holding = (test) => testFiles.filter((file) => readFileSync(join(dir, file), "utf8").includes(test));
 
-  const copy = mkdtempSync(join(tmpdir(), "browser-banner-" + name + "-"));
+  const repo = mkdtempSync(join(tmpdir(), "browser-banner-" + name + "-"));
+  const copy = join(repo, relative(root, dir));
   let missed = 0;
   try {
-    for (const file of tracked(dir)) {
-      mkdirSync(dirname(join(copy, file)), { recursive: true });
-      cpSync(join(dir, file), join(copy, file));
+    for (const file of tracked(root)) {
+      mkdirSync(dirname(join(repo, file)), { recursive: true });
+      cpSync(join(root, file), join(repo, file));
     }
-    symlinkSync(join(root, "node_modules"), join(copy, "node_modules"));
+    symlinkSync(join(root, "node_modules"), join(repo, "node_modules"));
 
     const clean = run(copy);
     if (clean.timedOut || clean.status !== 0) {
@@ -136,7 +138,7 @@ function mutate(site) {
       }
     }
   } finally {
-    rmSync(copy, { recursive: true, force: true });
+    rmSync(repo, { recursive: true, force: true });
   }
   console.log(`${name}: ${mutations.length - missed} of ${mutations.length} mutations caught`);
   return missed;

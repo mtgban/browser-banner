@@ -10,11 +10,12 @@
 
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
+import { siteManifest } from "../../../tests/manifest.js";
 
 const OFFERS = "https://www.cardmarket.com/en/Magic/Users/Seller/Offers/Singles";
 
 function source(name) {
-  return readFileSync(new URL("../src/" + name, import.meta.url), "utf8");
+  return readFileSync(new URL("../" + name, import.meta.url), "utf8");
 }
 
 function fixture(name) {
@@ -60,8 +61,10 @@ export function mount({
   };
   window.URL.revokeObjectURL = function () {};
 
-  for (const name of ["rates.js", "parse.js", "pages.js", "csv.js", "content.js"]) {
-    window.eval(source(name));
+  for (const entry of siteManifest("cardmarket").content_scripts) {
+    for (const script of entry.js) {
+      window.eval(source(script));
+    }
   }
 
   const panel = window.document.getElementById("cm-banner");

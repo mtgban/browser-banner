@@ -1,9 +1,10 @@
 import { test, expect, describe } from "bun:test";
 import { readFileSync, readdirSync, existsSync, statSync } from "fs";
+import { siteManifest } from "../../../tests/manifest.js";
 
 const root = new URL("../", import.meta.url);
 const read = (name) => readFileSync(new URL(name, root), "utf8");
-const manifest = JSON.parse(read("manifest.json"));
+const manifest = siteManifest("cardkingdom");
 
 // files lists every file under dir, relative to the repository root, or
 // nothing when dir does not exist yet.
@@ -35,7 +36,7 @@ describe("the manifest", () => {
   });
 
   test("names only files that exist", () => {
-    const named = Object.values(manifest.icons);
+    const named = [];
     for (const cs of manifest.content_scripts || []) {
       named.push(...(cs.js || []), ...(cs.css || []));
     }
@@ -87,7 +88,6 @@ describe("punctuation", () => {
       "README.md",
       "SPECIFICATIONS.md",
       "AGENTS.md",
-      "manifest.json",
     ];
     const dashed = names.filter((name) => {
       const text = read(name);

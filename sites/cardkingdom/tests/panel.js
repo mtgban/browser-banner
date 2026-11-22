@@ -10,9 +10,10 @@ import { Window } from "happy-dom";
 import { IDBFactory } from "fake-indexeddb";
 import { readFileSync } from "fs";
 import { CKB, pageHTML, text } from "./helpers.js";
+import { siteManifest } from "../../../tests/manifest.js";
 
 const SITE = "https://www.cardkingdom.com";
-const manifest = JSON.parse(readFileSync(new URL("../manifest.json", import.meta.url), "utf8"));
+const manifest = siteManifest("cardkingdom");
 
 function source(name) {
   return readFileSync(new URL("../" + name, import.meta.url), "utf8");

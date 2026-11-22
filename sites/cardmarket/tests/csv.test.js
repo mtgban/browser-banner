@@ -1,6 +1,7 @@
 import { test, expect, describe } from "bun:test";
 import { load, parse, MKM } from "./helpers.js";
 import { readFileSync } from "fs";
+import { siteManifest } from "../../../tests/manifest.js";
 
 describe("the columns", () => {
   // Every name here is one the upload's header matcher reads, and reads the
@@ -92,9 +93,7 @@ describe("end to end", () => {
 });
 
 describe("where the extension runs", () => {
-  const manifest = JSON.parse(
-    readFileSync(new URL("../manifest.json", import.meta.url), "utf8")
-  );
+  const manifest = siteManifest("cardmarket");
 
   test("only on a seller's offers pages, and nowhere else", () => {
     // The site receives its own rows now, on a page it owns, so this runs on

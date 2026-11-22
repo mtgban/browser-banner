@@ -11,9 +11,10 @@
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
 import { site } from "./helpers.js";
+import { siteManifest } from "../../../tests/manifest.js";
 
 const URL_ = "https://store.tcgplayer.com/myaccount/orderhistory";
-const manifest = JSON.parse(readFileSync(new URL("../manifest.json", import.meta.url), "utf8"));
+const manifest = siteManifest("tcgplayer");
 
 function source(name) {
   return readFileSync(new URL("../" + name, import.meta.url), "utf8");
