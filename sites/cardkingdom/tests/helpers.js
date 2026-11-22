@@ -9,7 +9,7 @@ function source(name) {
 }
 
 globalThis.CKB = globalThis.CKB || {};
-for (const name of ["../../../core/net.js", "../../../core/csv.js", "../../../core/money.js", "net.js", "money.js", "csv.js", "history.js", "cart.js", "prices.js", "store.js", "compare.js", "update.js", "../../../core/handoff.js", "handoff.js"]) {
+for (const name of ["../../../core/net.js", "../../../core/csv.js", "../../../core/money.js", "net.js", "money.js", "csv.js", "history.js", "cart.js", "prices.js", "store.js", "compare.js", "update.js", "invoice.js", "../../../core/handoff.js", "handoff.js"]) {
   new Function("globalThis", source(name))(globalThis);
 }
 

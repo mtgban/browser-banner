@@ -97,6 +97,33 @@
     },
     {
       "matches": [
+        "https://www.cardkingdom.com/myaccount/po_invoice/*"
+      ],
+      "js": [
+        "core/net.js",
+        "core/csv.js",
+        "core/money.js",
+        "sites/cardkingdom/src/net.js",
+        "sites/cardkingdom/src/money.js",
+        "sites/cardkingdom/src/csv.js",
+        "core/ui.js",
+        "sites/cardkingdom/src/ui.js",
+        "sites/cardkingdom/src/prices.js",
+        "sites/cardkingdom/src/store.js",
+        "sites/cardkingdom/src/compare.js",
+        "core/handoff.js",
+        "sites/cardkingdom/src/handoff.js",
+        "sites/cardkingdom/src/invoice.js",
+        "sites/cardkingdom/src/invoicepage.js"
+      ],
+      "css": [
+        "core/panel.css",
+        "sites/cardkingdom/src/panel.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
         "https://store.tcgplayer.com/*"
       ],
       "js": [

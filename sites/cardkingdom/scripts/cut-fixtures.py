@@ -256,7 +256,8 @@ def serialize(node, names):
 
 def check(out, private):
     leaks = [value for value in private if value and value in out]
-    if "@" in out:
+    # An invoice line's "2 NM @ $1.30" is CK's; any other @ may be an email.
+    if "@" in re.sub(r"\b\d+ (?:NM|EX|VG|G) @ \$", "", out):
         leaks.append("an @")
     if re.search(r"\d{15,}", out):
         leaks.append("a 15-plus digit run")
@@ -372,6 +373,11 @@ class Catalogue:
                 "variation": not foil and r["variation"] and ":" not in r["variation"],
                 "box": not foil and not r["variation"] and stock >= 100,
                 "foil variation": foil and r["variation"],
+                # Foil said only by the variation ("Judge Foil"), never by
+                # the edition, and the etched ones, which the list has as
+                # not foil.
+                "variation foil": foil and re.search(r"(^|[^-])\bFoil\b", r["variation"]),
+                "etched": not foil and "Foil Etched" in r["variation"],
             }[shape]
 
         row = self.rng.choice([r for r in self.rows if fits(r)])
@@ -580,6 +586,92 @@ def cut_buy(path, catalogue):
     return finish(items, lines, "Cart", private)
 
 
+# The sell invoice's lines, grouped as CK groups them, by edition, " Foil"
+# after a foil one: per group, whether its heading says Foil, and per line a
+# shape, a quantity and a condition.
+SELL_INVOICE = (
+    (False, (("plain", 2, "NM"), ("plain", 1, "EX"))),
+    (True, (("foil", 3, "NM"),)),
+    (False, (("variation", 1, "NM"),)),
+    (False, (("variation foil", 1, "NM"),)),
+    (False, (("etched", 2, "VG"),)),
+)
+
+
+def cut_sell_invoice(path, catalogue, first_id):
+    """CK's own invoice table with none of the account's items: each group
+    and line is a copy of a saved one, refilled with an item drawn from a
+    price list; the order id is renumbered and the totals recomputed. The
+    addresses, payment and comment above the table are not kept."""
+    root = parse(path)
+    heading = only((n for n in walk(root) if n.tag == "h1" and "Order #" in text(n)), "order heading")
+    original = re.search(r"#(\d+)", text(heading)).group(1)
+    wrapper = only((n for n in walk(root) if n.tag == "div" and classed(n, "invoiceListWrapper")), "invoice list")
+    table = only((n for n in wrapper.kids if isinstance(n, Node) and n.tag == "table"), "invoice table")
+    body = only((n for n in table.kids if isinstance(n, Node) and n.tag == "tbody"), "invoice body")
+    rows = [k for k in body.kids if isinstance(k, Node) and k.tag == "tr"]
+    cells = lambda tr: [k for k in tr.kids if isinstance(k, Node) and k.tag == "td"]
+    private = []
+    for tr in rows:
+        if any(classed(td, "Description") for td in cells(tr)):
+            private.append(text(cells(tr)[0]).strip())
+    title = rows[0]
+    spacer = next(tr for tr in rows if len(cells(tr)) == 1 and not cells(tr)[0].attr("colspan"))
+    group = next(tr for tr in rows if len(cells(tr)) == 1 and cells(tr)[0].attr("colspan") == "3")
+    line = next(tr for tr in rows if any(classed(td, "Description") for td in cells(tr)))
+    footer = [tr for tr in rows if any(td.attr("id") in ("subtotal", "store_credit_premium", "total_before_grading") for td in cells(tr))]
+    if len(footer) != 3:
+        sys.exit("the invoice does not end in Subtotal, bonus and Total")
+
+    kept, subtotal = [title], 0
+    for foil, lines in SELL_INVOICE:
+        drawn = [(catalogue.draw(shape, "sell", qty), qty, condition) for shape, qty, condition in lines]
+        edition = drawn[0][0]["edition"]
+        # One group is one edition: the group's other lines come from it too.
+        for i in range(1, len(drawn)):
+            row, qty, condition = drawn[i]
+            if row["edition"] != edition:
+                catalogue.drawn.remove(row)
+                pick = [r for r in catalogue.rows if r["edition"] == edition and r["id"] not in catalogue.used
+                        and not r["variation"] and r["is_foil"] == drawn[0][0]["is_foil"] and cents(r["price_buy"]) > 0
+                        and r["name"] not in catalogue.names and ":" not in r["name"]]
+                row = catalogue.rng.choice(pick)
+                catalogue.used.add(row["id"])
+                catalogue.drawn.append(row)
+                drawn[i] = (row, qty, condition)
+        head = clone(group, body)
+        bold = only((n for n in walk(head) if n.tag == "b"), "group name")
+        bold.kids = [edition + (" Foil" if foil else "")]
+        kept += [clone(spacer, body), head]
+        for row, qty, condition in drawn:
+            each = cents(row["price_buy"])
+            tr = clone(line, body)
+            desc, qty_cell, total_cell = cells(tr)
+            desc.kids = [row["name"] + (f" ({row['variation']})" if row["variation"] else "")]
+            qty_cell.kids = [f"{qty} {condition} @ {dollars(each)}"]
+            total_cell.kids = [dollars(qty * each)]
+            subtotal += qty * each
+            kept.append(tr)
+    bonus = round(subtotal * 0.3)
+    only((td for td in cells(footer[0]) if td.attr("id") == "subtotal"), "subtotal").kids = [dollars(subtotal)]
+    only((td for td in cells(footer[1]) if td.attr("id") == "store_credit_premium"), "bonus").kids = [f" +{dollars(bonus)} "]
+    total = only((td for td in cells(footer[2]) if td.attr("id") == "total_before_grading"), "total")
+    total.kids = ["USD ", Node("b", [], total)]
+    total.kids[1].kids = [f"{dollars(subtotal + bonus)} "]
+    kept += [clone(spacer, body)] + footer
+    spaced = []
+    for tr in kept:
+        spaced += [tr, " "]
+    body.kids = spaced[:-1]
+
+    heading.kids = [f"My Account / Order #{first_id}"]
+    out = serialize(heading, Verbatim()) + " " + '<div class="invoiceListWrapper">' + serialize(table, Verbatim()) + "</div>"
+    check(out, sorted(private, key=len, reverse=True))
+    if re.search(r"\b" + original + r"\b", out):
+        sys.exit("refusing to write, the cut still holds the order id")
+    return out
+
+
 def write(name, body, source, what):
     head = f"<!-- Cut by scripts/cut-fixtures.py from a saved {source} page. {what} -->\n"
     with open(os.path.join(OUT, name), "w", encoding="utf-8") as f:
@@ -596,6 +688,11 @@ CART = (
     "price list, at that list's price; line ids renumbered, every _token replaced."
 )
 
+INVOICE = (
+    "CK's table with\nnone of the account's items: every line holds an item drawn at random from a\n"
+    "price list, at that list's price; the order id renumbered, totals recomputed."
+)
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -603,12 +700,13 @@ def main():
     ap.add_argument("--sales", help="saved /myaccount/selling_history page")
     ap.add_argument("--cart", help="saved /sellcart page")
     ap.add_argument("--buy", help="saved /cart page")
-    ap.add_argument("--prices", help="a CK price list, to draw the carts' items from")
+    ap.add_argument("--sellinvoice", help="saved /myaccount/po_invoice/<id> page")
+    ap.add_argument("--prices", help="a CK price list, to draw the carts' and invoices' items from")
     args = ap.parse_args()
-    if not (args.orders or args.sales or args.cart or args.buy):
+    if not (args.orders or args.sales or args.cart or args.buy or args.sellinvoice):
         ap.error("give at least one saved page")
-    if (args.cart or args.buy) and not args.prices:
-        ap.error("a cart needs --prices to draw its items from")
+    if (args.cart or args.buy or args.sellinvoice) and not args.prices:
+        ap.error("a cart or an invoice needs --prices to draw its items from")
     os.makedirs(OUT, exist_ok=True)
 
     wrap = lambda body: '<div class="orderHistoryWrapper">' + body + "</div>"
@@ -633,6 +731,16 @@ def main():
         with open(os.path.join(OUT, "pricelist.json"), "w", encoding="utf-8") as f:
             f.write(json.dumps({"meta": catalogue.meta, "data": rows}, indent=1) + "\n")
         print("wrote pricelist.json")
+    if args.sellinvoice:
+        # Drawn on its own, with a list of its own, so the carts' fixtures
+        # and theirs stay as they were cut.
+        catalogue = Catalogue(args.prices, set())
+        catalogue.names = {text(n).strip().split(" (")[0] for n in walk(parse(args.sellinvoice)) if classed(n, "Description")}
+        write("sell-invoice.html", cut_sell_invoice(args.sellinvoice, catalogue, 3000001), "sell invoice", INVOICE)
+        rows = sorted(catalogue.drawn, key=lambda r: r["id"])
+        with open(os.path.join(OUT, "invoice-pricelist.json"), "w", encoding="utf-8") as f:
+            f.write(json.dumps({"meta": catalogue.meta, "data": rows}, indent=1) + "\n")
+        print("wrote invoice-pricelist.json")
 
 
 if __name__ == "__main__":
