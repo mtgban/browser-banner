@@ -43,7 +43,8 @@ src/parse.js     DOM → offers. The volatile half; see SPECIFICATIONS.md §3
 src/pages.js     one page → every page, at Cloudflare's pace; see §6
 src/csv.js       offers → CSV. The contract with mtgban; see §4
 src/ui.js        core/ui.js's panel and download, the panel headed CM
-src/content.js   what the panel does, the handoff
+src/handoff.js   core/handoff.js's sender, every game BAN prices, "use the CSV"
+src/content.js   what the panel does, and when it sends
 src/content.css  what this panel adds to core/panel.css
 tests/panel.js   stands the content script up in a window; clicks are real
 tests/mutations.json  each guard, the text that breaks it, the test that fails

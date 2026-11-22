@@ -28,17 +28,29 @@ function body(name) {
   return content.slice(at, next === -1 ? content.length : next);
 }
 
+// The shared sender's handOff (core/handoff.js), which opens the tab and
+// listens for it: from its declaration to the sender it makes.
+const core = readFileSync(new URL("../../../core/handoff.js", import.meta.url), "utf8");
+function coreHandOff() {
+  const at = core.indexOf("function handOff(");
+  expect(at).toBeGreaterThan(-1);
+  return core.slice(at, core.indexOf("return { handOff", at));
+}
+
 describe("handing the rows over", () => {
   test("nothing slow stands between the click and the window", () => {
     // window.open needs the click's transient activation, which Firefox
     // keeps alive about five seconds and then calls the result a pop-up,
     // blocks it, and puts a bar across the top of the page. So the open
-    // is the first thing the function does.
+    // comes before anything waits on the rows, and nothing slow is asked
+    // for on the way to it.
     const handOff = body("handOff");
-    expect(handOff).toContain("window.open(");
-    expect(handOff.indexOf("window.open(")).toBeLessThan(handOff.indexOf(".then("));
+    expect(handOff).toContain("MKM.handOff(");
+    const shared = coreHandOff();
+    expect(shared.indexOf("window.open(")).toBeLessThan(shared.indexOf("rows.then("));
     for (const slow of ["collect(", "walkPages", "fetchRates", "await "]) {
       expect(handOff).not.toContain(slow);
+      expect(shared).not.toContain(slow);
     }
   });
 
@@ -73,7 +85,7 @@ describe("handing the rows over", () => {
     // running, so the listener is in time as long as it goes up in the
     // body itself - not inside the callback waiting on the rows, which
     // is the version of this that would hang.
-    const handOff = body("handOff");
+    const handOff = coreHandOff();
     expect(handOff).toContain('window.addEventListener("message"');
     expect(handOff.indexOf('window.addEventListener("message"')).toBeLessThan(
       handOff.indexOf("rows.then(")
@@ -263,12 +275,10 @@ describe("the handoff listener", () => {
     // The page it opens has no deadline on purpose. A tab that never
     // answers at all would otherwise leave its listener behind for the
     // life of the page.
-    const handOff = body("handOff");
-    expect(handOff).toContain("removeEventListener");
-    expect(handOff.indexOf("removeEventListener")).toBeLessThan(
-      handOff.indexOf("window.open(")
-    );
-    expect(handOff).toContain("awaiting = onMessage");
+    const handOff = coreHandOff();
+    expect(handOff).toContain("replaced.finish(");
+    expect(handOff.indexOf("replaced.finish(")).toBeLessThan(handOff.indexOf("window.open("));
+    expect(core).toContain('window.removeEventListener("message", was.listener)');
   });
 });
 

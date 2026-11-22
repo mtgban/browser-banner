@@ -106,14 +106,14 @@
   },
   {
     "guard": "the handoff listens only to mtgban",
-    "file": "src/handoff.js",
-    "find": "!TCGB.isBanHost(event.origin) ||",
+    "file": "../../core/handoff.js",
+    "find": "!BAN.isBanHost(event.origin) ||",
     "replace": "",
     "expectFailing": "listens only to mtgban, from the tab it opened"
   },
   {
     "guard": "the handoff listens only to the tab it opened",
-    "file": "src/handoff.js",
+    "file": "../../core/handoff.js",
     "find": "event.source !== opened ||",
     "replace": "",
     "expectFailing": "listens only to mtgban, from the tab it opened"
@@ -127,7 +127,7 @@
   },
   {
     "guard": "a superseded handoff's tab is closed",
-    "file": "src/handoff.js",
+    "file": "../../core/handoff.js",
     "find": "replaced.opened.close();",
     "replace": "",
     "expectFailing": "a second send closes the first tab, which would wait for good"
@@ -253,44 +253,44 @@
   },
   {
     "guard": "a closed BAN tab is noticed on focus",
-    "file": "src/handoff.js",
-    "find": "    window.addEventListener(\"focus\", onFocus);\n",
+    "file": "../../core/handoff.js",
+    "find": "      window.addEventListener(\"focus\", onFocus);\n",
     "replace": "",
     "expectFailing": "a BAN tab closed before it listened is noticed on coming back"
   },
   {
     "guard": "focus with the BAN tab open does not end the send",
-    "file": "src/handoff.js",
-    "find": "    function onFocus() {\n      if (opened.closed) {",
-    "replace": "    function onFocus() {\n      if (true) {",
+    "file": "../../core/handoff.js",
+    "find": "      function onFocus() {\n        if (opened.closed) {",
+    "replace": "      function onFocus() {\n        if (true) {",
     "expectFailing": "says it is sending until mtgban's page listens"
   },
   {
     "guard": "a name only ending in mtgban.com is not mtgban",
-    "file": "src/handoff.js",
+    "file": "../../core/handoff.js",
     "find": "parsed.hostname.slice(-11) === \".mtgban.com\"",
     "replace": "parsed.hostname.slice(-10) === \"mtgban.com\"",
     "expectFailing": "is not a name that only ends in mtgban.com"
   },
   {
     "guard": "mtgban is answered over https only",
-    "file": "src/handoff.js",
+    "file": "../../core/handoff.js",
     "find": "parsed.protocol === \"https:\" &&",
     "replace": "",
     "expectFailing": "is not one over plain http"
   },
   {
     "guard": "only the ready message gets the cards",
-    "file": "src/handoff.js",
-    "find": "        event.data.type !== READY\n",
-    "replace": "        false\n",
+    "file": "../../core/handoff.js",
+    "find": "          event.data.type !== READY\n",
+    "replace": "          false\n",
     "expectFailing": "a message of another type from the tab gets no cards"
   },
   {
     "guard": "a tab closed before it listened gets no cards",
-    "file": "src/handoff.js",
-    "find": "      stopWaiting();\n      if (opened.closed) {\n        done(TCGB.CLOSED);",
-    "replace": "      stopWaiting();\n      if (false) {\n        done(TCGB.CLOSED);",
+    "file": "../../core/handoff.js",
+    "find": "        if (opened.closed) {\n          finish(words.closed);\n          return;\n        }\n        // Answered",
+    "replace": "        if (false) {\n          finish(words.closed);\n          return;\n        }\n        // Answered",
     "expectFailing": "a tab that says it is listening after it was closed gets no cards"
   },
   {
@@ -397,5 +397,12 @@
     "find": "(chosen === TCGB.ALL ? range + \": \" : \"\")",
     "replace": "(\"\")",
     "expectFailing": "names the year it is reading"
+  },
+  {
+    "guard": "a store sends only the games it names",
+    "file": "../../core/handoff.js",
+    "find": "games.indexOf(game) >= 0 && ",
+    "replace": "",
+    "expectFailing": "an order with nothing to send gets none"
   }
 ]

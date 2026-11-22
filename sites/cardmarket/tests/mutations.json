@@ -302,21 +302,21 @@
   },
   {
     "guard": "only an https mtgban origin is heard",
-    "file": "src/content.js",
+    "file": "../../core/handoff.js",
     "find": "parsed.protocol === \"https:\" &&",
     "replace": "true &&",
     "expectFailing": "but not one answering from anywhere but BAN"
   },
   {
     "guard": "only a host under mtgban.com is heard",
-    "file": "src/content.js",
+    "file": "../../core/handoff.js",
     "find": "parsed.hostname.slice(-11) === \".mtgban.com\"",
     "replace": "true",
     "expectFailing": "but not one answering from anywhere but BAN"
   },
   {
     "guard": "only the tab that was opened is heard",
-    "file": "src/content.js",
+    "file": "../../core/handoff.js",
     "find": "event.source !== opened ||",
     "replace": "false ||",
     "expectFailing": "nor a window it did not open"
@@ -337,16 +337,16 @@
   },
   {
     "guard": "a blocked pop-up is said",
-    "file": "src/content.js",
-    "find": "    if (!opened) {",
-    "replace": "    if (false) {",
+    "file": "../../core/handoff.js",
+    "find": "      if (!opened) {\n        done(words.blocked);",
+    "replace": "      if (false) {\n        done(words.blocked);",
     "expectFailing": "a blocked pop-up is a cross, with the rows still in hand"
   },
   {
     "guard": "a tab closed before the rows arrived is said",
-    "file": "src/content.js",
-    "find": "if (opened.closed) {",
-    "replace": "if (false) {",
+    "file": "../../core/handoff.js",
+    "find": "        if (opened.closed) {\n          finish(words.closed);\n          return;\n        }\n        // Answered",
+    "replace": "        if (false) {\n          finish(words.closed);\n          return;\n        }\n        // Answered",
     "expectFailing": "so is an upload tab closed before the rows reached it"
   },
   {
@@ -456,9 +456,9 @@
   },
   {
     "guard": "the rows name the page they were read from",
-    "file": "src/content.js",
-    "find": "source: location.href,",
-    "replace": "source: \"\",",
+    "file": "../../core/handoff.js",
+    "find": "source: location.href",
+    "replace": "source: \"\"",
     "expectFailing": "the rows say which page they were read from"
   },
   {
@@ -467,5 +467,19 @@
     "find": "parts[2].toLowerCase()",
     "replace": "parts[2]",
     "expectFailing": "and sends from a game Cardmarket added after this was written"
+  },
+  {
+    "guard": "a tab closed while the send waits is noticed on focus",
+    "file": "../../core/handoff.js",
+    "find": "      window.addEventListener(\"focus\", onFocus);\n",
+    "replace": "",
+    "expectFailing": "an upload tab closed while it waits is noticed on coming back"
+  },
+  {
+    "guard": "a second send closes the first tab",
+    "file": "../../core/handoff.js",
+    "find": "replaced.opened.close();",
+    "replace": "",
+    "expectFailing": "a second send closes the first tab, which would wait for good"
   }
 ]

@@ -27,6 +27,8 @@
         "sites/cardmarket/src/csv.js",
         "core/ui.js",
         "sites/cardmarket/src/ui.js",
+        "core/handoff.js",
+        "sites/cardmarket/src/handoff.js",
         "sites/cardmarket/src/content.js"
       ],
       "css": [
@@ -73,6 +75,7 @@
         "sites/cardkingdom/src/store.js",
         "sites/cardkingdom/src/compare.js",
         "sites/cardkingdom/src/update.js",
+        "core/handoff.js",
         "sites/cardkingdom/src/handoff.js",
         "sites/cardkingdom/src/cartpage.js"
       ],
@@ -93,6 +96,7 @@
         "sites/tcgplayer/src/read.js",
         "sites/tcgplayer/src/net.js",
         "sites/tcgplayer/src/walk.js",
+        "core/handoff.js",
         "sites/tcgplayer/src/handoff.js",
         "core/ui.js",
         "sites/tcgplayer/src/ui.js",

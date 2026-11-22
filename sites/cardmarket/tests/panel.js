@@ -107,6 +107,7 @@ export function mount({
     hoverSend: () => at(".ban-send").dispatchEvent(new window.Event("mouseenter")),
     leaveSend: () => at(".ban-send").dispatchEvent(new window.Event("mouseleave")),
     blur: () => window.dispatchEvent(new window.Event("blur")),
+    focus: () => window.dispatchEvent(new window.Event("focus")),
     // Whether leaving now would ask first.
     leaving: () => {
       const event = new window.Event("beforeunload", { cancelable: true });

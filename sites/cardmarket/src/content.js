@@ -17,15 +17,14 @@
 
   // The shared panel's id (core/ui.js).
   var PANEL_ID = "ban-panel";
-  // What the two halves of the handoff say to each other.
-  // The protocol the site's handoff page speaks.
+  // What the send button says.
   var SEND = "Send to BAN";
+  // What the heading's hover says to a visitor Cardmarket has not signed in.
+  var SIGN_IN = "Sign in to Cardmarket to read the whole list";
   // What the file button says. It is the quieter of the two while there
   // are two, and says the whole thing when it is alone - the panel is a
   // fixed width, so the longer word is what keeps the row from shrinking
   // to the size of one small button.
-  // What the heading's hover says to a visitor Cardmarket has not signed in.
-  var SIGN_IN = "Sign in to Cardmarket to read the whole list";
   var SAVE = "CSV";
   var SAVE_ALONE = "Download CSV";
   // What the button says once the rows are read and waiting for the click
@@ -33,59 +32,9 @@
   // has room and is otherwise repeating a scope that was chosen before the
   // read and has not changed since.
   //
-  // Not called READY - that name is taken, by the message the site's
-  // handoff page sends when it is listening, and the two are one keyword
-  // apart from silently swapping places.
+  // Not called READY: core/handoff.js has a READY, the message the handoff
+  // page sends when it is listening.
   var ARMED = "READY";
-  var READY = "mtgban-handoff-ready";
-  var ROWS = "mtgban-handoff-rows";
-
-  // Each game is served by its own deployment. Magic is the default one and
-  // answers at the bare domain: magic.mtgban.com redirects there, which
-  // changes the origin on the way, so it is named as it ends up.
-  //
-  // All nine BAN prices are here, including the one Cardmarket does not
-  // sell: what can be sent is the overlap of two lists, and the one that
-  // moves is Cardmarket's - Gundam arrived there after the first seven
-  // were wired up.
-  //
-  // Cardmarket's other fourteen games are not pages to stay off: the
-  // offers table, the tooltips and the paging are one layout with a
-  // different word in the path, so the read and the file are the same
-  // work on any of them. Only the send has nowhere to go.
-  var HOSTS = {
-    magic: "mtgban.com",
-    pokemon: "pokemon.mtgban.com",
-    yugioh: "yugioh.mtgban.com",
-    lorcana: "lorcana.mtgban.com",
-    onepiece: "onepiece.mtgban.com",
-    fleshandblood: "fleshandblood.mtgban.com",
-    riftbound: "riftbound.mtgban.com",
-    gundam: "gundam.mtgban.com",
-    // No Cardmarket path names it yet, so this one waits rather than
-    // works. It costs an entry; leaving it out costs a dead button on the
-    // day it appears.
-    palworld: "palworld.mtgban.com",
-  };
-
-  // isBanHost says whether an origin is one of ours. The window that answers
-  // is not always the one that was opened - a deployment may redirect, and
-  // that lands on a different origin - so the origin is checked for being
-  // ours rather than for being the exact one asked for. What pins the
-  // conversation to the right window is the source check beside it.
-  function isBanHost(origin) {
-    var parsed;
-    try {
-      parsed = new URL(origin);
-    } catch (err) {
-      return false;
-    }
-    return (
-      parsed.protocol === "https:" &&
-      (parsed.hostname === "mtgban.com" ||
-        parsed.hostname.slice(-11) === ".mtgban.com")
-    );
-  }
 
   // The page path names the game: /<language>/<Game>/Users/...
   function gameFromPath(pathname) {
@@ -93,16 +42,11 @@
     return parts.length > 2 && parts[2] ? parts[2].toLowerCase() : "";
   }
 
-  function uploadURL(game) {
-    var host = HOSTS[game];
-    return host ? "https://" + host + "/upload/handoff" : "";
-  }
-
   // sendable says whether this page's game has a deployment behind it. The
   // path cannot change under a content script, so it answers the same
   // thing for the life of the panel.
   function sendable() {
-    return !!uploadURL(gameFromPath(location.pathname));
+    return !!MKM.handoffURL(gameFromPath(location.pathname));
   }
 
   function today() {
@@ -525,118 +469,50 @@
     });
   }
 
-  // handOff opens the site's handoff page and gives it the rows.
+  // handOff opens the game's handoff page and gives it the rows, through
+  // the shared sender (handoff.js, core/handoff.js).
   //
-  // The window is opened from the click with nothing asynchronous in
-  // front of it, because window.open needs that click - Firefox keeps one
-  // alive for about five seconds and then calls the result a pop-up.
-  //
-  // The rows may already be in hand or may be a moment away, so they come
-  // in as a promise and whichever of "the page is listening" and "the
-  // rows are ready" lands second does the handing over. The page it opens
-  // says "Waiting for the card list..." until then, and waits for as long
-  // as it takes.
-  //
-  // That page is the site's own and does its own uploading, so nothing
-  // here has to know the shape of a form that is not ours. It says it is
-  // listening once, as it loads, which cannot happen before this function
-  // has returned - so the listener is always in place in time.
-  // awaiting is the handoff listener still hoping to hear from a tab.
-  //
-  // The page it opens has no deadline on purpose - it answers when it has
-  // loaded, and how long that takes is the network's business. But a tab
-  // that never answers at all, or is closed before it does, would leave
-  // its listener behind for the life of this page. One at a time is
-  // enough to bound that: a second handoff retires the first.
-  var awaiting = null;
-
+  // The window is opened from the click with nothing asynchronous in front
+  // of it, because window.open needs that click - Firefox keeps one alive
+  // for about five seconds and then calls the result a pop-up. The rows may
+  // already be in hand or may be a moment away, so they come in as a
+  // promise; the page it opens says "Waiting for the card list..." until
+  // they arrive, and waits for as long as it takes.
   function handOff(panel, rows) {
-    if (awaiting) {
-      window.removeEventListener("message", awaiting);
-      awaiting = null;
-    }
     // The tick is for a file written, and a send is not one.
     mark(panel, "");
-
-    var opened = window.open(uploadURL(gameFromPath(location.pathname)), "_blank");
-    if (!opened) {
-      // Rows in hand stay in hand, so this is worth another click rather
-      // than another read.
-      say(panel, "The upload page was blocked; use the CSV");
-      return;
-    }
-
-    var listening = "";
-    var collected = null;
-
-    function give() {
-      if (!listening || !collected) {
-        return;
+    var sent = null;
+    MKM.handOff(
+      gameFromPath(location.pathname),
+      rows.then(function (done) {
+        sent = done;
+        // The count goes with them: the page receives text, and text does
+        // not say whether its first line is a header or a card.
+        return done ? { csv: done.csv, rows: done.count } : null;
+      }),
+      function (said) {
+        // Nothing read, so nothing to say that the read has not said; or a
+        // later send that speaks for itself.
+        if (said === null || said === MKM.REPLACED) {
+          return;
+        }
+        if (said) {
+          // Rows in hand stay in hand, so this is worth another click
+          // rather than another read.
+          say(panel, said);
+          return;
+        }
+        // Spent only once they have landed somewhere, so a tab that never
+        // answered can be tried again without reading the pages afresh.
+        disarm(panel);
+        // Nothing is said of a whole list: the tab that just took it is the
+        // answer. A short one keeps its warning on the tooltip, because that
+        // tab cannot tell that it is short.
+        if (sent.partial) {
+          recap(panel, sent.note);
+        }
       }
-      if (opened.closed) {
-        say(panel, "The upload page was closed; use the CSV");
-        return;
-      }
-      // Answered to the origin that spoke, which is where the page
-      // actually ended up rather than where it was sent.
-      // The count goes with them: the page receives text, and text does
-      // not say whether its first line is a header or a card.
-      opened.postMessage(
-        {
-          type: ROWS,
-          csv: collected.csv,
-          rows: collected.count,
-          // Where they were read. The site says "Results from Cardmarket -
-          // <seller>" rather than "from pasted text", which is all a form
-          // post looks like by the time it gets there. It decides what to
-          // call this; what goes over is the page, filters and all, so the
-          // heading can link back to the list these rows actually are.
-          source: location.href,
-        },
-        listening
-      );
-      // Spent only once they have landed somewhere, so a tab that never
-      // answered can be tried again without reading the pages afresh.
-      disarm(panel);
-      // Nothing is said of a whole list: the tab that just took it is the
-      // answer. A short one keeps its warning on the tooltip, because that
-      // tab cannot tell that it is short.
-      if (collected.partial) {
-        recap(panel, collected.note);
-      }
-    }
-
-    function onMessage(event) {
-      if (
-        event.source !== opened ||
-        !isBanHost(event.origin) ||
-        !event.data ||
-        event.data.type !== READY
-      ) {
-        return;
-      }
-      window.removeEventListener("message", onMessage);
-      awaiting = null;
-      listening = event.origin;
-      give();
-    }
-
-    awaiting = onMessage;
-    window.addEventListener("message", onMessage);
-
-    rows.then(function (done) {
-      if (!done) {
-        // Nothing to hand over after all. The tab was opened on the
-        // promise of a list, so it goes again rather than sitting on
-        // "Waiting for the card list..." for good.
-        window.removeEventListener("message", onMessage);
-        awaiting = null;
-        opened.close();
-        return;
-      }
-      collected = done;
-      give();
-    });
+    );
   }
 
   // sendToBan hands the rows over, reading them first if they are not

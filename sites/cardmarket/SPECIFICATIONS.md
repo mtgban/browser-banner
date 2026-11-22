@@ -484,10 +484,9 @@ as the heading would be two tooltips over the same few words. It appears
 the panel carries a `title`. While a read runs it shows nothing, since the
 heading holds the count then and takes no click.
 
-(The label constant is `ARMED`, not `READY`. That name belongs to the
-message the handoff page sends when it is listening, and the two are one
-keyword apart from silently swapping places - which they did, once, for
-as long as it took the suite to run.) Rows in hand are dropped when the table moves underneath them
+(The label constant is `ARMED`, not `READY`. In `core/handoff.js`,
+`READY` is the message the handoff page sends when it is listening.)
+Rows in hand are dropped when the table moves underneath them
 (Cardmarket refills it on every filter) and when the scope changes, since
 neither describes what is being asked for any more. Either button can fill
 them and either can spend them, so wanting the file as well does not mean
@@ -506,13 +505,18 @@ A read that produced nothing closes the tab again, rather than leaving it
 waiting for a list that is not coming.
 
 Only one handoff listens at a time: the page it opens has no deadline on
-purpose, so a tab that never answers would otherwise leave its listener
-behind for the life of the page. A second handoff retires the first.
+purpose, so a tab that never answers would otherwise leave its listener behind
+for the life of the page. A second handoff retires the first and closes its
+tab. A tab closed while it waits is noticed on coming back to the page, with
+no timer, and said the same way as one closed before the rows reached it.
 
-`tests/content.test.js` holds all of this. It reads the source rather than
-running it - content.js installs a panel into a live Cardmarket page on
-sight - which is weak, but an ordering nobody would think to preserve is
-worth pinning even loosely.
+The sending is the shared sender's (`core/handoff.js`), which TCGplayer's and
+Card Kingdom's sends use too, each with the games it may send and its own
+words; Cardmarket's are "use the CSV". `tests/content.test.js` holds the
+ordering of all of this. It reads the source rather than running it -
+content.js installs a panel into a live Cardmarket page on sight - which is
+weak, but an ordering nobody would think to preserve is worth pinning even
+loosely.
 
 ### 5.3 Hosts, and the Magic exception
 
@@ -528,13 +532,13 @@ worth pinning even loosely.
 | gundam | `gundam.mtgban.com` |
 | palworld | `palworld.mtgban.com` |
 
-All nine games BAN prices, each verified answering `/upload/handoff`:
-`curl` gets the same `Unauthorized` page from every one of them, which is
-what a request carrying no session is owed. **Palworld is in the table and
-unreachable** - Cardmarket does not sell it, so no path can name it. It
-is listed because the list that moves is Cardmarket's: Gundam arrived
-there after the first seven were wired up, and an entry costs less than a
-dead button on the day the next one does.
+All nine games BAN prices, each verified answering `/upload/handoff`, and the
+table `core/handoff.js` keeps for every store: `curl` gets the same
+`Unauthorized` page from every one of them, which is what a request carrying
+no session is owed. **Palworld is in the table and unreachable** - Cardmarket
+does not sell it, so no path can name it. It is listed because the list that
+moves is Cardmarket's: Gundam arrived there after the first seven were wired
+up, and an entry costs less than a dead button on the day the next one does.
 
 What can be sent is the overlap, which is **eight** games. A game outside
 it still gets the panel and the file; see §2.

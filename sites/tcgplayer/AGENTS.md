@@ -40,7 +40,7 @@ src/csv.js       the orders and cards CSVs: their columns and Go's quoting
 src/read.js      a page: the filter, the list's heading, every order and line
 src/net.js       one request at a time: a page, or the filter POST
 src/walk.js      a year: set it, read every page, put the visitor's range back
-src/handoff.js   window.open and postMessage to mtgban's /upload/handoff
+src/handoff.js   core/handoff.js's sender, Magic only, with TCGplayer's words
 src/ui.js        core/ui.js's panel and download, the panel headed TCG
 src/page.js      content script: order buttons, Send to BAN, the panel
 src/orders.css   the order headers' controls; the panel's are core/panel.css
