@@ -63,8 +63,8 @@ src/cart.css     the marks, four classes deep to outrank CK's own reset
 src/ui.js        the panel both pages share, and the file download
 src/historypage.js  content script: year picker and Download CSV
 src/panel.css, src/history.css
-scripts/mutate.mjs   breaks each guard in tests/mutations.json in turn
 scripts/cut-fixtures.py  cuts tests/fixtures/ from saved pages, locally only
+tests/mutations.json  each guard, the text that breaks it, the test that fails
 tests/           bun + happy-dom, no browser
 ```
 
@@ -75,22 +75,26 @@ The source arrives step by step, in the order `SPECIFICATIONS.md` gives.
 
 ## Verifying
 
+From the repository's root:
+
 ```
 bun install
-bun test tests/
-bun run mutate
+bun run test
+bun run mutate sites/cardkingdom
 ```
 
-CI runs the same on every push, and checks that every file the manifest names
-exists. There is no build step: the scripts are plain ES5-ish so they can be
-`content_scripts` entries as they are; keep them that way.
+CI runs the same on every push; `bun test tests/` here runs this site's tests
+alone, without the repository's own. There is no build step: the scripts are
+plain ES5-ish so they can be `content_scripts` entries as they are; keep them
+that way.
 
 A guard (a refusal, a strict shape, a check that keeps a write safe) lands
 with an entry in `tests/mutations.json`: the text that breaks it and the name
-of the test that must then fail. `bun run mutate` runs the whole suite once,
-then applies each mutation to a copy of the tree and runs only the test it
-names; it fails if that test does not fail, if no test file names it, or if an
-entry's text no longer appears exactly once.
+of the test that must then fail. The runner, the repository's
+`scripts/mutate.mjs`, runs the whole suite once, then applies each mutation to
+a copy of this directory and runs only the test it names; it fails if that
+test does not fail, if no test file names it, or if an entry's text no longer
+appears exactly once.
 
 ## Traps
 

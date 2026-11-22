@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        site: [cardmarket]
+        site: [cardmarket, cardkingdom]
     steps:
       - uses: actions/checkout@v4
 

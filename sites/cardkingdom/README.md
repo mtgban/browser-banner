@@ -57,9 +57,12 @@ Extensions* turned on, which Safari resets when it quits.
 
 ## Developing
 
+From the repository's root:
+
 ```
 bun install
-bun test tests/
+bun run test
 ```
 
-Read `AGENTS.md` before changing anything.
+`bun test tests/` here runs this site's suite alone, without the
+repository's own tests. Read `AGENTS.md` before changing anything.
