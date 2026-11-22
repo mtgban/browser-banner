@@ -52,15 +52,18 @@ tests/           bun + happy-dom, no browser
 
 ## Verifying
 
+From the repository's root:
+
 ```
 bun install
-bun test tests/
-bun run mutate sites/cardmarket    (from the repository's root)
+bun run test
+bun run mutate sites/cardmarket
 ```
 
-That is the whole suite and it runs in CI on every push. It loads the real
-`src/*.js` against a DOM and the fixture - no mocking of the code under
-test.
+That is the whole suite, the repository's own tests with it, and CI runs the
+same on every push. `bun test tests/` here runs this site's tests alone. They
+load the real `src/*.js` against a DOM and the fixture - no mocking of the
+code under test.
 
 A guard (a refusal, a fold, a check that keeps the walk honest) lands with
 an entry in `tests/mutations.json`: the text that breaks it and the name of
