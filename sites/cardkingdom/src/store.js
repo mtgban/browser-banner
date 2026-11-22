@@ -10,7 +10,7 @@ globalThis.CKB = globalThis.CKB || {};
 (function (CKB) {
   "use strict";
 
-  var DB = "ck-banner";
+  var DB = "banner";
   var STORE = "cache";
   var LIST = "pricelist";
   var SEEN = "seen";

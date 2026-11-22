@@ -1,4 +1,4 @@
-# ck-banner specification
+# BANner for Card Kingdom: specification
 
 What the extension does, what it reads from Card Kingdom (CK), and the rules
 it keeps. Every markup fact here was read from a saved CK page of a signed-in
@@ -126,7 +126,7 @@ been seen.
 ## 5. The one-hour cache
 
 The reduced list is stored in IndexedDB on www.cardkingdom.com (no permission
-needed), database `ck-banner`, store `cache`. It is fresh while less than an
+needed), database `banner`, store `cache`. It is fresh while less than an
 hour old; at exactly an hour it is stale, and one dated in the future (the
 clock moved back) is stale too. A stale or missing list is never used: the panel offers *Load prices*
 and marks nothing. An entry of the wrong shape or schema version counts as
