@@ -1,0 +1,12 @@
+{
+  "name": "browser-banner",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Browser extensions that get a card store's lists to mtgban",
+  "scripts": {
+    "test": "bun test sites/ tests/"
+  },
+  "devDependencies": {
+    "happy-dom": "^15.11.7"
+  }
+}
