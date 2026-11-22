@@ -1,7 +1,8 @@
 # One extension for Cardmarket, Card Kingdom and TCGplayer
 
-Status: plan, reviewed once (Fable, 2026-11-21) and revised. PR 1 is the
-one that carries this file.
+Status: plan, reviewed once (Fable, 2026-11-21) and revised. PRs 1 to 5
+are done: the three imports, Cardmarket's guards, and one manifest. Next
+are P1 and P3 (section 5); PRs 6 to 10 wait for the owner after those.
 
 A first version of PR 1 went to cm-banner as mtgban/cm-banner#8 and was
 closed when the home became a new repository.
@@ -247,16 +248,19 @@ unchanged.
 
 ## 7. Cleanup
 
-As each import merges: close that repository's open Dependabot PRs
-(superseded by the root lockfile) and archive it with a pointer README.
-The local checkouts in `~/src`, and the untracked files in them, are left
-for the owner.
+Last, once the work above is done: close each old repository's open
+Dependabot PRs (superseded by the root lockfile), merge a pointer README
+into it, and archive it. The local checkouts in `~/src`, and the untracked
+files in them, are left for the owner.
 
 ## 8. Decisions for the owner
 
-1. The repository: decided, a new `mtgban/browser-banner`.
-2. The extension's name in the browser: `BANner`; the panel heading keeps its
-   store prefix (`CM BANner`, `CK BANner`, `TCG BANner`), or becomes
-   `BANner` everywhere.
-3. Which of P1 to P4 to do, and in what order. Suggested: P1, P3, P2, then
-   P4 only if wanted.
+All decided:
+
+1. The repository: a new `mtgban/browser-banner`.
+2. The extension's name in the browser is `BANner`, and each panel heading
+   keeps its store prefix: `CM BANner`, `CK BANner`, `TCG BANner`.
+3. P1 and P3, in that order, after the one-manifest PR. P4 is for later;
+   P2 is not scheduled.
+4. The old repositories are archived at the end, not as each import
+   merges (section 7).
