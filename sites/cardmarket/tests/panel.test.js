@@ -339,17 +339,30 @@ describe("Escape", () => {
     expect(it.busy()).toBe(false);
     expect(it.send().disabled).toBe(false);
     expect(it.markShown()).toBe(false);
-    await it.settle();
+    // Past the walk's wait before page two, which is when it would.
+    await it.settle(1500);
     // The read that was abandoned comes back later and says nothing.
     expect(it.send().textContent).toBe("Send to BAN");
     expect(it.busy()).toBe(false);
   });
 
-  test("it is inert when there is nothing of ours to stop", () => {
+  test("it is inert when there is nothing of ours to stop", async () => {
     const it = mount();
     it.escape();
     expect(it.busy()).toBe(false);
     expect(it.heading()).toBe("CM BANner - all offers");
+
+    // A refused read leaves a cross and its reason, which are not ours to
+    // clear either.
+    const refused = mount({ url: OFFERS + "?site=4", pager: "pager-next.html", total: 1093 });
+    refused.window.fetch = () =>
+      Promise.resolve({ ok: false, status: 500, headers: { get: () => null } });
+    refused.save().click();
+    await refused.settle(120);
+    expect(refused.markFailed()).toBe(true);
+    refused.escape();
+    expect(refused.markFailed()).toBe(true);
+    expect(refused.tip()).toBe("Cardmarket answered 500");
   });
 });
 
@@ -458,6 +471,34 @@ describe("a handoff the tab has not answered", () => {
 
     expect(it.send().textContent).toBe("Send to BAN");
     expect(it.armed()).toBe(false);
+  });
+
+  test("but not one answering from anywhere but BAN", async () => {
+    for (const origin of [
+      "http://mtgban.com",
+      "https://notmtgban.com",
+      "https://mtgban.com.example.org",
+    ]) {
+      const it = mount();
+      it.send().click();
+      await it.settle();
+      it.send().click();
+      it.ready({ origin });
+      await it.settle();
+      expect(it.posted()).toEqual([]);
+      expect(it.armed()).toBe(true);
+    }
+  });
+
+  test("nor a window it did not open", async () => {
+    const it = mount();
+    it.send().click();
+    await it.settle();
+    it.send().click();
+    it.ready({ source: {} });
+    await it.settle();
+    expect(it.posted()).toEqual([]);
+    expect(it.armed()).toBe(true);
   });
 });
 

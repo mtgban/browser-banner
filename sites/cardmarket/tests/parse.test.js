@@ -171,6 +171,17 @@ describe("the price as the page wrote it", () => {
     expect(byArticle["2060000003"].currency).toBe("eur");
   });
 
+  test("an element wrapping the quantity and the price is not the price", () => {
+    // Flattened, the wrapper says "10,05 €", the count glued to the front.
+    const window = new Window();
+    window.document.body.innerHTML =
+      '<div id="stockRow1">' +
+      '<a href="/en/Magic/Products/Singles/Urzas-Legacy/Fog-Elemental">Fog Elemental</a>' +
+      '<div><span class="item-count">1</span><span>0,05 €</span></div>' +
+      "</div>";
+    expect(MKM.parseOffers(window.document)[0].price).toBe("0.05");
+  });
+
   test("a row showing no price carries none", () => {
     expect(byArticle["2058743685"].price).toBe("");
     expect(byArticle["2058743685"].currency).toBe("");

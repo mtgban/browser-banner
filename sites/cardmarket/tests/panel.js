@@ -121,15 +121,19 @@ export function mount({
       window.document.dispatchEvent(
         new window.KeyboardEvent("keydown", { key: "Escape" })
       ),
-    // Answers the way the site's handoff page does once it has loaded.
-    ready: () =>
+    // Answers the way the site's handoff page does once it has loaded;
+    // from tells it to answer from somewhere else, { origin, source }.
+    ready: (from = {}) =>
       window.dispatchEvent(
         Object.assign(new window.Event("message"), {
           source: opened.source,
           origin: "https://mtgban.com",
           data: { type: "mtgban-handoff-ready" },
+          ...from,
         })
       ),
+    // What reached the tab: everything posted to it.
+    posted: () => opened.filter((entry) => entry && entry.data),
     settle: (ms = 50) => new Promise((done) => setTimeout(done, ms)),
   };
 }

@@ -38,6 +38,14 @@ describe("finding the next page", () => {
     expect(MKM.nextPageURL(docOf(text("pager-last.html")), BASE)).toBe("");
   });
 
+  test("a disabled control ends it even with an href on it", () => {
+    const disabled =
+      '<a href="/en/Magic/Users/Seller/Offers/Singles?site=3" role="button"' +
+      ' aria-label="Next page" data-direction="next"' +
+      ' class="btn btn-primary btn-sm ms-3 pagination-control disabled"></a>';
+    expect(MKM.nextPageURL(docOf(disabled), BASE)).toBe("");
+  });
+
   test("a page with no pager at all has no next page", () => {
     expect(MKM.nextPageURL(load("offers.html"), BASE)).toBe("");
   });
@@ -269,9 +277,13 @@ describe("walking the list", () => {
 
   test("a pager pointing back at a page already read ends the walk", async () => {
     // Nothing here counts pages, so a loop would otherwise be forever.
+    // Refused after a few, so a walk that does loop fails here rather than
+    // spinning in microtasks that no test timeout can interrupt.
     const loop = pageOf({ offset: 0, next: BASE + "?site=2", total: 42 });
+    let fetched = 0;
     const walked = await MKM.walkPages(loop, BASE, {
-      fetchPage: () => Promise.resolve(loop),
+      fetchPage: () =>
+        ++fetched > 5 ? Promise.reject(new Error("looped")) : Promise.resolve(loop),
       pace: 0,
     });
     expect(walked.pages).toBe(2);
@@ -392,6 +404,21 @@ describe("being told to stop", () => {
     expect(walked.pages).toBe(1);
   });
 
+  test("a stop that comes during the wait asks for nothing", async () => {
+    // Asked once before the wait and once after it; the second says stop.
+    const asked = [];
+    let calls = 0;
+    await MKM.walkPages(pageOf({ next: BASE + "?site=2", total: 42 }), BASE, {
+      pace: 0,
+      cancelled: () => ++calls > 1,
+      fetchPage: (url) => {
+        asked.push(url);
+        return Promise.resolve(pageOf({ total: 42 }));
+      },
+    });
+    expect(asked).toEqual([]);
+  });
+
   test("a walk nobody stopped says so", async () => {
     const pages = three();
     const walked = await MKM.walkPages(pages[BASE], BASE, {
@@ -432,7 +459,7 @@ describe("a request that goes nowhere", () => {
     try {
       await MKM.fetchPage(BASE).catch(() => {});
       expect(asked).not.toBeNull();
-      expect("signal" in asked).toBe(true);
+      expect(asked.signal).toBeInstanceOf(AbortSignal);
     } finally {
       globalThis.fetch = saved;
     }
