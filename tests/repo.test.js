@@ -57,3 +57,18 @@ test("every manifest names only files that exist", () => {
     });
   expect(missing).toEqual([]);
 });
+
+// Every site's tests run in one process, and happy-dom shares element
+// prototypes across windows: a stub set on one outlives the test and reaches
+// the next site's, depending on the order bun happens to list the files in.
+test("no site's tests patch a prototype", () => {
+  const patching = readdirSync(new URL("sites/", root)).flatMap((site) => {
+    const dir = new URL("sites/" + site + "/tests/", root);
+    if (!existsSync(dir)) return [];
+    return readdirSync(dir)
+      .filter((name) => name.endsWith(".js"))
+      .filter((name) => /\.prototype\.\w+\s*=[^=]/.test(readFileSync(new URL(name, dir), "utf8")))
+      .map((name) => "sites/" + site + "/tests/" + name);
+  });
+  expect(patching).toEqual([]);
+});
