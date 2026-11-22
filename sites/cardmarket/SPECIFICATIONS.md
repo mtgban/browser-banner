@@ -12,7 +12,8 @@
 A browser extension (MV3) that reads the offers on a Cardmarket seller's
 page, or the articles of one of the visitor's own purchases (section 8),
 and gets them to mtgban's upload, either as a CSV file or by handing them
-to the site directly.
+to the site directly. On the visitor's purchase lists it saves the
+purchase history, one line per order (section 9).
 
 It asks for **no permissions** and runs on **one host**. There is no
 background script, no storage, and no extension API call anywhere in the
@@ -26,6 +27,8 @@ src/pages.js     one page → every page
 src/csv.js       offers → CSV text
 src/content.js   the panel, and the two things its buttons do
 src/orderpage.js one purchase's panel: CSV and Send to BAN
+src/history.js   a purchase list's orders, and their CSV
+src/historypage.js  the purchase lists' range and Download CSV
 tests/           bun + happy-dom, run in CI
 ```
 
@@ -37,6 +40,7 @@ that is what a manifest's `content_scripts` list can load.
 ```
 https://www.cardmarket.com/*/*/Users/*/Offers/*
 https://www.cardmarket.com/*/*/Orders/*
+https://www.cardmarket.com/*/*/Orders/Purchases/*
 ```
 
 The second is for one purchase (section 8). Its script returns unless the
@@ -919,4 +923,33 @@ rate that cannot be read leaves the prices empty and says so. *CSV* saves
 Three saved orders, of 5, 14 and 10 articles, read whole: every row was
 read, the amounts added up to the count in the table's heading (5, 40 and
 11), and price times amount to the page's Article Value, to the cent.
+
+## 9. The purchase history
+
+`/<language>/<Game>/Orders/Purchases/<Tab>` is one of the visitor's
+purchase lists, a tab per status: Unpaid, Paid, Sent, Arrived, NotArrived,
+Cancelled. Each lists its orders newest first, 30 to a page, numbered by a
+`site` parameter left off the first, under the same pager the offers use
+(section 6.1), with the count beside it. A row is `[data-url]` in
+`#StatusTable .table-body`: the order id in its address, the seller's name,
+the article count, the total ("1.204,50 €") and the tab's date, its day and
+time in two spans with nothing between them ("11.11.2026" and "22:12").
+
+The panel offers a range, as Card Kingdom's and TCGplayer's histories do
+(the last 30, 90 or 120 days, every year, or one year back to 2007), and
+*Download CSV*. The walk starts from the first page, waits the offers' pace
+before each one it fetches (section 6.3), and ends at the last page or at
+the page holding the first order older than the range. The file is one line
+per order: Order ID, Order Status (the tab, NotArrived written "Not arrived"
+as its button says it), Date as the page prints it, Seller, Quantity, Amount
+with a decimal point, and Currency. The amount is not converted: today's
+rate is not the one the order was paid at. An order is written once: one
+that arrives during the walk pushes the rest down, and the order it pushes
+onto the next page is read again. A row that cannot be read whole is left
+out and counted. A refused page saves nothing and says why, and Escape stops
+the walk with nothing saved. The file is `cm-purchases-<tab>-<range>.csv`,
+named as the other stores' are.
+
+Two saved list pages, 60 orders from 2021 to 2026, read whole, their totals
+matching the page's to the cent and every order id once.
 

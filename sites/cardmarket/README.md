@@ -18,6 +18,11 @@ On one of your own purchases - `cardmarket.com/<lang>/<Game>/Orders/<id>` -
 the panel counts the order's cards and offers *Send to BAN* and *CSV*, with
 the same columns as the offers' file and the prices in dollars.
 
+On your purchase lists - `cardmarket.com/<lang>/<Game>/Orders/Purchases/…` -
+you pick a year, every year, or the last 30, 90 or 120 days, and download a
+CSV of those orders, one line each: id, status, date, seller, quantity and
+amount.
+
 **Escape** stops a read and puts the panel back - spinner off, buttons back,
 nothing kept. A read that was stopped half way is not a shorter export, so its
 rows go with it. The key does nothing when there is nothing of ours running.

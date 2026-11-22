@@ -63,6 +63,28 @@
     },
     {
       "matches": [
+        "https://www.cardmarket.com/*/*/Orders/Purchases/*"
+      ],
+      "js": [
+        "core/net.js",
+        "core/csv.js",
+        "core/money.js",
+        "core/ranges.js",
+        "sites/cardmarket/src/rates.js",
+        "sites/cardmarket/src/pages.js",
+        "sites/cardmarket/src/history.js",
+        "core/ui.js",
+        "sites/cardmarket/src/ui.js",
+        "sites/cardmarket/src/historypage.js"
+      ],
+      "css": [
+        "core/panel.css",
+        "sites/cardmarket/src/content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
         "https://www.cardkingdom.com/myaccount/order_history*",
         "https://www.cardkingdom.com/myaccount/selling_history*"
       ],
