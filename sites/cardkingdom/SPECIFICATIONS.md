@@ -300,6 +300,10 @@ reported, not silently dropped.
 The year of a purchase is its order date's; the year of a sale is its Received
 date's. A completed sale with no Received date refuses the export.
 
+The last 30, 90 or 120 days hold the rows filed on or after the day that
+many days before the browser's today, by the same dates: 30 days on Feb
+25 is Jan 26 onwards. The dates are compared by day, as CK prints them.
+
 ## 10. The walk
 
 - One page at a time, a pause of 1.2 s before each after the first, from
@@ -324,6 +328,9 @@ date's. A completed sale with no Received date refuses the export.
   with no sale ordered or received in the year or later. A page read out of
   order makes the walk read every page instead. *All years* reads every
   page.
+- The last days are at the top of the list, so their walk reads from page 1
+  until a page is past them, by the same rules with the first day in place
+  of the year.
 - Escape cancels, and a page that arrives after it is dropped; a cancelled or
   refused walk writes nothing.
 
@@ -341,10 +348,11 @@ read them by name:
 | `Amount` | as printed (`$123.45`) | as printed |
 
 Named `ck-purchases-<year>.csv` or `ck-sales-<year>.csv` (`all` for every
-year), rows in CK's order. The bytes are what Go's `csv.Writer` writes for the
-same rows: a value is quoted only when it holds a comma, a quote or a line
-break, a quote is doubled, and every row ends in LF. No address and
-nothing from a tracking link.
+year), or `ck-purchases-last-30-days-<yyyy-mm-dd>.csv` for the last days,
+dated the day it was read, rows in CK's order. The bytes are what Go's
+`csv.Writer` writes for the same rows: a value is quoted only when it holds a
+comma, a quote or a line break, a quote is doubled, and every row ends in LF.
+No address and nothing from a tracking link.
 
 The carts' *CSV* writes the cart as it stands, one row per line in the
 page's order, with each line's Scryfall id from the list in hand, of any
@@ -373,11 +381,12 @@ every line of four saved carts, `Edition: Name` was the line's image text,
 
 A saved file is kept in IndexedDB beside the price list (section 5), one per
 page and year choice (`csv:purchases:2026`, `csv:sales:all`), with a version
-and the history's signature when it was built: the total and every row of
-page 1 (order id, status, status date, payment). A new order, or a recent one
+and the history's signature when it was built: the total and every row of page
+1 (order id, status, status date, payment). A new order, or a recent one
 changing state, changes the signature. It is not keyed by account: order ids
 belong to one account, so no other account's page 1 can match it, and nothing
-that names the account is read or kept.
+that names the account is read or kept. The last days are never kept, since
+the same range holds other orders tomorrow.
 
 *Download CSV* reads page 1 alone first. While its signature is the kept
 file's, the kept file downloads at once, the tooltip says when it was built
@@ -405,8 +414,9 @@ draws itself; nothing is written under the buttons, and nothing carries a
 `title`. Escape stops whatever is running. While a read runs the page asks
 before it is left.
 
-On the history pages the row is a year (All years, then this year back to
-1999, the year CK opened; this year is chosen) and *Download CSV*. While the
+On the history pages the row is a range (the last 30, 90 and 120 days,
+shown as `30 days` and so on, All years, then this year back to 1999, the
+year CK opened; this year is chosen) and *Download CSV*. While the
 walk runs the heading names the page it is reading (`page 3`). Done, it says how many
 orders the file holds (`34 shipped`, `12 completed`) beside a tick, and the
 tooltip names the file, the pages read, and what was left out by status,

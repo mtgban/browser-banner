@@ -22,13 +22,20 @@ describe("the panel", () => {
     expect(mountHistory({ body: '<form><input name="email"></form>' }).panel.hidden).toBe(true);
   });
 
-  test("offers every year back to 1999 and All years, this year first", () => {
-    const options = [...mountHistory().year().options].map((option) => option.value);
-    expect(options[0]).toBe("all");
-    expect(options[1]).toBe(String(NOW));
-    expect(options.at(-1)).toBe("1999");
-    expect(options.length).toBe(NOW - 1999 + 2);
+  test("offers the last 30, 90 and 120 days, All years, then every year back to 1999", () => {
+    const options = [...mountHistory().year().options].map((option) => [option.value, option.textContent]);
+    expect(options.slice(0, 5)).toEqual([
+      ["days:30", "30 days"],
+      ["days:90", "90 days"],
+      ["days:120", "120 days"],
+      ["all", "All years"],
+      [String(NOW), String(NOW)],
+    ]);
+    expect(options.at(-1)[0]).toBe("1999");
+    expect(options.length).toBe(NOW - 1999 + 5);
     expect(mountHistory().year().value).toBe(String(NOW));
+    // It picks a range now, not only a year.
+    expect(mountHistory().year().getAttribute("aria-label")).toBe("Range");
   });
 
   test("the tooltip says what the file will hold", () => {
@@ -46,6 +53,93 @@ describe("the panel", () => {
     const it = mountHistory();
     expect(it.titled()).toBe(0);
     expect(it.below()).toBe(0);
+  });
+});
+
+describe("the last days", () => {
+  // The browser's today, so the range is the same whenever the tests run.
+  const at = (it, year, month, day) => (it.window.CKB.today = () => ({ year, month, day }));
+
+  test("the tooltip says what the file will hold", () => {
+    const it = mountHistory();
+    it.choose("days:90");
+    expect(it.tip()).toBe("Every shipped, paid purchase ordered in the last 90 days, as a CSV with one row per order");
+    const sales = mountHistory({ kind: "sales" });
+    sales.choose("days:30");
+    expect(sales.tip()).toBe("Every completed, paid sale Card Kingdom received in the last 30 days, as a CSV with one row per order");
+  });
+
+  test("are read from page 1 until a page is past them, and named for the day read", async () => {
+    const it = mountHistory();
+    at(it, 2026, 2, 25);
+    it.choose("days:30");
+    it.go().click();
+    await it.idle();
+    // Page 1 already holds an order from before Jan 26, so it is the last.
+    expect(it.asked).toEqual(["https://www.cardkingdom.com/myaccount/order_history?page=1"]);
+    const file = await it.file();
+    expect(file.name).toBe("ck-purchases-last-30-days-2026-02-25.csv");
+    expect(file.text.trimEnd().split("\n").length).toBe(14);
+    expect(it.heading()).toBe("CK BANner - 13 shipped\u2713");
+    expect(it.tip()).toBe(
+      "Saved ck-purchases-last-30-days-2026-02-25.csv: 13 orders, filed by order date. Read 1 page; left out 12 from before 2026-01-26."
+    );
+  });
+
+  test("sales are filed by the date received", async () => {
+    const it = mountHistory({ kind: "sales", total: 60 });
+    at(it, 2026, 2, 10);
+    it.choose("days:30");
+    it.go().click();
+    await it.idle();
+    expect(it.asked.length).toBe(2);
+    expect((await it.file()).name).toBe("ck-sales-last-30-days-2026-02-10.csv");
+    expect(it.tip()).toBe(
+      "Saved ck-sales-last-30-days-2026-02-10.csv: 19 orders, filed by the date Card Kingdom received them. Read 2 pages; left out 12 CANCELED, 19 from before 2026-01-11."
+    );
+  });
+
+  test("are never kept, so asking again reads the list again", async () => {
+    const it = mountHistory();
+    at(it, 2026, 2, 25);
+    it.choose("days:30");
+    it.go().click();
+    await it.idle();
+    it.go().click();
+    await it.idle();
+    expect(it.asked.length).toBe(2);
+    expect(it.go().textContent).toBe("Download CSV");
+    expect(it.saved.length).toBe(2);
+    // Nor is the range kept under All years' key, which would answer for it.
+    it.choose("all");
+    it.go().click();
+    await it.idle();
+    expect(it.asked.length).toBe(2 + 9);
+    expect(it.saved.at(-1).name).toBe("ck-purchases-all.csv");
+  });
+
+  test("a kept every-year file is not handed out for the last days", async () => {
+    const it = mountHistory({ total: 60 });
+    at(it, 2026, 2, 25);
+    it.choose("all");
+    it.go().click();
+    await it.idle();
+    it.choose("days:30");
+    it.go().click();
+    await it.idle();
+    expect(it.saved.at(-1).name).toBe("ck-purchases-last-30-days-2026-02-25.csv");
+    expect(it.heading()).toBe("CK BANner - 13 shipped\u2713");
+  });
+
+  test("none in the range is said, and no file", async () => {
+    const it = mountHistory();
+    at(it, 2026, 11, 22);
+    it.choose("days:120");
+    it.go().click();
+    await it.idle();
+    expect(it.saved).toEqual([]);
+    expect(it.failed()).toBe(true);
+    expect(it.tip()).toBe("No shipped, paid purchases in the last 120 days; read 1 page.");
   });
 });
 

@@ -24,6 +24,29 @@ globalThis.CKB = globalThis.CKB || {};
     return [4, 6, 9, 11].indexOf(month) >= 0 ? 30 : 31;
   }
 
+  // daysBefore is the calendar date n days before date, both {year, month,
+  // day}.
+  CKB.daysBefore = function (date, n) {
+    var year = date.year;
+    var month = date.month;
+    var day = date.day - n;
+    while (day < 1) {
+      month--;
+      if (month < 1) {
+        month = 12;
+        year--;
+      }
+      day += daysIn(year, month);
+    }
+    return { year: year, month: month, day: day };
+  };
+
+  // today is the browser's date, {year, month, day}.
+  CKB.today = function () {
+    var now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
+  };
+
   // cents reads "$1,234.56" as 123456, and answers null for any other shape.
   CKB.cents = function (text) {
     var m = MONEY.exec(String(text).trim());

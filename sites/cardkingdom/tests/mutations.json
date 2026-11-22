@@ -121,15 +121,15 @@
   {
     "guard": "a list out of order is read whole",
     "file": "src/history.js",
-    "find": "            if (!orderly()) {",
-    "replace": "            if (false) {",
+    "find": "            if (!orderly()) {\n              year = -Infinity;",
+    "replace": "            if (false) {\n              year = -Infinity;",
     "expectFailing": "purchases out of order are read whole"
   },
   {
     "guard": "a sale received after the year's turn is still found",
     "file": "src/history.js",
-    "find": "return row.ordered.year < year && (CKB.yearOf(row, kind) === null || CKB.yearOf(row, kind) < year);",
-    "replace": "return row.ordered.year < year;",
+    "find": "return older(row.ordered) && (CKB.filedOn(row, kind) === null || older(CKB.filedOn(row, kind)));",
+    "replace": "return older(row.ordered);",
     "expectFailing": "a sale received in the year but ordered before it is still found"
   },
   {
@@ -625,15 +625,15 @@
   {
     "guard": "a walk reuses the page 1 it was handed",
     "file": "src/historypage.js",
-    "find": "              first: first,\n",
+    "find": "            first: first,\n",
     "replace": "",
     "expectFailing": "a second download reads page 1 alone and hands out the kept file"
   },
   {
     "guard": "a walk that found nothing replaces what was kept",
     "file": "src/historypage.js",
-    "find": "        var file = finish(walked, y);\n",
-    "replace": "        var file = finish(walked, y);\n        if (!file.count) {\n          return;\n        }\n",
+    "find": "        var file = finish(walked, c, today, since);\n",
+    "replace": "        var file = finish(walked, c, today, since);\n        if (!file.count) {\n          return;\n        }\n",
     "expectFailing": "a Rebuild that finds nothing replaces the file kept before"
   },
   {
@@ -929,5 +929,61 @@
     "find": "          refused(box, answer.message);\n        }\n      })\n      .catch(function (err) {\n        broke(box, err);\n      });",
     "replace": "          refused(box, answer.message);\n        }\n      });",
     "expectFailing": "stops, and says so, when the page fails once CK answered"
+  },
+  {
+    "guard": "the last days' walk checks the list is in order",
+    "file": "src/history.js",
+    "find": "        if (since) {\n          return through(1)",
+    "replace": "        if (false) {\n          return through(1)",
+    "expectFailing": "a page out of order makes it read every page"
+  },
+  {
+    "guard": "a page is past the last days by the day, not the year",
+    "file": "src/history.js",
+    "find": "return since ? dayOf(when) < dayOf(since) : when.year < year;",
+    "replace": "return since ? false : when.year < year;",
+    "expectFailing": "purchases are read from page 1 until a page holds an order before the day"
+  },
+  {
+    "guard": "a range read out of order is read whole",
+    "file": "src/history.js",
+    "find": "            if (!orderly()) {\n              since = null;",
+    "replace": "            if (false) {\n              since = null;",
+    "expectFailing": "a page out of order makes it read every page"
+  },
+  {
+    "guard": "the last days hold only rows filed on or after the day",
+    "file": "src/history.js",
+    "find": "      if (since && dayOf(CKB.filedOn(row, kind)) < dayOf(since)) {",
+    "replace": "      if (false) {",
+    "expectFailing": "takes the rows filed on or after the day, and counts the earlier ones"
+  },
+  {
+    "guard": "counting back days follows the calendar",
+    "file": "src/money.js",
+    "find": "      day += daysIn(year, month);",
+    "replace": "      day += 30;",
+    "expectFailing": "goes back across a month and a year by the calendar"
+  },
+  {
+    "guard": "a range's file carries the day it was read",
+    "file": "src/historypage.js",
+    "find": "\"-days-\" + ymd(today) + \".csv\"",
+    "replace": "\"-days.csv\"",
+    "expectFailing": "are read from page 1 until a page is past them, and named for the day read"
+  },
+  {
+    "guard": "a range of recent days is never kept",
+    "file": "src/historypage.js",
+    "find": "        if (since) {\n          return;\n        }\n",
+    "replace": "",
+    "expectFailing": "are never kept, so asking again reads the list again"
+  },
+  {
+    "guard": "a range of recent days is not cut from a kept file",
+    "file": "src/historypage.js",
+    "find": "        if (since) {\n          return walk();\n        }\n",
+    "replace": "",
+    "expectFailing": "a kept every-year file is not handed out for the last days"
   }
 ]

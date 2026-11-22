@@ -177,6 +177,42 @@ describe("finding a year", () => {
   });
 });
 
+describe("finding the last days", () => {
+  const pages = (shop) => shop.asked.map((url) => Number(/page=(\d+)/.exec(url)[1]));
+
+  test("purchases are read from page 1 until a page holds an order before the day", async () => {
+    // Page 1 runs from Feb 25 back to Jan 5, 2026.
+    const shop = purchases(200);
+    const walked = await walk("purchases", shop, { since: { year: 2026, month: 1, day: 26 } });
+    expect(pages(shop)).toEqual([1]);
+    expect(walked.rows.length).toBe(25);
+    expect(walked.stoppedEarly).toBe(true);
+  });
+
+  test("a range reaching past page 1 reads on until a page is past it", async () => {
+    // Page 2 is 2025 throughout, page 3 2024.
+    const shop = purchases(200);
+    await walk("purchases", shop, { since: { year: 2025, month: 1, day: 1 } });
+    expect(pages(shop)).toEqual([1, 2, 3]);
+  });
+
+  test("sales read on while a page holds one ordered or received in the range", async () => {
+    // Page 1's sales were all received after Jan 11, though some were
+    // ordered before it; page 2 holds none in it.
+    const shop = sales(200);
+    await walk("sales", shop, { since: { year: 2026, month: 1, day: 11 } });
+    expect(pages(shop)).toEqual([1, 2]);
+  });
+
+  test("a page out of order makes it read every page", async () => {
+    // Synthetic: page 2 dated 2027, newer than page 1 above it.
+    const shop = purchases(200, { 2: (doc) => docOf(doc.body.innerHTML.replace(/, 2025\b/g, ", 2027")) });
+    const walked = await walk("purchases", shop, { since: { year: 2025, month: 1, day: 1 } });
+    expect(pages(shop)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(walked.rows.length).toBe(200);
+  });
+});
+
 describe("pace and cancelling", () => {
   test("it waits before each page after the first", async () => {
     const shop = purchases(60);
