@@ -1,8 +1,8 @@
 # One extension for Cardmarket, Card Kingdom and TCGplayer
 
 Status: plan, reviewed once (Fable, 2026-11-21) and revised. PRs 1 to 10
-are done, and so are P1 and P3 (section 5); P4 is for later. What is left
-is section 7's cleanup.
+are done, and so are P1, P3 (section 5) and section 7's cleanup. P2 is
+next; P4 is for later.
 
 A first version of PR 1 went to cm-banner as mtgban/cm-banner#8 and was
 closed when the home became a new repository.
@@ -227,8 +227,9 @@ saved page of it (AGENTS.md's one rule).
   key; tcg already keeps only years). tcg gains All years, which costs one
   POST and a walk per year, at 1.2 s a request, plus putting the filter
   back: its tooltip says how many requests before it starts. The range
-  options and their file names become one shared helper. Done, each store
-  with its own options and names; the shared helper waits for `core/`.
+  options and their file names become one shared helper. Done: each store
+  keeps its own options and names, and `core/ranges.js` builds the picker
+  and the file name.
 - **P4, Cardmarket purchases.** A new page and `matches` entry, a new walk
   under Cardmarket's tighter Cloudflare budget, and euros to convert. The
   largest; proposed last and only if wanted.
@@ -261,7 +262,7 @@ All decided:
 1. The repository: a new `mtgban/browser-banner`.
 2. The extension's name in the browser is `BANner`, and each panel heading
    keeps its store prefix: `CM BANner`, `CK BANner`, `TCG BANner`.
-3. P1 and P3, in that order, after the one-manifest PR. P4 is for later;
-   P2 is not scheduled.
+3. P1 and P3, in that order, after the one-manifest PR, then P2. P4 is
+   for later.
 4. The old repositories are archived at the end, not as each import
    merges (section 7).

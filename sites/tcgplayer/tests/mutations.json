@@ -373,9 +373,23 @@
   {
     "guard": "every year's file is named for all",
     "file": "src/page.js",
-    "find": "    if (range === TCGB.ALL) {\n      return \"tcg-orders-all.csv\";\n    }\n",
-    "replace": "",
+    "find": "isYear(range) || range === TCGB.ALL || days",
+    "replace": "isYear(range) || days",
     "expectFailing": "walks every year in turn into one file, and puts the range back"
+  },
+  {
+    "guard": "every year is all in the shared file name",
+    "file": "../../core/ranges.js",
+    "find": "(range.year === null ? \"all\" : range.year)",
+    "replace": "range.year",
+    "expectFailing": "walks every year in turn into one file, and puts the range back"
+  },
+  {
+    "guard": "a relative range's file names its days",
+    "file": "src/page.js",
+    "find": "days: days ? Number(days[1]) : null",
+    "replace": "days: null",
+    "expectFailing": "walks the last days and names the file for the day it was read"
   },
   {
     "guard": "All years says its cost before it starts",

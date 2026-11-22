@@ -967,8 +967,8 @@
   },
   {
     "guard": "a range's file carries the day it was read",
-    "file": "src/historypage.js",
-    "find": "\"-days-\" + ymd(today) + \".csv\"",
+    "file": "../../core/ranges.js",
+    "find": "\"-days-\" + BAN.ymd(today) + \".csv\"",
     "replace": "\"-days.csv\"",
     "expectFailing": "are read from page 1 until a page is past them, and named for the day read"
   },
