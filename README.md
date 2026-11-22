@@ -9,13 +9,13 @@ stores' pages.
 |---|---|---|
 | Cardmarket | [`sites/cardmarket`](sites/cardmarket) | a seller's offers |
 | Card Kingdom | [`sites/cardkingdom`](sites/cardkingdom) | the sell and buy carts, order and selling history |
+| TCGplayer | [`sites/tcgplayer`](sites/tcgplayer) | the order history, and an order to send |
 
 Each store's own README says what it does and how to load it; its
 SPECIFICATIONS.md says what is known about the store's markup.
 
 [docs/single-extension-plan.md](docs/single-extension-plan.md) is the plan
-for bringing TCGplayer's extension here and making the three one
-extension.
+for making the three one extension.
 
 ## Testing
 

@@ -4,7 +4,6 @@ import { readFileSync, readdirSync, existsSync, statSync } from "fs";
 const root = new URL("../", import.meta.url);
 const read = (name) => readFileSync(new URL(name, root), "utf8");
 const manifest = JSON.parse(read("manifest.json"));
-const pkg = JSON.parse(read("package.json"));
 
 function files(dir) {
   const at = new URL(dir + "/", root);
@@ -44,9 +43,6 @@ describe("the manifest", () => {
     expect(manifest.content_scripts.flatMap((cs) => cs.matches)).toEqual(["https://store.tcgplayer.com/*"]);
   });
 
-  test("carries package.json's version", () => {
-    expect(manifest.version).toBe(pkg.version);
-  });
 });
 
 describe("the source", () => {
@@ -94,13 +90,11 @@ describe("punctuation", () => {
       ...files("src"),
       ...files("scripts"),
       ...files("tests").filter((name) => !name.startsWith("tests/fixtures/") && name !== "tests/repo.test.js"),
-      ...files(".github"),
       ...files("docs"),
       "README.md",
       "SPECIFICATIONS.md",
       "AGENTS.md",
       "manifest.json",
-      "package.json",
     ];
     const dashed = names.filter((name) => {
       const text = read(name);
