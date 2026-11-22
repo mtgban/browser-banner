@@ -1,8 +1,8 @@
 # One extension for Cardmarket, Card Kingdom and TCGplayer
 
 Status: plan, reviewed once (Fable, 2026-11-21) and revised. PRs 1 to 5
-are done: the three imports, Cardmarket's guards, and one manifest. Next
-are P1 and P3 (section 5); PRs 6 to 10 wait for the owner after those.
+are done (the three imports, Cardmarket's guards, one manifest), and so are
+P1 and P3 (section 5). PRs 6 to 10 wait for the owner.
 
 A first version of PR 1 went to cm-banner as mtgban/cm-banner#8 and was
 closed when the home became a new repository.
@@ -217,7 +217,8 @@ saved page of it (AGENTS.md's one rule).
   mtgban's columns and Scryfall ids; Magic only. No new page to read. It
   changes ck's rule that its scripts name no site but Card Kingdom's, which
   PR 5's root test replaces with "names no other store; `core/` names
-  mtgban".
+  mtgban". Done: *BAN* beside *CSV*, on TCGplayer's rows-in-hand handoff
+  copied under `CKB`, so PR 8 has three handoffs to fold into one.
 - **P2, CK invoice pages** (`/myaccount/invoice/<id>`,
   `/myaccount/po_invoice/<id>`): Download CSV of the order's cards and Send
   to BAN, as tcg's single-order view does. Needs saved invoice pages and a
@@ -227,7 +228,8 @@ saved page of it (AGENTS.md's one rule).
   key; tcg already keeps only years). tcg gains All years, which costs one
   POST and a walk per year, at 1.2 s a request, plus putting the filter
   back: its tooltip says how many requests before it starts. The range
-  options and their file names become one shared helper.
+  options and their file names become one shared helper. Done, each store
+  with its own options and names; the shared helper waits for `core/`.
 - **P4, Cardmarket purchases.** A new page and `matches` entry, a new walk
   under Cardmarket's tighter Cloudflare budget, and euros to convert. The
   largest; proposed last and only if wanted.
