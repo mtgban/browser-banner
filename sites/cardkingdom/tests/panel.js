@@ -282,7 +282,7 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
     label: () => at$(".ban-label"),
     all: () => doc.querySelector(".ban-all"),
     csv: () => at$(".ban-csv"),
-    ban: () => at$(".ban-ban"),
+    ban: () => at$(".ban-send"),
     tabs,
     // ready is mtgban's handoff page saying it is listening, from tab i.
     ready: (i = 0, origin = "https://mtgban.com") =>
