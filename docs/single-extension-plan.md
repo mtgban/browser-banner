@@ -1,8 +1,7 @@
 # One extension for Cardmarket, Card Kingdom and TCGplayer
 
 Status: plan, reviewed once (Fable, 2026-11-21) and revised. PRs 1 to 10
-are done, and so are P1, P2, P3 (section 5) and section 7's cleanup. P4 has
-one purchase's CSV and Send to BAN; the purchase history is next.
+are done, and so are P1, P2, P3, P4 (section 5) and section 7's cleanup.
 
 A first version of PR 1 went to cm-banner as mtgban/cm-banner#8 and was
 closed when the home became a new repository.
@@ -235,7 +234,8 @@ saved page of it (AGENTS.md's one rule).
   under Cardmarket's tighter Cloudflare budget, and euros to convert. The
   largest; proposed last and only if wanted. One purchase's page, which
   holds every article and needs no walk, came first: CSV and Send to BAN
-  with the offers' columns.
+  with the offers' columns. Then the purchase lists: a range and one line
+  per order, as the other stores' histories are.
 
 Not proposed: the price comparison and Update price elsewhere (only CK
 publishes a price list), the heading jump elsewhere (only CK marks lines on

@@ -46,6 +46,8 @@ src/ui.js        core/ui.js's panel and download, the panel headed CM
 src/handoff.js   core/handoff.js's sender, every game BAN prices, "use the CSV"
 src/content.js   what the panel does, and when it sends
 src/orderpage.js one purchase's panel: CSV and Send to BAN, no walk; §8
+src/history.js   a purchase list's orders, one line each; §9
+src/historypage.js  the purchase lists' range and Download CSV; §9
 src/content.css  what this panel adds to core/panel.css
 tests/panel.js   stands the content script up in a window; clicks are real
 tests/mutations.json  each guard, the text that breaks it, the test that fails

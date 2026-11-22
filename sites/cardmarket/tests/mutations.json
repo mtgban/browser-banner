@@ -572,5 +572,96 @@
     "find": "return { csv: written.csv, rows: written.rows };",
     "replace": "return { csv: \"\", rows: written.rows };",
     "expectFailing": "Send to BAN opens the game's upload at once and hands it the CSV's rows"
+  },
+  {
+    "guard": "a list's day and time are read apart",
+    "file": "src/history.js",
+    "find": "var dateText = Array.prototype.map.call(parts, text).join(\" \");",
+    "replace": "var dateText = text(row.querySelector(\".col-datetime\"));",
+    "expectFailing": "reads every order, the day and time apart, an amount grouped by a full stop"
+  },
+  {
+    "guard": "an order's amount drops its grouping full stop",
+    "file": "src/history.js",
+    "find": "price[1].replace(/\\./g, \"\").replace(\",\", \".\")",
+    "replace": "price[1].replace(\",\", \".\")",
+    "expectFailing": "reads every order, the day and time apart, an amount grouped by a full stop"
+  },
+  {
+    "guard": "an order not read whole is counted",
+    "file": "src/history.js",
+    "find": "if (!id || !seller || !/^\\d+$/.test(quantity) || !price || !date) {",
+    "replace": "if (!id || !seller || !date) {",
+    "expectFailing": "counts a row it cannot read whole"
+  },
+  {
+    "guard": "each order carries the list's status",
+    "file": "src/history.js",
+    "find": "return c[1] === \"status\" ? status : o[c[1]];",
+    "replace": "return o[c[1]];",
+    "expectFailing": "writes one line per order under the list's status"
+  },
+  {
+    "guard": "a range stops at its first older order",
+    "file": "src/historypage.js",
+    "find": "if (past || !next) {",
+    "replace": "if (!next) {",
+    "expectFailing": "the last 30 days read the page in hand and stop at its first older order"
+  },
+  {
+    "guard": "a history walk starts from the first page",
+    "file": "src/historypage.js",
+    "find": "var first = MKM.firstPageURL(location.href);",
+    "replace": "var first = \"\";",
+    "expectFailing": "starts from the first page when opened on a later one"
+  },
+  {
+    "guard": "a history walk waits the pace",
+    "file": "src/historypage.js",
+    "find": "return after(MKM.PACE)",
+    "replace": "return after(0)",
+    "expectFailing": "waits Cardmarket's pace before each page"
+  },
+  {
+    "guard": "Escape stops a history walk",
+    "file": "src/historypage.js",
+    "find": "if (event.key === \"Escape\") {\n      cancel();",
+    "replace": "if (event.key === \"Escape\") {",
+    "expectFailing": "Escape stops the walk, and nothing is saved"
+  },
+  {
+    "guard": "a refused history page says why",
+    "file": "src/historypage.js",
+    "find": "        panel.fail(err && err.message ? err.message : String(err));\n",
+    "replace": "",
+    "expectFailing": "a refused page says why, and nothing is saved"
+  },
+  {
+    "guard": "an empty range saves nothing and says so",
+    "file": "src/historypage.js",
+    "find": "if (!done.orders.length) {",
+    "replace": "if (false) {",
+    "expectFailing": "an older range with none says so"
+  },
+  {
+    "guard": "a history file is named for its list and range",
+    "file": "src/historypage.js",
+    "find": "BAN.rangeFile(\"cm-purchases-\" + tab.toLowerCase(), c, today)",
+    "replace": "\"cm-purchases.csv\"",
+    "expectFailing": "All years walks every page, one at a time, into one file"
+  },
+  {
+    "guard": "a history walk writes an order once",
+    "file": "src/historypage.js",
+    "find": "if (seen[o.id]) {",
+    "replace": "if (false) {",
+    "expectFailing": "writes an order once when a new one pushes it onto the next page"
+  },
+  {
+    "guard": "NotArrived is written as its button says it",
+    "file": "src/historypage.js",
+    "find": "var status = tab === \"NotArrived\" ? \"Not arrived\" : tab;",
+    "replace": "var status = tab;",
+    "expectFailing": "writes the NotArrived tab's status as Cardmarket's button says it"
   }
 ]
