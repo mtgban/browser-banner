@@ -183,14 +183,14 @@
   },
   {
     "guard": "the page is held only while work runs",
-    "file": "src/ui.js",
+    "file": "../../core/ui.js",
     "find": "} else {\n          window.removeEventListener(\"beforeunload\", hold);",
     "replace": "} else {",
     "expectFailing": "the page is held only while it reads"
   },
   {
     "guard": "controls are taken away while work runs",
-    "file": "src/ui.js",
+    "file": "../../core/ui.js",
     "find": "controls[i].disabled = on;",
     "replace": "",
     "expectFailing": "reads the list and saves the year's orders"
@@ -512,7 +512,7 @@
   },
   {
     "guard": "a reload the update calls for does not ask",
-    "file": "src/ui.js",
+    "file": "../../core/ui.js",
     "find": "      release: function () {\n        window.removeEventListener(\"beforeunload\", hold);",
     "replace": "      release: function () {",
     "expectFailing": "one click sends one request, for the line's quantity, then reloads"

@@ -113,7 +113,7 @@ describe("clicking send", () => {
     expect(it.busy()).toBe(true);
     expect(it.send().disabled).toBe(true);
     expect(it.save().disabled).toBe(true);
-    expect(it.label().disabled).toBe(false);
+    expect(it.label().disabled).toBeFalsy();
     await it.settle();
   });
 

@@ -13,7 +13,10 @@ const content = readFileSync(
   new URL("../src/content.js", import.meta.url),
   "utf8"
 );
-const css = readFileSync(new URL("../src/content.css", import.meta.url), "utf8");
+// The panel's styles: the shared panel's, then what Cardmarket adds.
+const css =
+  readFileSync(new URL("../../../core/panel.css", import.meta.url), "utf8") +
+  readFileSync(new URL("../src/content.css", import.meta.url), "utf8");
 
 // Top-level functions inside the IIFE are indented two spaces; the ones
 // nested inside them are indented four, so they are not mistaken for the
@@ -169,7 +172,7 @@ describe("the panel does not move", () => {
     // Giving it a line of its own means keeping that line empty the rest
     // of the time, since one that came and went would move the buttons.
     // The heading is free at exactly the moment the count needs it.
-    expect(body("counting")).toContain("ban-scope");
+    expect(body("counting")).toContain("ui.word(");
     expect(body("say")).toContain("recap(panel, message)");
   });
 

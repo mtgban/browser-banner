@@ -1,5 +1,7 @@
-/* The panel sits above the page and styles itself completely, since it
-   inherits whatever TCGplayer's own CSS leaves lying around otherwise. */
+/* The panel every store shares. It sits above the page and styles itself
+   completely, since it inherits whatever the store's own CSS leaves lying
+   around otherwise. What one store alone draws is in that store's own
+   stylesheet. */
 
 #ban-panel {
   position: fixed;
@@ -26,8 +28,8 @@
   color: #fff;
   box-shadow: 0 2px 10px rgb(0 0 0 / 35%);
 
-  /* Every inherited face property, set: TCGplayer gives its body
-     font-weight: lighter, which the tooltip would otherwise take. */
+  /* Every inherited face property, set: a store whose body is
+     font-weight: lighter would otherwise lend it to the tooltip. */
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 13px;
   font-style: normal;
@@ -36,8 +38,31 @@
   text-align: left;
 }
 
+#ban-panel[hidden] {
+  display: none;
+}
+
+/* The heading. It may be a control (see .ban-jumps), but it reads as the
+   heading it is: whatever element it is, nothing of a button's own style. */
 #ban-panel .ban-label {
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  background: none;
+  color: inherit;
+
+  font: inherit;
   font-weight: 500;
+  text-align: left;
+}
+
+#ban-panel .ban-label.ban-jumps {
+  cursor: pointer;
+}
+
+#ban-panel .ban-label.ban-jumps:hover .ban-word {
+  text-decoration: underline;
 }
 
 #ban-panel .ban-label:focus-visible {

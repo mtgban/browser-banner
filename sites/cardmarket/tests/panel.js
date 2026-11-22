@@ -82,7 +82,7 @@ export function mount({
         .filter((node) => !node.hidden)
         .map((node) => node.textContent)
         .join(""),
-    scope: () => at(".ban-scope").textContent,
+    scope: () => at(".ban-word").textContent,
     label: () => at(".ban-label"),
     send: () => at(".ban-send"),
     save: () => at(".ban-save"),

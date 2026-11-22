@@ -41,9 +41,9 @@ src/read.js      a page: the filter, the list's heading, every order and line
 src/net.js       one request at a time: a page, or the filter POST
 src/walk.js      a year: set it, read every page, put the visitor's range back
 src/handoff.js   window.open and postMessage to mtgban's /upload/handoff
-src/ui.js        the panel, and the file download
+src/ui.js        core/ui.js's panel and download, the panel headed TCG
 src/page.js      content script: order buttons, Send to BAN, the panel
-src/panel.css, src/orders.css
+src/orders.css   the order headers' controls; the panel's are core/panel.css
 scripts/cut-fixtures.mjs  cuts tests/fixtures/ from a saved page, locally only
 tests/mutations.json      each guard, what breaks it, the test that fails
 tests/panel.js   stands the content script up in a window; clicks are real

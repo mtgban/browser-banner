@@ -62,7 +62,7 @@ describe("the source", () => {
 
 describe("the panel", () => {
   test("is one fixed width", () => {
-    const css = read("src/panel.css");
+    const css = read("../../core/panel.css");
     const rule = /#ban-panel \{([^}]*)\}/.exec(css)[1];
     expect(rule).toMatch(/\swidth: 240px;/);
     expect(css + read("src/orders.css")).not.toMatch(/(min|max)-width/);
@@ -71,7 +71,7 @@ describe("the panel", () => {
 
 describe("the panel's type", () => {
   test("sets every face property itself, since TCGplayer's body is lighter", () => {
-    const rule = /#ban-panel \{([^}]*)\}/.exec(read("src/panel.css"))[1];
+    const rule = /#ban-panel \{([^}]*)\}/.exec(read("../../core/panel.css"))[1];
     for (const property of ["font-family", "font-size", "font-style", "font-weight", "line-height"]) {
       expect([property, rule.includes(property + ":")]).toEqual([property, true]);
     }

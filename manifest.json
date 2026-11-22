@@ -25,9 +25,12 @@
         "sites/cardmarket/src/parse.js",
         "sites/cardmarket/src/pages.js",
         "sites/cardmarket/src/csv.js",
+        "core/ui.js",
+        "sites/cardmarket/src/ui.js",
         "sites/cardmarket/src/content.js"
       ],
       "css": [
+        "core/panel.css",
         "sites/cardmarket/src/content.css"
       ],
       "run_at": "document_idle"
@@ -41,12 +44,14 @@
         "sites/cardkingdom/src/net.js",
         "sites/cardkingdom/src/money.js",
         "sites/cardkingdom/src/csv.js",
+        "core/ui.js",
         "sites/cardkingdom/src/ui.js",
         "sites/cardkingdom/src/store.js",
         "sites/cardkingdom/src/history.js",
         "sites/cardkingdom/src/historypage.js"
       ],
       "css": [
+        "core/panel.css",
         "sites/cardkingdom/src/panel.css",
         "sites/cardkingdom/src/history.css"
       ],
@@ -61,6 +66,7 @@
         "sites/cardkingdom/src/net.js",
         "sites/cardkingdom/src/money.js",
         "sites/cardkingdom/src/csv.js",
+        "core/ui.js",
         "sites/cardkingdom/src/ui.js",
         "sites/cardkingdom/src/cart.js",
         "sites/cardkingdom/src/prices.js",
@@ -71,6 +77,7 @@
         "sites/cardkingdom/src/cartpage.js"
       ],
       "css": [
+        "core/panel.css",
         "sites/cardkingdom/src/panel.css",
         "sites/cardkingdom/src/cart.css"
       ],
@@ -87,11 +94,12 @@
         "sites/tcgplayer/src/net.js",
         "sites/tcgplayer/src/walk.js",
         "sites/tcgplayer/src/handoff.js",
+        "core/ui.js",
         "sites/tcgplayer/src/ui.js",
         "sites/tcgplayer/src/page.js"
       ],
       "css": [
-        "sites/tcgplayer/src/panel.css",
+        "core/panel.css",
         "sites/tcgplayer/src/orders.css"
       ],
       "run_at": "document_idle"

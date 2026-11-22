@@ -335,21 +335,21 @@ lands in whichever mode, uploader or buylist, the reader last used.
 
 ## 7. The panel
 
-Card Kingdom's panel: the stroopwafel and "TCG BANner", one word, a mark, a
-drawn tooltip, one row (the range, *Download CSV*). Until it is asked for
-something, and again when the year changes, the word is `ready` with a
+The shared panel (`core/ui.js`): the stroopwafel and "TCG BANner", one word, a
+mark, a drawn tooltip, one row (the range, *Download CSV*). Until it is asked
+for something, and again when the year changes, the word is `ready` with a
 tick, and with no word the heading drops its dash. On a list a search has
-narrowed to one order (a search is set, the heading counts one order, and
-that order is read whole), the row is that order's instead: *Download CSV*
-saves its cards with no request, and *Send to BAN* does what the icon beside
-its number does, disabled when none of its lines can be sent. A fixed width; nothing
-is written under the row and nothing carries a `title`. While a walk runs the
-word is the page being read (`page 3 of 22`), every control in the row is disabled,
-Escape stops it, and the page asks before it is left. Done, the word counts
-the orders and a tick stands beside it; the tooltip names the file, the
-pages read, pending orders left out, and a range that could not be put back.
-A refusal is a red cross with the reason. A send says how many cards went,
-and what was left.
+narrowed to one order (a search is set, the heading counts one order, and that
+order is read whole), the row is that order's instead: *Download CSV* saves
+its cards with no request, and *Send to BAN* does what the icon beside its
+number does, disabled when none of its lines can be sent. A fixed width;
+nothing is written under the row and nothing carries a `title`. While a walk
+runs the word is the page being read (`page 3 of 22`), every control in the
+row is disabled, Escape stops it, and the page asks before it is left. Done,
+the word counts the orders and a tick stands beside it; the tooltip names the
+file, the pages read, pending orders left out, and a range that could not be
+put back. A refusal is a red cross with the reason. A send says how many cards
+went, and what was left.
 
 ## 8. Fixtures
 
