@@ -55,11 +55,14 @@ Then open your order history on TCGplayer; the panel is at the bottom right.
 
 ## Developing
 
+From the repository's root:
+
 ```
 bun install
-bun test tests/
-bun run mutate
+bun run test
+bun run mutate sites/tcgplayer
 ```
 
-`AGENTS.md` says how to work on it, and `SPECIFICATIONS.md` what it reads
-from TCGplayer and why.
+`bun test tests/` here runs this site's suite alone, without the repository's
+own tests. `AGENTS.md` says how to work on it, and `SPECIFICATIONS.md` what it
+reads from TCGplayer and why.

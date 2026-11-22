@@ -46,7 +46,7 @@ src/ui.js        the panel, and the file download
 src/page.js      content script: order buttons, Send to BAN, the panel
 src/panel.css, src/orders.css
 scripts/cut-fixtures.mjs  cuts tests/fixtures/ from a saved page, locally only
-scripts/mutate.mjs        breaks each guard in tests/mutations.json in turn
+tests/mutations.json      each guard, what breaks it, the test that fails
 tests/panel.js   stands the content script up in a window; clicks are real
 tests/           bun + happy-dom, no browser
 ```
@@ -57,21 +57,24 @@ session (a range, a search, and pages of a list cut from the fixture).
 
 ## Verifying
 
+From the repository's root:
+
 ```
 bun install
-bun test tests/
-bun run mutate
+bun run test
+bun run mutate sites/tcgplayer
 ```
 
-CI runs the same on every push, and checks that every file the manifest names
-exists. There is no build step: the scripts are plain ES5-ish so they can be
-`content_scripts` entries as they are; keep them that way.
+CI runs the same on every push; `bun test tests/` here runs this site's tests
+alone, without the repository's own. There is no build step: the scripts are
+plain ES5-ish so they can be `content_scripts` entries as they are; keep them
+that way.
 
 A guard (a refusal, a strict shape, a check that keeps the walk honest) lands
 with an entry in `tests/mutations.json`: the text that breaks it and the name
-of the test that must then fail. `bun run mutate` fails if that test does not
-fail, if no test file names it, or if an entry's text no longer appears
-exactly once.
+of the test that must then fail. The repository's `scripts/mutate.mjs` fails
+if that test does not fail, if no test file names it, or if an entry's text
+no longer appears exactly once.
 
 ## Traps
 
