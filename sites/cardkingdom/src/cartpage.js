@@ -841,7 +841,7 @@
     panel.actions.appendChild(csv);
     ban = document.createElement("button");
     ban.type = "button";
-    ban.className = "ban-go ban-ban";
+    ban.className = "ban-go ban-send";
     ban.textContent = "BAN";
     ban.setAttribute("aria-label", "Send to BAN");
     ban.addEventListener("click", sendToBan);
