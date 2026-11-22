@@ -15,7 +15,7 @@
 (function (MKM) {
   "use strict";
 
-  var PANEL_ID = "cm-banner";
+  var PANEL_ID = "ban-panel";
   // What the two halves of the handoff say to each other.
   // The protocol the site's handoff page speaks.
   var SEND = "Send to BAN";
@@ -161,9 +161,9 @@
   // No hint while a read runs: the heading holds the count then, and a
   // click on it does nothing.
   function tip(panel) {
-    var box = panel.querySelector(".cm-banner-tip");
+    var box = panel.querySelector(".ban-tip");
     if (box) {
-      var reading = panel.classList.contains("cm-banner-busy");
+      var reading = panel.classList.contains("ban-busy");
       box.textContent = recapped || (reading ? "" : hinted);
     }
   }
@@ -176,13 +176,13 @@
   // clicked and nothing here hears about it; what the tick says is that
   // the rows were read and handed over to it.
   function mark(panel, how) {
-    var at = panel.querySelector(".cm-banner-mark");
+    var at = panel.querySelector(".ban-mark");
     if (!at) {
       return;
     }
     at.hidden = !how;
     at.textContent = how === "failed" ? "\u2717" : "\u2713";
-    at.classList.toggle("cm-banner-failed", how === "failed");
+    at.classList.toggle("ban-failed", how === "failed");
   }
 
   // counting puts the read's progress where the scope word usually is.
@@ -193,7 +193,7 @@
   // there while the spinner is, which is the one moment the scope word is
   // not worth reading.
   function counting(panel, text) {
-    var says = panel.querySelector(".cm-banner-scope");
+    var says = panel.querySelector(".ban-scope");
     if (says) {
       says.textContent = text;
     }
@@ -226,7 +226,7 @@
   // is true, since a page carrying one is a page the browser will not keep
   // in its back/forward cache.
   function guard(panel) {
-    if (unused || panel.classList.contains("cm-banner-busy")) {
+    if (unused || panel.classList.contains("ban-busy")) {
       window.addEventListener("beforeunload", hold);
     } else {
       window.removeEventListener("beforeunload", hold);
@@ -243,8 +243,8 @@
   // decided together: a read ending must not hand back a button that was
   // never clickable in the first place.
   function buttons(panel, working) {
-    var send = panel.querySelector(".cm-banner-send");
-    var save = panel.querySelector(".cm-banner-save");
+    var send = panel.querySelector(".ban-send");
+    var save = panel.querySelector(".ban-save");
     if (send) {
       send.disabled = working || !sendable();
     }
@@ -259,7 +259,7 @@
   //
   // It is also where the page is held while the read runs; see guard.
   function busy(panel, working) {
-    panel.classList.toggle("cm-banner-busy", working);
+    panel.classList.toggle("ban-busy", working);
     // The two that do something. The heading is left alone: it is holding
     // the count, and a disabled button is a dimmed one in every browser's
     // own stylesheet, so disabling it would dim the progress.
@@ -726,12 +726,12 @@
 
   function call(panel, by) {
     calledBy = by;
-    panel.classList.toggle("cm-banner-calling", by !== "");
+    panel.classList.toggle("ban-calling", by !== "");
   }
 
   function arm(panel, done, calling) {
     armed = done;
-    var send = panel.querySelector(".cm-banner-send");
+    var send = panel.querySelector(".ban-send");
     // Not where there is nothing to send to. The rows are real and the
     // count still goes up in the heading, but a button that cannot be
     // clicked saying READY is an offer that is not there.
@@ -740,7 +740,7 @@
       // The pulse goes on with the word and for the same reason: both of
       // them are the offer, and there is no offer where nothing can take
       // the rows.
-      panel.classList.add("cm-banner-armed");
+      panel.classList.add("ban-armed");
       // Looping from the start only when Send started the read. Rows a CSV
       // read left in hand wait for the cursor: the file was what was asked
       // for.
@@ -760,10 +760,10 @@
   function disarm(panel) {
     armed = null;
     mark(panel, "");
-    panel.classList.remove("cm-banner-armed");
+    panel.classList.remove("ban-armed");
     call(panel, "");
     use(panel);
-    var send = panel.querySelector(".cm-banner-send");
+    var send = panel.querySelector(".ban-send");
     if (send) {
       send.textContent = SEND;
     }
@@ -805,13 +805,13 @@
 
   function label(panel) {
     var count = MKM.countRows(document);
-    var says = panel.querySelector(".cm-banner-scope");
+    var says = panel.querySelector(".ban-scope");
     if (says) {
       // Naming the wrong scope is how a twentieth of a collection gets
       // uploaded as all of it, so the button says which it means.
       says.textContent = SCOPES[scope].says;
     }
-    var button = panel.querySelector(".cm-banner-label");
+    var button = panel.querySelector(".ban-label");
     if (button) {
       // The number lives here rather than in the label, which now names a
       // scope instead of a count. It is written the way Cardmarket wrote
@@ -834,25 +834,25 @@
     var panel = document.createElement("div");
     panel.id = PANEL_ID;
     panel.innerHTML =
-      '<button type="button" class="cm-banner-label" aria-describedby="cm-banner-tip">' +
-      'CM BAN<i class="cm-banner-ner">ner</i> - ' +
-      '<span class="cm-banner-spin" aria-hidden="true"></span>' +
-      '<b class="cm-banner-scope"></b>' +
-      '<span class="cm-banner-mark" aria-hidden="true" hidden>\u2713</span>' +
+      '<button type="button" class="ban-label" aria-describedby="ban-tip">' +
+      'CM BAN<i class="ban-ner">ner</i> - ' +
+      '<span class="ban-spin" aria-hidden="true"></span>' +
+      '<b class="ban-scope"></b>' +
+      '<span class="ban-mark" aria-hidden="true" hidden>\u2713</span>' +
       "</button>" +
-      '<span class="cm-banner-tip" id="cm-banner-tip" role="tooltip"></span>' +
-      '<div class="cm-banner-actions">' +
-      '<button type="button" class="cm-banner-send">' + SEND + "</button>" +
-      '<button type="button" class="cm-banner-save">' + SAVE + "</button>" +
+      '<span class="ban-tip" id="ban-tip" role="tooltip"></span>' +
+      '<div class="ban-actions">' +
+      '<button type="button" class="ban-send">' + SEND + "</button>" +
+      '<button type="button" class="ban-save">' + SAVE + "</button>" +
       "</div>";
 
     // Changing what will be taken makes whatever the last export said
     // about the other scope stale, so the note goes with it.
-    panel.querySelector(".cm-banner-label").addEventListener("click", function () {
+    panel.querySelector(".ban-label").addEventListener("click", function () {
       // Not while a read is running: this line is showing the count, and
       // switching scope would write over it and abandon a read that was
       // asked for under the other one.
-      if (panel.classList.contains("cm-banner-busy")) {
+      if (panel.classList.contains("ban-busy")) {
         return;
       }
       // Nowhere to move between; the heading says why on its hover.
@@ -866,17 +866,17 @@
       say(panel, "");
       label(panel);
     });
-    panel.querySelector(".cm-banner-send").addEventListener("click", function () {
+    panel.querySelector(".ban-send").addEventListener("click", function () {
       sendToBan(panel);
     });
     // Rows a CSV read left in hand start pulsing when the cursor reaches the
     // button, and keep going after it leaves.
-    panel.querySelector(".cm-banner-send").addEventListener("mouseenter", function () {
-      if (panel.classList.contains("cm-banner-armed") && !calledBy) {
+    panel.querySelector(".ban-send").addEventListener("mouseenter", function () {
+      if (panel.classList.contains("ban-armed") && !calledBy) {
         call(panel, "hover");
       }
     });
-    panel.querySelector(".cm-banner-save").addEventListener("click", function () {
+    panel.querySelector(".ban-save").addEventListener("click", function () {
       exportOffers(panel);
     });
     // A game BAN does not price gets the panel, the read and the file all
@@ -885,8 +885,8 @@
     // itself for ever in a panel three words wide. The file button takes
     // the row and says what it does instead.
     if (!sendable()) {
-      panel.querySelector(".cm-banner-send").hidden = true;
-      panel.querySelector(".cm-banner-save").textContent = SAVE_ALONE;
+      panel.querySelector(".ban-send").hidden = true;
+      panel.querySelector(".ban-save").textContent = SAVE_ALONE;
     }
     buttons(panel, false);
     return panel;
@@ -906,7 +906,7 @@
     }
 
     var panel = build();
-    panel.classList.toggle("cm-banner-locked", locked);
+    panel.classList.toggle("ban-locked", locked);
     document.body.appendChild(panel);
     label(panel);
 
@@ -924,7 +924,7 @@
       if (event.key !== "Escape") {
         return;
       }
-      if (!panel.classList.contains("cm-banner-busy") && !armed) {
+      if (!panel.classList.contains("ban-busy") && !armed) {
         return;
       }
       stopReading(panel);
@@ -962,7 +962,7 @@
         // documents of their own and never touch this one, but Cardmarket
         // keeps working on its own table, and reacting to that would wipe
         // the count saying how far along the export is.
-        if (panel.classList.contains("cm-banner-busy")) {
+        if (panel.classList.contains("ban-busy")) {
           return;
         }
         if (tableState() === shown) {

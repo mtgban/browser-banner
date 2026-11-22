@@ -3,7 +3,7 @@
    `.cart-product-list .cart-interaction-wrapper :not(.btn,.cart-tag)` reset,
    three classes deep, does not strip it. */
 
-.cart-product-list .cart-interaction-wrapper .save-for-later-button.ck-banner-host {
+.cart-product-list .cart-interaction-wrapper .save-for-later-button.ban-host {
   /* One row, right-aligned: the mark, then Save for Later. */
   display: flex;
   justify-content: flex-end;
@@ -11,7 +11,7 @@
   gap: 6px;
 }
 
-.cart-product-list .cart-interaction-wrapper .ck-banner-line {
+.cart-product-list .cart-interaction-wrapper .ban-line {
   position: relative;
   margin: 0;
   padding: 0;
@@ -19,7 +19,7 @@
 
 /* The height and top margin of CK's own `.save-for-later-button .btn`, so
    the mark lines up with Save for Later beside it. */
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-badge {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-badge {
   display: inline-block;
   box-sizing: border-box;
   margin: 6px 0 0;
@@ -35,32 +35,32 @@
   cursor: default;
 }
 
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-good {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-good {
   background: #e3f4e8;
   border-color: #9fd3b0;
   color: #1d6b38;
 }
 
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-warn {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-warn {
   background: #fff4dc;
   border-color: #f0cf86;
   color: #8a5a00;
 }
 
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-quiet {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-quiet {
   background: #f1f1f1;
   border-color: #ddd;
   color: #666;
 }
 
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-badge:focus-visible {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-badge:focus-visible {
   outline: 2px solid #2d67c4;
   outline-offset: 2px;
 }
 
 /* Above the badge and right-aligned with it, since the line's buttons sit
    at its right edge. */
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-linetip {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-linetip {
   position: absolute;
   right: 0;
   bottom: calc(100% + 6px);
@@ -86,20 +86,20 @@
   pointer-events: none;
 }
 
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-badge:hover + .ck-banner-linetip,
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-badge:focus-visible + .ck-banner-linetip {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-badge:hover + .ban-linetip,
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-badge:focus-visible + .ban-linetip {
   opacity: 1;
   visibility: visible;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-linetip {
+  .cart-product-list .cart-interaction-wrapper .ban-line .ban-linetip {
     transform: translateY(3px);
     transition: opacity 120ms ease, transform 120ms ease, visibility 0s linear 120ms;
   }
 
-  .cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-badge:hover + .ck-banner-linetip,
-  .cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-badge:focus-visible + .ck-banner-linetip {
+  .cart-product-list .cart-interaction-wrapper .ban-line .ban-badge:hover + .ban-linetip,
+  .cart-product-list .cart-interaction-wrapper .ban-line .ban-badge:focus-visible + .ban-linetip {
     transform: none;
     transition-delay: 80ms, 80ms, 0s;
   }
@@ -107,22 +107,22 @@
 
 /* Update price is drawn by CK's own `.save-for-later-button .btn` rule,
    exactly like Save for Later beside it. */
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-update {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-update {
   white-space: nowrap;
 }
 
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-update[disabled] {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-update[disabled] {
   cursor: default;
   opacity: 0.55;
 }
 
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-update:hover + .ck-banner-linetip,
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-update:focus-visible + .ck-banner-linetip {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-update:hover + .ban-linetip,
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-update:focus-visible + .ban-linetip {
   opacity: 1;
   visibility: visible;
 }
 
-.cart-product-list .cart-interaction-wrapper .ck-banner-line .ck-banner-bad {
+.cart-product-list .cart-interaction-wrapper .ban-line .ban-bad {
   background: #fdecec;
   border-color: #f3b4b4;
   color: #a12626;
@@ -131,11 +131,11 @@
 /* Update all, under the sidebar's Empty Cart, is CK's own button. Greyed out
    when there is nothing to update, it draws a tooltip like a line's, above
    it and as wide. */
-.cart-sidebar .well .cart-button-padding.ck-banner-all {
+.cart-sidebar .well .cart-button-padding.ban-all {
   position: relative;
 }
 
-.cart-sidebar .well .ck-banner-all .ck-banner-alltip {
+.cart-sidebar .well .ban-all .ban-alltip {
   position: absolute;
   right: 0;
   bottom: calc(100% + 2px);
@@ -161,20 +161,20 @@
   pointer-events: none;
 }
 
-.cart-sidebar .well .ck-banner-all:hover .ck-banner-alltip,
-.cart-sidebar .well .ck-banner-all:focus-within .ck-banner-alltip {
+.cart-sidebar .well .ban-all:hover .ban-alltip,
+.cart-sidebar .well .ban-all:focus-within .ban-alltip {
   opacity: 1;
   visibility: visible;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .cart-sidebar .well .ck-banner-all .ck-banner-alltip {
+  .cart-sidebar .well .ban-all .ban-alltip {
     transform: translateY(3px);
     transition: opacity 120ms ease, transform 120ms ease, visibility 0s linear 120ms;
   }
 
-  .cart-sidebar .well .ck-banner-all:hover .ck-banner-alltip,
-  .cart-sidebar .well .ck-banner-all:focus-within .ck-banner-alltip {
+  .cart-sidebar .well .ban-all:hover .ban-alltip,
+  .cart-sidebar .well .ban-all:focus-within .ban-alltip {
     transform: none;
     transition-delay: 80ms, 80ms, 0s;
   }

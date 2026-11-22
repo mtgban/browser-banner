@@ -84,7 +84,7 @@ export function mountHistory({ kind = "purchases", total = 210, change = {}, bod
   }
   window.CKB.PACE = 0;
 
-  const panel = window.document.getElementById("ck-banner");
+  const panel = window.document.getElementById("ban-panel");
   const at = (selector) => panel.querySelector(selector);
 
   return {
@@ -95,26 +95,26 @@ export function mountHistory({ kind = "purchases", total = 210, change = {}, bod
     idb,
     // What the heading says out loud: the mark only when it is shown.
     heading: () =>
-      [...at(".ck-banner-label").childNodes]
+      [...at(".ban-label").childNodes]
         .filter((node) => !node.hidden)
         .map((node) => node.textContent)
         .join(""),
-    word: () => at(".ck-banner-word").textContent,
-    tip: () => at(".ck-banner-tip").textContent,
-    year: () => at(".ck-banner-year"),
-    go: () => at(".ck-banner-go"),
-    markShown: () => !at(".ck-banner-mark").hidden,
-    failed: () => !at(".ck-banner-mark").hidden && at(".ck-banner-mark").classList.contains("ck-banner-failed"),
-    busy: () => panel.classList.contains("ck-banner-busy"),
+    word: () => at(".ban-word").textContent,
+    tip: () => at(".ban-tip").textContent,
+    year: () => at(".ban-year"),
+    go: () => at(".ban-go"),
+    markShown: () => !at(".ban-mark").hidden,
+    failed: () => !at(".ban-mark").hidden && at(".ban-mark").classList.contains("ban-failed"),
+    busy: () => panel.classList.contains("ban-busy"),
     titled: () => panel.querySelectorAll("[title]").length,
     // Whatever sits under the row of controls, which nothing should.
     below: () => {
       const children = [...panel.children];
-      return children.slice(children.indexOf(at(".ck-banner-actions")) + 1).length;
+      return children.slice(children.indexOf(at(".ban-actions")) + 1).length;
     },
     choose: (value) => {
-      at(".ck-banner-year").value = value;
-      at(".ck-banner-year").dispatchEvent(new window.Event("change"));
+      at(".ban-year").value = value;
+      at(".ban-year").dispatchEvent(new window.Event("change"));
     },
     leaving: () => {
       const event = new window.Event("beforeunload", { cancelable: true });
@@ -129,7 +129,7 @@ export function mountHistory({ kind = "purchases", total = 210, change = {}, bod
     idle: async () => {
       const until = Date.now() + 5000;
       await new Promise((done) => setTimeout(done, 30));
-      while (panel.classList.contains("ck-banner-busy") && Date.now() < until) {
+      while (panel.classList.contains("ban-busy") && Date.now() < until) {
         await new Promise((done) => setTimeout(done, 10));
       }
     },
@@ -244,18 +244,18 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
     window.CKB.PACE = 0;
   }
   const doc = window.document;
-  const panel = doc.getElementById("ck-banner");
+  const panel = doc.getElementById("ban-panel");
   const at$ = (selector) => panel && panel.querySelector(selector);
   const settle = (ms = 40) => new Promise((done) => setTimeout(done, ms));
   await settle();
 
   const marks = () =>
-    [...doc.querySelectorAll(".ck-banner-line")].map((m) => ({
+    [...doc.querySelectorAll(".ban-line")].map((m) => ({
       product: Number(m.getAttribute("data-product")),
       verdict: m.getAttribute("data-verdict"),
-      badge: m.querySelector(".ck-banner-badge, .ck-banner-update").textContent,
-      tone: m.querySelector(".ck-banner-badge, .ck-banner-update").className.replace("ck-banner-badge ck-banner-", ""),
-      tip: m.querySelector(".ck-banner-linetip").textContent,
+      badge: m.querySelector(".ban-badge, .ban-update").textContent,
+      tone: m.querySelector(".ban-badge, .ban-update").className.replace("ban-badge ban-", ""),
+      tip: m.querySelector(".ban-linetip").textContent,
       inLink: !!m.closest("a"),
       first: m.parentElement.firstElementChild === m && m.parentElement.classList.contains("save-for-later-button"),
     }));
@@ -268,21 +268,21 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
     reloads,
     idb,
     marks,
-    update: (product) => doc.querySelector(`.ck-banner-line[data-product="${product}"] .ck-banner-update`),
-    updates: () => [...doc.querySelectorAll(".ck-banner-update")],
+    update: (product) => doc.querySelector(`.ban-line[data-product="${product}"] .ban-update`),
+    updates: () => [...doc.querySelectorAll(".ban-update")],
     mark: (product) => marks().find((m) => m.product === product),
     heading: () =>
-      [...at$(".ck-banner-label").childNodes]
+      [...at$(".ban-label").childNodes]
         .filter((node) => !node.hidden)
         .map((node) => node.textContent)
         .join(""),
-    word: () => at$(".ck-banner-word").textContent,
-    tip: () => at$(".ck-banner-tip").textContent,
-    button: () => at$(".ck-banner-go"),
-    label: () => at$(".ck-banner-label"),
-    all: () => doc.querySelector(".ck-banner-all"),
-    csv: () => at$(".ck-banner-csv"),
-    ban: () => at$(".ck-banner-ban"),
+    word: () => at$(".ban-word").textContent,
+    tip: () => at$(".ban-tip").textContent,
+    button: () => at$(".ban-go"),
+    label: () => at$(".ban-label"),
+    all: () => doc.querySelector(".ban-all"),
+    csv: () => at$(".ban-csv"),
+    ban: () => at$(".ban-ban"),
     tabs,
     // ready is mtgban's handoff page saying it is listening, from tab i.
     ready: (i = 0, origin = "https://mtgban.com") =>
@@ -291,13 +291,13 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
     file: async (i = 0) => ({ name: saved[i].name, text: await saved[i].blob.text() }),
     saved: () => saved,
     focused: () => doc.activeElement,
-    busy: () => panel.classList.contains("ck-banner-busy"),
-    failed: () => !at$(".ck-banner-mark").hidden && at$(".ck-banner-mark").classList.contains("ck-banner-failed"),
-    ticked: () => !at$(".ck-banner-mark").hidden && !at$(".ck-banner-mark").classList.contains("ck-banner-failed"),
-    titled: () => doc.querySelectorAll("#ck-banner [title], .ck-banner-line [title]").length,
+    busy: () => panel.classList.contains("ban-busy"),
+    failed: () => !at$(".ban-mark").hidden && at$(".ban-mark").classList.contains("ban-failed"),
+    ticked: () => !at$(".ban-mark").hidden && !at$(".ban-mark").classList.contains("ban-failed"),
+    titled: () => doc.querySelectorAll("#ban-panel [title], .ban-line [title]").length,
     below: () => {
       const children = [...panel.children];
-      return children.slice(children.indexOf(at$(".ck-banner-actions")) + 1).length;
+      return children.slice(children.indexOf(at$(".ban-actions")) + 1).length;
     },
     // redraw is the page re-rendering a line's Save for Later box, as Vue
     // does, which takes any mark in it along.
@@ -331,7 +331,7 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
       const until = Date.now() + 5000;
       const reloaded = reloads.length;
       await settle();
-      while (panel.classList.contains("ck-banner-busy") && reloads.length === reloaded && Date.now() < until) {
+      while (panel.classList.contains("ban-busy") && reloads.length === reloaded && Date.now() < until) {
         await settle(10);
       }
     },

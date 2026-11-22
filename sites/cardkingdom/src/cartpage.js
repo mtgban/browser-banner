@@ -141,11 +141,11 @@
   function mark(line, result) {
     var host = line.host;
     if (host) {
-      var old = host.querySelectorAll(".ck-banner-line");
+      var old = host.querySelectorAll(".ban-line");
       for (var i = 0; i < old.length; i++) {
         old[i].remove();
       }
-      if (result.verdict === "same" && host.classList.contains("ck-banner-own")) {
+      if (result.verdict === "same" && host.classList.contains("ban-own")) {
         host.remove();
       }
     }
@@ -154,13 +154,13 @@
     }
     if (!host) {
       host = document.createElement("div");
-      host.className = "save-for-later-button text-right ck-banner-own";
+      host.className = "save-for-later-button text-right ban-own";
       line.details.appendChild(host);
     }
     // The box lays its controls out in one row, the mark left of the link.
-    host.classList.add("ck-banner-host");
+    host.classList.add("ban-host");
     var box = document.createElement("div");
-    box.className = "ck-banner-line";
+    box.className = "ban-line";
     box.setAttribute("data-line", String(line.lineID));
     box.setAttribute("data-product", String(result.id || line.productID));
     box.setAttribute("data-verdict", result.verdict);
@@ -170,7 +170,7 @@
       badge = document.createElement("button");
       badge.type = "button";
       // CK's own btn class, so the box's `.btn` rule draws it like Save for Later.
-      badge.className = "btn ck-banner-update";
+      badge.className = "btn ban-update";
       badge.textContent = "Update price";
       badge.disabled = writing || locked;
       badge.addEventListener("click", function () {
@@ -180,8 +180,8 @@
       badge = badgeOf(BADGES[result.verdict][0], BADGES[result.verdict][1]);
     }
     var tip = document.createElement("span");
-    tip.className = "ck-banner-linetip";
-    tip.id = "ck-banner-line-" + line.lineID;
+    tip.className = "ban-linetip";
+    tip.id = "ban-line-" + line.lineID;
     tip.setAttribute("role", "tooltip");
     tip.textContent = lineTip(line, result);
     badge.setAttribute("aria-describedby", tip.id);
@@ -193,7 +193,7 @@
 
   function badgeOf(text, tone) {
     var badge = document.createElement("span");
-    badge.className = "ck-banner-badge ck-banner-" + tone;
+    badge.className = "ban-badge ban-" + tone;
     badge.tabIndex = 0;
     badge.textContent = text;
     return badge;
@@ -201,15 +201,15 @@
 
   // swap replaces a line's control with a badge, and says why on its tooltip.
   function swap(box, text, tone, tip) {
-    var control = box.querySelector(".ck-banner-badge, .ck-banner-update");
+    var control = box.querySelector(".ban-badge, .ban-update");
     var badge = badgeOf(text, tone);
     badge.setAttribute("aria-describedby", control.getAttribute("aria-describedby"));
     control.replaceWith(badge);
-    box.querySelector(".ck-banner-linetip").textContent = tip;
+    box.querySelector(".ban-linetip").textContent = tip;
   }
 
   function updates(disabled) {
-    var controls = document.querySelectorAll(".ck-banner-update, .ck-banner-update-all");
+    var controls = document.querySelectorAll(".ban-update, .ban-update-all");
     for (var i = 0; i < controls.length; i++) {
       controls[i].disabled = disabled || locked;
     }
@@ -335,9 +335,9 @@
     var line = CKB.readCart(document, location.href, side).filter(function (l) {
       return l.lineID === lineID && l.productID === productID;
     })[0];
-    var box = document.querySelector('.ck-banner-line[data-line="' + lineID + '"]');
+    var box = document.querySelector('.ban-line[data-line="' + lineID + '"]');
     // A newer list read first may leave the line nothing to update.
-    if (!box || !box.querySelector(".ck-banner-update")) {
+    if (!box || !box.querySelector(".ban-update")) {
       lastSummary();
       return;
     }
@@ -356,7 +356,7 @@
 
     writing = true;
     updates(true);
-    box.querySelector(".ck-banner-update").textContent = "Updating";
+    box.querySelector(".ban-update").textContent = "Updating";
     panel.clear();
     panel.jump(null);
     panel.word("updating");
@@ -476,7 +476,7 @@
     }
     var lines = CKB.readCart(document, location.href, side).filter(function (l) {
       var result = CKB.compare(l, list, side, seen);
-      if (result.verdict !== "better" || !document.querySelector('.ck-banner-line[data-line="' + l.lineID + '"] .ck-banner-update')) {
+      if (result.verdict !== "better" || !document.querySelector('.ban-line[data-line="' + l.lineID + '"] .ban-update')) {
         return false;
       }
       l.productID = result.id;
@@ -503,14 +503,14 @@
       return;
     }
     var line = lines[i];
-    var box = document.querySelector('.ck-banner-line[data-line="' + line.lineID + '"]');
+    var box = document.querySelector('.ban-line[data-line="' + line.lineID + '"]');
     panel.word("updating " + (i + 1) + " of " + lines.length);
     CKB.after(i ? CKB.PACE : 0)
       .then(function () {
         if (run.stopped) {
           return null;
         }
-        box.querySelector(".ck-banner-update").textContent = "Updating";
+        box.querySelector(".ban-update").textContent = "Updating";
         return CKB.updatePrice(line);
       })
       .then(function (answer) {
@@ -571,26 +571,26 @@
       all.remove();
       all = null;
     }
-    var n = document.querySelectorAll(".ck-banner-update").length;
+    var n = document.querySelectorAll(".ban-update").length;
     var empty = document.querySelector('form[action$="/sellcart/empty_cart"]');
     var slot = empty && empty.closest(".cart-button-padding");
     if (!slot) {
       return;
     }
     all = document.createElement("div");
-    all.className = "cart-button-padding ck-banner-all";
+    all.className = "cart-button-padding ban-all";
     all.innerHTML = '<div class="btn-group-justified"><div class="btn-group">' +
-      '<button type="button" class="btn btn-default ck-banner-update-all"></button></div></div>';
+      '<button type="button" class="btn btn-default ban-update-all"></button></div></div>';
     var control = all.querySelector("button");
     if (!n) {
       // Greyed rather than disabled, so its tooltip shows on hover and focus.
       control.textContent = "Update prices";
       control.classList.add("disabled");
       control.setAttribute("aria-disabled", "true");
-      control.setAttribute("aria-describedby", "ck-banner-alltip");
+      control.setAttribute("aria-describedby", "ban-alltip");
       var tip = document.createElement("span");
-      tip.className = "ck-banner-alltip";
-      tip.id = "ck-banner-alltip";
+      tip.className = "ban-alltip";
+      tip.id = "ban-alltip";
       tip.setAttribute("role", "tooltip");
       tip.textContent = "All the best prices are already in the cart.";
       all.appendChild(tip);
@@ -605,13 +605,13 @@
   // next takes the page to the next line the list favours, after the one
   // it went to last and round again, and focuses its control.
   function next() {
-    var boxes = document.querySelectorAll('.ck-banner-line[data-verdict="' + ORDER[side][0][0] + '"]');
+    var boxes = document.querySelectorAll('.ban-line[data-verdict="' + ORDER[side][0][0] + '"]');
     if (!boxes.length) {
       return;
     }
     jumped = (jumped + 1) % boxes.length;
     boxes[jumped].scrollIntoView({ block: "center" });
-    boxes[jumped].querySelector(".ck-banner-update, .ck-banner-badge").focus({ preventScroll: true });
+    boxes[jumped].querySelector(".ban-update, .ban-badge").focus({ preventScroll: true });
   }
 
   function signature(lines) {
@@ -689,7 +689,7 @@
   // marked says whether every line the last marking marked still has it.
   function marked(lines) {
     return (!all || document.contains(all)) && lines.every(function (l) {
-      return !wanted[l.lineID] || !(l.host || l.details) || (l.host && l.host.querySelector('.ck-banner-line[data-line="' + l.lineID + '"]'));
+      return !wanted[l.lineID] || !(l.host || l.details) || (l.host && l.host.querySelector('.ban-line[data-line="' + l.lineID + '"]'));
     });
   }
 
@@ -821,13 +821,13 @@
   }
 
   function install() {
-    if (document.getElementById("ck-banner")) {
+    if (document.getElementById("ban-panel")) {
       return;
     }
     panel = CKB.panel();
     button = document.createElement("button");
     button.type = "button";
-    button.className = "ck-banner-go";
+    button.className = "ban-go";
     button.textContent = "Load prices";
     button.addEventListener("click", function () {
       check();
@@ -835,13 +835,13 @@
     panel.actions.appendChild(button);
     csv = document.createElement("button");
     csv.type = "button";
-    csv.className = "ck-banner-go ck-banner-csv";
+    csv.className = "ban-go ban-csv";
     csv.textContent = "CSV";
     csv.addEventListener("click", saveCSV);
     panel.actions.appendChild(csv);
     ban = document.createElement("button");
     ban.type = "button";
-    ban.className = "ck-banner-go ck-banner-ban";
+    ban.className = "ban-go ban-ban";
     ban.textContent = "BAN";
     ban.setAttribute("aria-label", "Send to BAN");
     ban.addEventListener("click", sendToBan);

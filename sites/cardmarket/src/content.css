@@ -1,7 +1,7 @@
 /* The panel sits above the page and styles itself completely, since it
    inherits whatever Cardmarket's own CSS leaves lying around otherwise. */
 
-#cm-banner {
+#ban-panel {
   position: fixed;
   right: 16px;
   bottom: 16px;
@@ -31,7 +31,7 @@
   text-align: left;
 }
 
-#cm-banner[hidden] {
+#ban-panel[hidden] {
   display: none;
 }
 
@@ -39,7 +39,7 @@
    heading it was, because a second thing styled like a button next to two
    actual buttons is three buttons. The word that changes is the only part
    that advertises itself, and only under the cursor. */
-#cm-banner .cm-banner-label {
+#ban-panel .ban-label {
   margin: 0;
   padding: 0;
   border: 0;
@@ -57,13 +57,13 @@
 /* Said with its own style rather than with <i> alone: a page that uses <i>
    for icons - and Cardmarket's does - is a page whose stylesheet may have
    told every one of them to stand up straight. */
-#cm-banner .cm-banner-ner {
+#ban-panel .ban-ner {
   font-style: italic;
 }
 
 /* The word that changes carries the weight, because it is the word that
    is worth reading twice. */
-#cm-banner .cm-banner-label .cm-banner-scope {
+#ban-panel .ban-label .ban-scope {
   font-weight: 700;
 }
 
@@ -75,7 +75,7 @@
    file to somebody else's page is something browsers want declared in the
    manifest. Three kilobytes of base64 costs less than a manifest entry
    that exposes a file to every page this runs on. */
-#cm-banner .cm-banner-label::before {
+#ban-panel .ban-label::before {
   content: "";
   display: inline-block;
   box-sizing: border-box;
@@ -94,12 +94,12 @@
   background: url("data:image/png;base64,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") center / contain no-repeat;
 }
 
-#cm-banner .cm-banner-label:hover .cm-banner-scope {
+#ban-panel .ban-label:hover .ban-scope {
   text-decoration: underline dotted;
   text-underline-offset: 3px;
 }
 
-#cm-banner .cm-banner-label:focus-visible {
+#ban-panel .ban-label:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
   border-radius: 3px;
@@ -109,7 +109,7 @@
    runs off the right edge the panel is anchored to. It shows a beat after
    the cursor arrives, which is soon enough to read as a response and late
    enough not to flash while the cursor passes over. */
-#cm-banner .cm-banner-tip {
+#ban-panel .ban-tip {
   position: absolute;
   left: 0;
   right: 0;
@@ -130,36 +130,36 @@
   pointer-events: none;
 }
 
-#cm-banner .cm-banner-tip:empty {
+#ban-panel .ban-tip:empty {
   display: none;
 }
 
-#cm-banner .cm-banner-label:hover + .cm-banner-tip,
-#cm-banner .cm-banner-label:focus-visible + .cm-banner-tip {
+#ban-panel .ban-label:hover + .ban-tip,
+#ban-panel .ban-label:focus-visible + .ban-tip {
   opacity: 1;
   visibility: visible;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  #cm-banner .cm-banner-tip {
+  #ban-panel .ban-tip {
     transform: translateY(3px);
     transition: opacity 120ms ease, transform 120ms ease, visibility 0s linear 120ms;
   }
 
-  #cm-banner .cm-banner-label:hover + .cm-banner-tip,
-  #cm-banner .cm-banner-label:focus-visible + .cm-banner-tip {
+  #ban-panel .ban-label:hover + .ban-tip,
+  #ban-panel .ban-label:focus-visible + .ban-tip {
     transform: none;
     transition-delay: 80ms, 80ms, 0s;
   }
 }
 
-#cm-banner .cm-banner-actions {
+#ban-panel .ban-actions {
   display: flex;
   gap: 6px;
 }
 
-#cm-banner .cm-banner-send,
-#cm-banner .cm-banner-save {
+#ban-panel .ban-send,
+#ban-panel .ban-save {
   margin: 0;
   padding: 7px 12px;
   border: 0;
@@ -171,7 +171,7 @@
   cursor: pointer;
 }
 
-#cm-banner .cm-banner-send {
+#ban-panel .ban-send {
   /* Carries the ring below, which is drawn outside its own box. */
   position: relative;
 
@@ -179,7 +179,7 @@
   background: #2d67c4;
 }
 
-#cm-banner .cm-banner-send:hover {
+#ban-panel .ban-send:hover {
   background: #3a78d8;
 }
 
@@ -190,18 +190,18 @@
    Green because the panel already has a word for good - the tick beside
    the count wears it - though not the tick's own #7bd88f, which is a
    colour for a glyph on navy rather than a ground for white text. */
-#cm-banner.cm-banner-armed .cm-banner-send {
+#ban-panel.ban-armed .ban-send {
   background: #30915a;
 }
 
-#cm-banner.cm-banner-armed .cm-banner-send:hover {
+#ban-panel.ban-armed .ban-send:hover {
   background: #38a869;
 }
 
 /* Outside the button rather than on it, so a pulse costs a composited
    transform and opacity and never the button's own paint - which is
    worth caring about for the one animation here that does not stop. */
-#cm-banner .cm-banner-send::before {
+#ban-panel .ban-send::before {
   content: "";
   position: absolute;
   inset: -2px;
@@ -224,12 +224,12 @@
    asked for: the green underneath says the same thing standing still,
    and an animation with no end is the kind that request is about. */
 @media (prefers-reduced-motion: no-preference) {
-  #cm-banner.cm-banner-calling .cm-banner-send::before {
-    animation: cm-banner-pulse 2.4s ease-out infinite;
+  #ban-panel.ban-calling .ban-send::before {
+    animation: ban-pulse 2.4s ease-out infinite;
   }
 }
 
-@keyframes cm-banner-pulse {
+@keyframes ban-pulse {
   0% {
     opacity: 0.85;
     transform: scale(0.97);
@@ -247,23 +247,23 @@
 }
 
 /* The quieter of the two: the file is the fallback, not the point. */
-#cm-banner .cm-banner-save {
+#ban-panel .ban-save {
   background: #33507d;
   font-weight: 500;
 }
 
-#cm-banner .cm-banner-save:hover {
+#ban-panel .ban-save:hover {
   background: #3f5f92;
 }
 
 /* Alone on the row, it takes the room the send button was using. The panel
    is a fixed width and the button carries a longer word to suit. */
-#cm-banner .cm-banner-send[hidden] + .cm-banner-save {
+#ban-panel .ban-send[hidden] + .ban-save {
   flex: 1;
 }
 
-#cm-banner .cm-banner-send:focus-visible,
-#cm-banner .cm-banner-save:focus-visible {
+#ban-panel .ban-send:focus-visible,
+#ban-panel .ban-save:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
 }
@@ -273,24 +273,24 @@
    hiding it is the browser's job and not a rule of ours to get wrong. What
    either one stands for is on the heading's tooltip; nothing is written
    under the buttons. */
-#cm-banner .cm-banner-mark {
+#ban-panel .ban-mark {
   margin-left: 5px;
   color: #7bd88f;
   font-weight: 700;
 }
 
-#cm-banner .cm-banner-mark.cm-banner-failed {
+#ban-panel .ban-mark.ban-failed {
   color: #f07178;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  #cm-banner .cm-banner-send,
-  #cm-banner .cm-banner-save {
+  #ban-panel .ban-send,
+  #ban-panel .ban-save {
     transition: background 120ms ease;
   }
 }
 
-#cm-banner .cm-banner-spin {
+#ban-panel .ban-spin {
   display: none;
 }
 
@@ -298,7 +298,7 @@
    than the text it sits beside. A spinner taller than the line grows the
    heading at the moment a read starts, which is the panel changing size
    under the cursor that just clicked it. */
-#cm-banner.cm-banner-busy .cm-banner-spin {
+#ban-panel.ban-busy .ban-spin {
   display: inline-block;
   box-sizing: border-box;
 
@@ -311,10 +311,10 @@
   border-top-color: #fff;
   border-radius: 50%;
 
-  animation: cm-banner-spin 700ms linear infinite;
+  animation: ban-spin 700ms linear infinite;
 }
 
-@keyframes cm-banner-spin {
+@keyframes ban-spin {
   to {
     transform: rotate(360deg);
   }
@@ -324,7 +324,7 @@
    there to say - just slowly enough not to be the thing on the page that
    demands attention. */
 @media (prefers-reduced-motion: reduce) {
-  #cm-banner.cm-banner-busy .cm-banner-spin {
+  #ban-panel.ban-busy .ban-spin {
     animation-duration: 2.4s;
   }
 }
@@ -332,8 +332,8 @@
 /* The two that do something, and not the heading above them. While a read
    runs the heading is holding the count, which is the one thing on the
    panel worth reading at that moment - dimming it dims the progress. */
-#cm-banner .cm-banner-send[disabled],
-#cm-banner .cm-banner-save[disabled] {
+#ban-panel .ban-send[disabled],
+#ban-panel .ban-save[disabled] {
   cursor: default;
   opacity: 0.55;
 }
@@ -341,12 +341,12 @@
 /* The heading takes no click while a read is running, since the line it
    would write the scope into is the line showing the count. It says so by
    dropping the affordance rather than by going grey. */
-#cm-banner.cm-banner-busy .cm-banner-label,
-#cm-banner.cm-banner-locked .cm-banner-label {
+#ban-panel.ban-busy .ban-label,
+#ban-panel.ban-locked .ban-label {
   cursor: default;
 }
 
-#cm-banner.cm-banner-busy .cm-banner-label:hover .cm-banner-scope,
-#cm-banner.cm-banner-locked .cm-banner-label:hover .cm-banner-scope {
+#ban-panel.ban-busy .ban-label:hover .ban-scope,
+#ban-panel.ban-locked .ban-label:hover .ban-scope {
   text-decoration: none;
 }

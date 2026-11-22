@@ -67,7 +67,7 @@ export function mount({
     }
   }
 
-  const panel = window.document.getElementById("cm-banner");
+  const panel = window.document.getElementById("ban-panel");
   const at = (selector) => panel && panel.querySelector(selector);
 
   return {
@@ -78,34 +78,34 @@ export function mount({
     // whether or not it is on screen, which is the one thing about the
     // heading worth telling apart.
     heading: () =>
-      [...at(".cm-banner-label").childNodes]
+      [...at(".ban-label").childNodes]
         .filter((node) => !node.hidden)
         .map((node) => node.textContent)
         .join(""),
-    scope: () => at(".cm-banner-scope").textContent,
-    label: () => at(".cm-banner-label"),
-    send: () => at(".cm-banner-send"),
-    save: () => at(".cm-banner-save"),
-    markShown: () => !at(".cm-banner-mark").hidden,
-    mark: () => at(".cm-banner-mark").textContent,
+    scope: () => at(".ban-scope").textContent,
+    label: () => at(".ban-label"),
+    send: () => at(".ban-send"),
+    save: () => at(".ban-save"),
+    markShown: () => !at(".ban-mark").hidden,
+    mark: () => at(".ban-mark").textContent,
     markFailed: () =>
-      at(".cm-banner-mark").classList.contains("cm-banner-failed"),
+      at(".ban-mark").classList.contains("ban-failed"),
     // The heading's tooltip: what clicking it does, or what the last read
     // had to say about itself while that is up.
-    tip: () => at(".cm-banner-tip").textContent,
+    tip: () => at(".ban-tip").textContent,
     // Anything still wearing a title, which the browser would draw a second
     // later on top of the panel's own.
     titled: () => panel.querySelectorAll("[title]").length,
     // Whether anything sits under the buttons, which nothing should.
     below: () => {
       const rows = [...panel.children];
-      return rows.slice(rows.indexOf(at(".cm-banner-actions")) + 1).length;
+      return rows.slice(rows.indexOf(at(".ban-actions")) + 1).length;
     },
-    busy: () => panel.classList.contains("cm-banner-busy"),
-    armed: () => panel.classList.contains("cm-banner-armed"),
-    calling: () => panel.classList.contains("cm-banner-calling"),
-    hoverSend: () => at(".cm-banner-send").dispatchEvent(new window.Event("mouseenter")),
-    leaveSend: () => at(".cm-banner-send").dispatchEvent(new window.Event("mouseleave")),
+    busy: () => panel.classList.contains("ban-busy"),
+    armed: () => panel.classList.contains("ban-armed"),
+    calling: () => panel.classList.contains("ban-calling"),
+    hoverSend: () => at(".ban-send").dispatchEvent(new window.Event("mouseenter")),
+    leaveSend: () => at(".ban-send").dispatchEvent(new window.Event("mouseleave")),
     blur: () => window.dispatchEvent(new window.Event("blur")),
     // Whether leaving now would ask first.
     leaving: () => {
@@ -118,8 +118,8 @@ export function mount({
       Object.defineProperty(window.document, "hidden", { value: true, configurable: true });
       window.document.dispatchEvent(new window.Event("visibilitychange"));
     },
-    locked: () => panel.classList.contains("cm-banner-locked"),
-    toggleScope: () => at(".cm-banner-label").click(),
+    locked: () => panel.classList.contains("ban-locked"),
+    toggleScope: () => at(".ban-label").click(),
     escape: () =>
       window.document.dispatchEvent(
         new window.KeyboardEvent("keydown", { key: "Escape" })

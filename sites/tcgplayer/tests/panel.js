@@ -98,7 +98,7 @@ export function mount(options = {}) {
   }
   window.TCGB.PACE = 0;
 
-  const panel = document.getElementById("tcg-banner");
+  const panel = document.getElementById("ban-panel");
   const at = (selector) => panel && panel.querySelector(selector);
 
   return {
@@ -109,21 +109,21 @@ export function mount(options = {}) {
     saved,
     tabs,
     submitted,
-    word: () => at(".tcg-banner-word").textContent,
-    tip: () => at(".tcg-banner-tip").textContent,
-    year: () => at(".tcg-banner-year"),
-    button: (text) => [...panel.querySelectorAll(".tcg-banner-go")].find((b) => b.textContent === text),
-    failed: () => !at(".tcg-banner-mark").hidden && at(".tcg-banner-mark").classList.contains("tcg-banner-failed"),
-    done: () => !at(".tcg-banner-mark").hidden && !at(".tcg-banner-mark").classList.contains("tcg-banner-failed"),
-    busy: () => panel.classList.contains("tcg-banner-busy"),
+    word: () => at(".ban-word").textContent,
+    tip: () => at(".ban-tip").textContent,
+    year: () => at(".ban-year"),
+    button: (text) => [...panel.querySelectorAll(".ban-go")].find((b) => b.textContent === text),
+    failed: () => !at(".ban-mark").hidden && at(".ban-mark").classList.contains("ban-failed"),
+    done: () => !at(".ban-mark").hidden && !at(".ban-mark").classList.contains("ban-failed"),
+    busy: () => panel.classList.contains("ban-busy"),
     titled: () => panel.querySelectorAll("[title]").length,
     below: () => {
       const children = [...panel.children];
-      return children.slice(children.indexOf(at(".tcg-banner-actions")) + 1).length;
+      return children.slice(children.indexOf(at(".ban-actions")) + 1).length;
     },
     choose: (value) => {
-      at(".tcg-banner-year").value = value;
-      at(".tcg-banner-year").dispatchEvent(new window.Event("change"));
+      at(".ban-year").value = value;
+      at(".ban-year").dispatchEvent(new window.Event("change"));
     },
     escape: () => document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" })),
     file: async (i = 0) => ({ name: saved[i].name, text: await saved[i].blob.text() }),
@@ -135,7 +135,7 @@ export function mount(options = {}) {
       const until = Date.now() + 5000;
       while (Date.now() < until) {
         await new Promise((done) => setTimeout(done, 10));
-        if (!panel.classList.contains("tcg-banner-busy")) return;
+        if (!panel.classList.contains("ban-busy")) return;
       }
       throw new Error("still busy");
     },

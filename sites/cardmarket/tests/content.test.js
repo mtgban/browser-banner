@@ -140,7 +140,7 @@ describe("stopping", () => {
     // else's page does not get to swallow it.
     const install = body("install");
     const handler = install.slice(install.indexOf('event.key !== "Escape"'));
-    expect(handler).toContain("cm-banner-busy");
+    expect(handler).toContain("ban-busy");
     expect(handler).toContain("armed");
     expect(handler).not.toContain("preventDefault");
   });
@@ -160,7 +160,7 @@ describe("the panel does not move", () => {
   // a button out from under that cursor - and it grows while reading,
   // which is exactly when nobody is looking at it.
   test("it has one width rather than a width that fits what it says", () => {
-    const at = css.indexOf("#cm-banner {");
+    const at = css.indexOf("#ban-panel {");
     expect(at).toBeGreaterThan(-1);
     expect(css.slice(at, css.indexOf("}", at))).toMatch(/\n\s*width:/);
   });
@@ -169,7 +169,7 @@ describe("the panel does not move", () => {
     // Giving it a line of its own means keeping that line empty the rest
     // of the time, since one that came and went would move the buttons.
     // The heading is free at exactly the moment the count needs it.
-    expect(body("counting")).toContain("cm-banner-scope");
+    expect(body("counting")).toContain("ban-scope");
     expect(body("say")).toContain("recap(panel, message)");
   });
 
@@ -177,7 +177,7 @@ describe("the panel does not move", () => {
     // Inline, and sized inside its border, so it is shorter than the text
     // beside it. A taller one grows the heading at the moment a read
     // starts - the panel changing size under the cursor that clicked it.
-    const at = css.indexOf("#cm-banner.cm-banner-busy .cm-banner-spin {");
+    const at = css.indexOf("#ban-panel.ban-busy .ban-spin {");
     expect(at).toBeGreaterThan(-1);
     const spin = css.slice(at, css.indexOf("}", at));
     expect(spin).toContain("display: inline-block");
@@ -189,7 +189,7 @@ describe("the heading's tooltip", () => {
   test("it is hidden until the heading is hovered or focused", () => {
     // Keyboard focus as well as the cursor: the hint says what the heading
     // does, and somebody tabbing to it needs that as much.
-    const at = css.indexOf("#cm-banner .cm-banner-tip {");
+    const at = css.indexOf("#ban-panel .ban-tip {");
     expect(at).toBeGreaterThan(-1);
     const rest = css.slice(at, css.indexOf("}", at));
     expect(rest).toContain("visibility: hidden");
@@ -198,8 +198,8 @@ describe("the heading's tooltip", () => {
       .filter((rule) => rule[2].includes("visibility: visible"))
       .map((rule) => rule[1]);
     expect(shows.length).toBe(1);
-    expect(shows[0]).toContain(".cm-banner-label:hover + .cm-banner-tip");
-    expect(shows[0]).toContain(".cm-banner-label:focus-visible + .cm-banner-tip");
+    expect(shows[0]).toContain(".ban-label:hover + .ban-tip");
+    expect(shows[0]).toContain(".ban-label:focus-visible + .ban-tip");
   });
 });
 
@@ -210,7 +210,7 @@ describe("the mark", () => {
     // page is something browsers want declared in the manifest. Three
     // kilobytes of base64 costs less than a declaration exposing a file
     // to every page this runs on.
-    const at = css.indexOf("#cm-banner .cm-banner-label::before {");
+    const at = css.indexOf("#ban-panel .ban-label::before {");
     expect(at).toBeGreaterThan(-1);
     expect(css.slice(at, css.indexOf("}", at))).toContain(
       'url("data:image/png;base64,'
@@ -224,20 +224,20 @@ describe("the armed pulse", () => {
     // button itself the nearest one is the panel - which is fixed - and
     // the ring gets drawn around the whole box rather than around the
     // one button inside it that it is about.
-    const at = css.indexOf("#cm-banner .cm-banner-send {");
+    const at = css.indexOf("#ban-panel .ban-send {");
     expect(at).toBeGreaterThan(-1);
     expect(css.slice(at, css.indexOf("}", at))).toContain("position: relative");
   });
 
   test("it runs only while the panel is calling", () => {
     const rule = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find((r) =>
-      r[2].includes("animation: cm-banner-pulse")
+      r[2].includes("animation: ban-pulse")
     );
     expect(rule).toBeDefined();
     const selectors = rule[1].split(",").map((s) => s.trim());
     // Not :hover. A hover starts it from the script and it keeps going
     // after the cursor leaves, which CSS alone cannot do.
-    expect(selectors).toEqual(["#cm-banner.cm-banner-calling .cm-banner-send::before"]);
+    expect(selectors).toEqual(["#ban-panel.ban-calling .ban-send::before"]);
   });
 
   test("it stops where less motion is asked for", () => {
@@ -245,7 +245,7 @@ describe("the armed pulse", () => {
     // spinner says the opposite of what it is there to say. This one has
     // the green underneath saying the same thing standing still, and it
     // is the only animation here that never ends - so it goes.
-    const at = css.indexOf("animation: cm-banner-pulse");
+    const at = css.indexOf("animation: ban-pulse");
     expect(at).toBeGreaterThan(-1);
     const opener = css.lastIndexOf("@media (prefers-reduced-motion", at);
     expect(opener).toBeGreaterThan(-1);

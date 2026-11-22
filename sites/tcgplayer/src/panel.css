@@ -1,7 +1,7 @@
 /* The panel sits above the page and styles itself completely, since it
    inherits whatever TCGplayer's own CSS leaves lying around otherwise. */
 
-#tcg-banner {
+#ban-panel {
   position: fixed;
   right: 16px;
   bottom: 16px;
@@ -36,22 +36,22 @@
   text-align: left;
 }
 
-#tcg-banner .tcg-banner-label {
+#ban-panel .ban-label {
   font-weight: 500;
 }
 
-#tcg-banner .tcg-banner-label:focus-visible {
+#ban-panel .ban-label:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
   border-radius: 3px;
 }
 
 /* Its own style rather than <i> alone, in case the page restyles <i>. */
-#tcg-banner .tcg-banner-ner {
+#ban-panel .ban-ner {
   font-style: italic;
 }
 
-#tcg-banner .tcg-banner-word {
+#ban-panel .ban-word {
   font-weight: 700;
 }
 
@@ -59,7 +59,7 @@
    resolves against the extension's origin, which the page cannot load
    without a manifest entry exposing the file. Centred on the caps beside
    it rather than on the line box. */
-#tcg-banner .tcg-banner-label::before {
+#ban-panel .ban-label::before {
   content: "";
   display: inline-block;
   box-sizing: border-box;
@@ -73,7 +73,7 @@
 /* The heading's tooltip, above the panel and as wide as it, so it never
    runs off the edge the panel is anchored to. It shows a beat after the
    cursor arrives. */
-#tcg-banner .tcg-banner-tip {
+#ban-panel .ban-tip {
   position: absolute;
   left: 0;
   right: 0;
@@ -96,35 +96,35 @@
   pointer-events: none;
 }
 
-#tcg-banner .tcg-banner-tip:empty {
+#ban-panel .ban-tip:empty {
   display: none;
 }
 
-#tcg-banner .tcg-banner-label:hover + .tcg-banner-tip,
-#tcg-banner .tcg-banner-label:focus-visible + .tcg-banner-tip {
+#ban-panel .ban-label:hover + .ban-tip,
+#ban-panel .ban-label:focus-visible + .ban-tip {
   opacity: 1;
   visibility: visible;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  #tcg-banner .tcg-banner-tip {
+  #ban-panel .ban-tip {
     transform: translateY(3px);
     transition: opacity 120ms ease, transform 120ms ease, visibility 0s linear 120ms;
   }
 
-  #tcg-banner .tcg-banner-label:hover + .tcg-banner-tip,
-  #tcg-banner .tcg-banner-label:focus-visible + .tcg-banner-tip {
+  #ban-panel .ban-label:hover + .ban-tip,
+  #ban-panel .ban-label:focus-visible + .ban-tip {
     transform: none;
     transition-delay: 80ms, 80ms, 0s;
   }
 }
 
-#tcg-banner .tcg-banner-actions {
+#ban-panel .ban-actions {
   display: flex;
   gap: 6px;
 }
 
-#tcg-banner .tcg-banner-go {
+#ban-panel .ban-go {
   flex: 1;
   margin: 0;
   padding: 7px 8px;
@@ -139,45 +139,45 @@
   cursor: pointer;
 }
 
-#tcg-banner .tcg-banner-go:hover {
+#ban-panel .ban-go:hover {
   background: #3a78d8;
 }
 
-#tcg-banner .tcg-banner-go:focus-visible {
+#ban-panel .ban-go:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
 }
 
-#tcg-banner .tcg-banner-go[disabled] {
+#ban-panel .ban-go[disabled] {
   cursor: default;
   opacity: 0.55;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  #tcg-banner .tcg-banner-go {
+  #ban-panel .ban-go {
     transition: background 120ms ease;
   }
 }
 
 /* The sign beside the word: a tick for work done, a red cross for work
    refused. What either stands for is on the tooltip. */
-#tcg-banner .tcg-banner-mark {
+#ban-panel .ban-mark {
   margin-left: 5px;
   color: #7bd88f;
   font-weight: 700;
 }
 
-#tcg-banner .tcg-banner-mark.tcg-banner-failed {
+#ban-panel .ban-mark.ban-failed {
   color: #f07178;
 }
 
-#tcg-banner .tcg-banner-spin {
+#ban-panel .ban-spin {
   display: none;
 }
 
 /* On the heading's own line and shorter than its text, so starting work
    does not grow the heading under the cursor that started it. */
-#tcg-banner.tcg-banner-busy .tcg-banner-spin {
+#ban-panel.ban-busy .ban-spin {
   display: inline-block;
   box-sizing: border-box;
   width: 10px;
@@ -187,10 +187,10 @@
   border: 2px solid rgb(255 255 255 / 30%);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: tcg-banner-spin 700ms linear infinite;
+  animation: ban-spin 700ms linear infinite;
 }
 
-@keyframes tcg-banner-spin {
+@keyframes ban-spin {
   to {
     transform: rotate(360deg);
   }
@@ -198,7 +198,7 @@
 
 /* Still turning, since a still spinner says the opposite, but slowly. */
 @media (prefers-reduced-motion: reduce) {
-  #tcg-banner.tcg-banner-busy .tcg-banner-spin {
+  #ban-panel.ban-busy .ban-spin {
     animation-duration: 2.4s;
   }
 }

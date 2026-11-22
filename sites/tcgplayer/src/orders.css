@@ -3,7 +3,7 @@
    holds "120 days" and its arrow, and leaves the button 122px of the 109px
    it needs. */
 
-#tcg-banner .tcg-banner-year {
+#ban-panel .ban-year {
   flex: none;
   width: 92px;
   margin: 0;
@@ -17,25 +17,25 @@
   cursor: pointer;
 }
 
-#tcg-banner .tcg-banner-year:focus-visible {
+#ban-panel .ban-year:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
 }
 
-#tcg-banner .tcg-banner-year[disabled] {
+#ban-panel .ban-year[disabled] {
   cursor: default;
   opacity: 0.55;
 }
 
 /* The number and the icon beside it, kept to one line; the icon may run
    past the header's column into the space before its buttons. */
-span.tcg-banner-number {
+span.ban-number {
   white-space: nowrap;
 }
 
 /* The order number, made a control: it reads as the number it replaces,
    underlined, in TCGplayer's own link blue. */
-button.tcg-banner-order {
+button.ban-order {
   margin: 0;
   padding: 0;
   border: 0;
@@ -46,7 +46,7 @@ button.tcg-banner-order {
   cursor: pointer;
 }
 
-button.tcg-banner-order:focus-visible {
+button.ban-order:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
 }
@@ -54,7 +54,7 @@ button.tcg-banner-order:focus-visible {
 /* Send to BAN: the BAN stroopwafel beside the number, a little taller than
    its text, so the header keeps its one row. Inlined like the panel's, since
    a relative url() resolves against the extension's origin. */
-button.tcg-banner-send {
+button.ban-send {
   display: inline-block;
   box-sizing: border-box;
   width: 16px;
@@ -68,16 +68,16 @@ button.tcg-banner-send {
   cursor: pointer;
 }
 
-button.tcg-banner-send:hover {
+button.ban-send:hover {
   box-shadow: 0 0 0 2px #2d67c4;
 }
 
-button.tcg-banner-send:focus-visible {
+button.ban-send:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
 }
 
-button.tcg-banner-send[disabled] {
+button.ban-send[disabled] {
   cursor: default;
   opacity: 0.4;
   box-shadow: none;

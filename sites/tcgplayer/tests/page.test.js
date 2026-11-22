@@ -13,7 +13,7 @@ describe("the panel", () => {
     expect(options.at(-1).value).toBe("2016");
     // The range the page shows.
     expect(p.year().value).toBe("Last 30 Days");
-    expect(p.panel.querySelectorAll(".tcg-banner-go").length).toBe(1);
+    expect(p.panel.querySelectorAll(".ban-go").length).toBe(1);
     expect(!!p.button("Download CSV")).toBe(true);
     expect(p.below()).toBe(0);
     expect(p.titled()).toBe(0);
@@ -23,11 +23,11 @@ describe("the panel", () => {
     const p = mount();
     expect(p.word()).toBe("ready");
     expect(p.done()).toBe(true);
-    expect(p.panel.querySelector(".tcg-banner-sep").hidden).toBe(false);
+    expect(p.panel.querySelector(".ban-sep").hidden).toBe(false);
     expect(p.tip()).toBe("Save a range of orders as CSV");
-    expect(p.panel.querySelector(".tcg-banner-label").textContent).toBe("TCG BANner - ready✓");
+    expect(p.panel.querySelector(".ban-label").textContent).toBe("TCG BANner - ready✓");
     // A panel given no word shows no dash either.
-    expect(p.window.TCGB.panel().root.querySelector(".tcg-banner-sep").hidden).toBe(true);
+    expect(p.window.TCGB.panel().root.querySelector(".ban-sep").hidden).toBe(true);
   });
 
   test("is ready again once another year is chosen", async () => {
@@ -63,7 +63,7 @@ describe("the panel", () => {
     // on another path is still not the order history.
     const p = mount({ url: "https://store.tcgplayer.com/myaccount/messagecenter" });
     expect(p.panel === null).toBe(true);
-    expect(p.document.querySelectorAll("button.tcg-banner-order").length).toBe(0);
+    expect(p.document.querySelectorAll("button.ban-order").length).toBe(0);
   });
 
   test("is not put on a page without the order history", () => {
@@ -272,7 +272,7 @@ describe("one order", () => {
     const p = one();
     expect(p.word()).toBe("ready");
     expect(p.year()).toBe(null);
-    expect([...p.panel.querySelectorAll(".tcg-banner-go")].map((b) => b.textContent)).toEqual(["Download CSV", "Send to BAN"]);
+    expect([...p.panel.querySelectorAll(".ban-go")].map((b) => b.textContent)).toEqual(["Download CSV", "Send to BAN"]);
     expect(p.tip()).toBe("Save the cards of " + ONE + " as CSV, or send them to BAN");
     expect(p.below()).toBe(0);
     expect(p.titled()).toBe(0);
@@ -299,7 +299,7 @@ describe("one order", () => {
     const p = one();
     p.button("Send to BAN").click();
     p.ready(0);
-    p.document.querySelector("button.tcg-banner-send").click();
+    p.document.querySelector("button.ban-send").click();
     p.ready(1);
     expect(p.tabs.length).toBe(2);
     expect(p.tabs[0].posted[0].data.csv).toBe(p.tabs[1].posted[0].data.csv);
@@ -331,7 +331,7 @@ describe("one order", () => {
 describe("the order number", () => {
   test("becomes a button that searches for it with the page's own form", () => {
     const p = mount();
-    const buttons = [...p.document.querySelectorAll("button.tcg-banner-order")];
+    const buttons = [...p.document.querySelectorAll("button.ban-order")];
     expect(buttons.length).toBe(10);
     const seller = buttons.find((b) => /^[0-9A-F]{8}-/.test(b.textContent));
     seller.click();
@@ -348,7 +348,7 @@ describe("the order number", () => {
   test("searches within the order's own year, not a relative range", () => {
     // In Last 90 Days, an order from July is out of range by November.
     const p = mount({ range: "Last 90 Days", change: (html) => html.replace("November 20, 2026", "July 21, 2025") });
-    const first = p.document.querySelector("button.tcg-banner-order");
+    const first = p.document.querySelector("button.ban-order");
     first.click();
     expect(p.submitted[0].SearchString).toBe(first.textContent);
     expect(p.submitted[0].DateRange).toBe("2025");
@@ -361,20 +361,20 @@ describe("the order number", () => {
       change: (html) => html.replace("November 20, 2026", "July 21, 2025").replace("Subtotal:", "Discount:"),
     });
     const first = p.document.querySelector(".orderWrap");
-    expect(first.querySelectorAll("button.tcg-banner-send").length).toBe(0);
-    first.querySelector("button.tcg-banner-order").click();
+    expect(first.querySelectorAll("button.ban-send").length).toBe(0);
+    first.querySelector("button.ban-order").click();
     expect(p.submitted[0].DateRange).toBe("2025");
   });
 
   test("an order dated in a year the dropdown does not offer keeps the range", () => {
     const p = mount({ change: (html) => html.replace("November 20, 2026", "July 21, 2015") });
-    p.document.querySelector("button.tcg-banner-order").click();
+    p.document.querySelector("button.ban-order").click();
     expect(p.submitted[0].DateRange).toBe("Last 30 Days");
   });
 
   test("a Direct order searches the same way", () => {
     const p = mount();
-    const direct = p.document.querySelector("button.tcg-banner-order");
+    const direct = p.document.querySelector("button.ban-order");
     expect(direct.textContent).toMatch(/^\d{6}-[0-9A-F]{4}$/);
     direct.click();
     expect(p.submitted[0].SearchString).toBe(direct.textContent);
@@ -384,31 +384,31 @@ describe("the order number", () => {
 describe("Send to BAN", () => {
   test("is the BAN icon beside the order number, named for a screen reader", () => {
     const p = mount();
-    const send = p.document.querySelector("button.tcg-banner-send");
+    const send = p.document.querySelector("button.ban-send");
     expect(send.textContent).toBe("");
     expect(send.getAttribute("aria-label")).toBe("Send to BAN");
-    expect(send.previousElementSibling.className).toBe("tcg-banner-order");
+    expect(send.previousElementSibling.className).toBe("ban-order");
     // Both in one span that does not wrap, so the icon never drops under a
     // long number.
-    expect(send.parentNode.className).toBe("tcg-banner-number");
-    expect(p.document.querySelectorAll("span.tcg-banner-number").length).toBe(10);
+    expect(send.parentNode.className).toBe("ban-number");
+    expect(p.document.querySelectorAll("span.ban-number").length).toBe(10);
   });
 
   test("an order with nothing to send gets none", () => {
     const p = mount({ change: (html) => html.replaceAll("/magic/ice-age/portent", "/pokemon/base-set/portent") });
     const first = p.document.querySelector(".orderWrap");
-    expect(first.querySelectorAll("button.tcg-banner-order").length).toBe(1);
-    expect(first.querySelectorAll("button.tcg-banner-send").length).toBe(0);
+    expect(first.querySelectorAll("button.ban-order").length).toBe(1);
+    expect(first.querySelectorAll("button.ban-send").length).toBe(0);
   });
 
   test("every order of Magic cards gets one", () => {
     const p = mount();
-    expect(p.document.querySelectorAll("button.tcg-banner-send").length).toBe(10);
+    expect(p.document.querySelectorAll("button.ban-send").length).toBe(10);
   });
 
   test("opens mtgban's handoff and gives it the order's cards once it is listening", () => {
     const p = mount();
-    const send = p.document.querySelector("button.tcg-banner-send");
+    const send = p.document.querySelector("button.ban-send");
     send.click();
     expect(p.tabs.map((t) => t.url)).toEqual(["https://mtgban.com/upload/handoff"]);
     expect(p.tabs[0].posted).toEqual([]);
@@ -424,7 +424,7 @@ describe("Send to BAN", () => {
 
   test("says it is sending until mtgban's page listens", () => {
     const p = mount();
-    p.document.querySelector("button.tcg-banner-send").click();
+    p.document.querySelector("button.ban-send").click();
     expect(p.word()).toBe("sending");
     expect(p.done()).toBe(false);
     expect(p.tip()).toBe("Waiting for mtgban's upload page to take the cards");
@@ -438,7 +438,7 @@ describe("Send to BAN", () => {
 
   test("a BAN tab closed before it listened is noticed on coming back", () => {
     const p = mount();
-    p.document.querySelector("button.tcg-banner-send").click();
+    p.document.querySelector("button.ban-send").click();
     p.tabs[0].closed = true;
     p.window.dispatchEvent(new p.window.Event("focus"));
     expect(p.word()).toBe("");
@@ -451,7 +451,7 @@ describe("Send to BAN", () => {
 
   test("listens only to mtgban, from the tab it opened", () => {
     const p = mount();
-    p.document.querySelector("button.tcg-banner-send").click();
+    p.document.querySelector("button.ban-send").click();
     p.ready(0, "https://evil.example");
     p.window.dispatchEvent(new p.window.MessageEvent("message", { data: { type: "mtgban-handoff-ready" }, origin: "https://mtgban.com", source: {} }));
     expect(p.tabs[0].posted).toEqual([]);
@@ -461,7 +461,7 @@ describe("Send to BAN", () => {
     const p = mount({ totals: { 2025: 23 } });
     p.choose("2025");
     p.button("Download CSV").click();
-    const send = p.document.querySelector("button.tcg-banner-send");
+    const send = p.document.querySelector("button.ban-send");
     expect(send.disabled).toBe(false);
     send.click();
     expect(p.tabs.map((t) => t.url)).toEqual(["https://mtgban.com/upload/handoff"]);
@@ -476,7 +476,7 @@ describe("Send to BAN", () => {
     const p = mount({ totals: { 2025: 23 }, blockPopups: true });
     p.choose("2025");
     p.button("Download CSV").click();
-    p.document.querySelector("button.tcg-banner-send").click();
+    p.document.querySelector("button.ban-send").click();
     expect(p.failed()).toBe(false);
     await p.idle();
     expect(p.word()).toBe("23 orders");
@@ -491,7 +491,7 @@ describe("Send to BAN", () => {
       totals: { 2025: 23 },
       change: (html, n, state) => (state.range === "2025" && n === 2 ? held.then(() => html) : html),
     });
-    p.document.querySelector("button.tcg-banner-send").click();
+    p.document.querySelector("button.ban-send").click();
     p.choose("2025");
     p.button("Download CSV").click();
     await new Promise((done) => setTimeout(done, 20));
@@ -509,7 +509,7 @@ describe("Send to BAN", () => {
 
   test("a message of another type from the tab gets no cards", () => {
     const p = mount();
-    p.document.querySelector("button.tcg-banner-send").click();
+    p.document.querySelector("button.ban-send").click();
     p.window.dispatchEvent(new p.window.MessageEvent("message", { data: { type: "something-else" }, origin: "https://mtgban.com", source: p.tabs[0] }));
     expect(p.tabs[0].posted).toEqual([]);
     expect(p.word()).toBe("sending");
@@ -517,7 +517,7 @@ describe("Send to BAN", () => {
 
   test("a tab that says it is listening after it was closed gets no cards", () => {
     const p = mount();
-    p.document.querySelector("button.tcg-banner-send").click();
+    p.document.querySelector("button.ban-send").click();
     p.tabs[0].closed = true;
     p.ready();
     expect(p.tabs[0].posted).toEqual([]);
@@ -526,7 +526,7 @@ describe("Send to BAN", () => {
 
   test("a second send closes the first tab, which would wait for good", () => {
     const p = mount();
-    const sends = p.document.querySelectorAll("button.tcg-banner-send");
+    const sends = p.document.querySelectorAll("button.ban-send");
     sends[0].click();
     sends[1].click();
     expect(p.tabs[0].closed).toBe(true);
@@ -540,7 +540,7 @@ describe("Send to BAN", () => {
 
   test("a blocked tab says so", () => {
     const p = mount({ blockPopups: true });
-    p.document.querySelector("button.tcg-banner-send").click();
+    p.document.querySelector("button.ban-send").click();
     expect(p.failed()).toBe(true);
     expect(p.tip()).toBe("The upload page was blocked; allow pop-ups here and try again");
   });
@@ -548,7 +548,7 @@ describe("Send to BAN", () => {
   test("a line not in English is left out and counted", () => {
     const p = mount({ change: (html) => html.replace("Condition: Lightly Played\n", "Condition: Lightly Played - Japanese\n") });
     const wrap = p.document.querySelector(".orderWrap");
-    wrap.querySelector("button.tcg-banner-send").click();
+    wrap.querySelector("button.ban-send").click();
     p.ready();
     expect(p.tabs[0].posted[0].data.rows).toBe(2);
     expect(p.tip()).toContain("1 line not in English, not sent");
@@ -557,7 +557,7 @@ describe("Send to BAN", () => {
   test("a refund is said not to name its cards", () => {
     const p = mount();
     const wrap = [...p.document.querySelectorAll(".orderWrap")].find((w) => w.querySelector(".orderAlert"));
-    wrap.querySelector("button.tcg-banner-send").click();
+    wrap.querySelector("button.ban-send").click();
     p.ready();
     expect(p.tip()).toContain("does not say which cards it covers");
   });
@@ -569,7 +569,7 @@ describe("Send to BAN", () => {
           .replace("https://tcgplayer-cdn.tcgplayer.com/product/4842_25w.jpg", "https://tcgplayer-cdn.tcgplayer.com/product/0_25w.jpg")
           .replace("https://store.tcgplayer.com/magic/ice-age/portent", "https://store.tcgplayer.com/listing?q=Portent"),
     });
-    p.document.querySelector(".orderWrap button.tcg-banner-send").click();
+    p.document.querySelector(".orderWrap button.ban-send").click();
     p.ready();
     expect(p.tabs[0].posted[0].data.rows).toBe(2);
     expect(p.tip()).toContain("1 line not read whole, not sent");
@@ -581,7 +581,7 @@ describe("Send to BAN", () => {
       change: (html) => html.replace("https://store.tcgplayer.com/magic/ice-age/portent", "https://store.tcgplayer.com/pokemon/base-set/portent"),
     });
     const wrap = p.document.querySelector(".orderWrap");
-    wrap.querySelector("button.tcg-banner-send").click();
+    wrap.querySelector("button.ban-send").click();
     p.ready();
     // The first of the order's three Portent lines is now a Pokemon card.
     expect(p.tabs[0].posted[0].data.rows).toBe(2);

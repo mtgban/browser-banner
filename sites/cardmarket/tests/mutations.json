@@ -366,14 +366,14 @@
   {
     "guard": "Escape does nothing with nothing to stop",
     "file": "src/content.js",
-    "find": "if (!panel.classList.contains(\"cm-banner-busy\") && !armed) {",
+    "find": "if (!panel.classList.contains(\"ban-busy\") && !armed) {",
     "replace": "if (false) {",
     "expectFailing": "it is inert when there is nothing of ours to stop"
   },
   {
     "guard": "the page is held only while something would be lost",
     "file": "src/content.js",
-    "find": "if (unused || panel.classList.contains(\"cm-banner-busy\")) {",
+    "find": "if (unused || panel.classList.contains(\"ban-busy\")) {",
     "replace": "if (true) {",
     "expectFailing": "but not once READY has used them"
   },
@@ -401,7 +401,7 @@
   {
     "guard": "the heading does not switch scope mid-read",
     "file": "src/content.js",
-    "find": "if (panel.classList.contains(\"cm-banner-busy\")) {\n        return;\n      }\n      // Nowhere",
+    "find": "if (panel.classList.contains(\"ban-busy\")) {\n        return;\n      }\n      // Nowhere",
     "replace": "if (false) {\n        return;\n      }\n      // Nowhere",
     "expectFailing": "and clicking it mid-read neither switches scope nor writes over the count"
   },
@@ -422,7 +422,7 @@
   {
     "guard": "a game BAN does not price gets no send button",
     "file": "src/content.js",
-    "find": "panel.querySelector(\".cm-banner-send\").hidden = true;",
+    "find": "panel.querySelector(\".ban-send\").hidden = true;",
     "replace": "",
     "expectFailing": "and on one it cannot send anywhere, minus the sending"
   },
@@ -443,7 +443,7 @@
   {
     "guard": "a hover pulses only a button with rows behind it",
     "file": "src/content.js",
-    "find": "if (panel.classList.contains(\"cm-banner-armed\") && !calledBy) {",
+    "find": "if (panel.classList.contains(\"ban-armed\") && !calledBy) {",
     "replace": "if (!calledBy) {",
     "expectFailing": "and a hover does nothing to a button with nothing to send"
   },

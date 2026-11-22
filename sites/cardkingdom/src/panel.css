@@ -1,7 +1,7 @@
 /* The panel sits above the page and styles itself completely, since it
    inherits whatever Card Kingdom's own CSS leaves lying around otherwise. */
 
-#ck-banner {
+#ban-panel {
   position: fixed;
   right: 16px;
   bottom: 16px;
@@ -32,34 +32,34 @@
   text-align: left;
 }
 
-#ck-banner[hidden] {
+#ban-panel[hidden] {
   display: none;
 }
 
-#ck-banner .ck-banner-label {
+#ban-panel .ban-label {
   font-weight: 500;
 }
 
-#ck-banner .ck-banner-label.ck-banner-jumps {
+#ban-panel .ban-label.ban-jumps {
   cursor: pointer;
 }
 
-#ck-banner .ck-banner-label.ck-banner-jumps:hover .ck-banner-word {
+#ban-panel .ban-label.ban-jumps:hover .ban-word {
   text-decoration: underline;
 }
 
-#ck-banner .ck-banner-label:focus-visible {
+#ban-panel .ban-label:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
   border-radius: 3px;
 }
 
 /* Its own style rather than <i> alone, in case the page restyles <i>. */
-#ck-banner .ck-banner-ner {
+#ban-panel .ban-ner {
   font-style: italic;
 }
 
-#ck-banner .ck-banner-word {
+#ban-panel .ban-word {
   font-weight: 700;
 }
 
@@ -67,7 +67,7 @@
    resolves against the extension's origin, which the page cannot load
    without a manifest entry exposing the file. Centred on the caps beside
    it rather than on the line box. */
-#ck-banner .ck-banner-label::before {
+#ban-panel .ban-label::before {
   content: "";
   display: inline-block;
   box-sizing: border-box;
@@ -81,7 +81,7 @@
 /* The heading's tooltip, above the panel and as wide as it, so it never
    runs off the edge the panel is anchored to. It shows a beat after the
    cursor arrives. */
-#ck-banner .ck-banner-tip {
+#ban-panel .ban-tip {
   position: absolute;
   left: 0;
   right: 0;
@@ -104,35 +104,35 @@
   pointer-events: none;
 }
 
-#ck-banner .ck-banner-tip:empty {
+#ban-panel .ban-tip:empty {
   display: none;
 }
 
-#ck-banner .ck-banner-label:hover + .ck-banner-tip,
-#ck-banner .ck-banner-label:focus-visible + .ck-banner-tip {
+#ban-panel .ban-label:hover + .ban-tip,
+#ban-panel .ban-label:focus-visible + .ban-tip {
   opacity: 1;
   visibility: visible;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  #ck-banner .ck-banner-tip {
+  #ban-panel .ban-tip {
     transform: translateY(3px);
     transition: opacity 120ms ease, transform 120ms ease, visibility 0s linear 120ms;
   }
 
-  #ck-banner .ck-banner-label:hover + .ck-banner-tip,
-  #ck-banner .ck-banner-label:focus-visible + .ck-banner-tip {
+  #ban-panel .ban-label:hover + .ban-tip,
+  #ban-panel .ban-label:focus-visible + .ban-tip {
     transform: none;
     transition-delay: 80ms, 80ms, 0s;
   }
 }
 
-#ck-banner .ck-banner-actions {
+#ban-panel .ban-actions {
   display: flex;
   gap: 6px;
 }
 
-#ck-banner .ck-banner-go {
+#ban-panel .ban-go {
   flex: 1;
   margin: 0;
   padding: 7px 12px;
@@ -149,50 +149,50 @@
 
 /* The carts' CSV and BAN share the row and take only the room their words
    need. */
-#ck-banner .ck-banner-csv,
-#ck-banner .ck-banner-ban {
+#ban-panel .ban-csv,
+#ban-panel .ban-ban {
   flex: none;
 }
 
-#ck-banner .ck-banner-go:hover {
+#ban-panel .ban-go:hover {
   background: #3a78d8;
 }
 
-#ck-banner .ck-banner-go:focus-visible {
+#ban-panel .ban-go:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
 }
 
-#ck-banner .ck-banner-go[disabled] {
+#ban-panel .ban-go[disabled] {
   cursor: default;
   opacity: 0.55;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  #ck-banner .ck-banner-go {
+  #ban-panel .ban-go {
     transition: background 120ms ease;
   }
 }
 
 /* The sign beside the word: a tick for work done, a red cross for work
    refused. What either stands for is on the tooltip. */
-#ck-banner .ck-banner-mark {
+#ban-panel .ban-mark {
   margin-left: 5px;
   color: #7bd88f;
   font-weight: 700;
 }
 
-#ck-banner .ck-banner-mark.ck-banner-failed {
+#ban-panel .ban-mark.ban-failed {
   color: #f07178;
 }
 
-#ck-banner .ck-banner-spin {
+#ban-panel .ban-spin {
   display: none;
 }
 
 /* On the heading's own line and shorter than its text, so starting work
    does not grow the heading under the cursor that started it. */
-#ck-banner.ck-banner-busy .ck-banner-spin {
+#ban-panel.ban-busy .ban-spin {
   display: inline-block;
   box-sizing: border-box;
   width: 10px;
@@ -202,10 +202,10 @@
   border: 2px solid rgb(255 255 255 / 30%);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: ck-banner-spin 700ms linear infinite;
+  animation: ban-spin 700ms linear infinite;
 }
 
-@keyframes ck-banner-spin {
+@keyframes ban-spin {
   to {
     transform: rotate(360deg);
   }
@@ -213,7 +213,7 @@
 
 /* Still turning, since a still spinner says the opposite, but slowly. */
 @media (prefers-reduced-motion: reduce) {
-  #ck-banner.ck-banner-busy .ck-banner-spin {
+  #ban-panel.ban-busy .ban-spin {
     animation-duration: 2.4s;
   }
 }

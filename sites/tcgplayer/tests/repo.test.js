@@ -63,7 +63,7 @@ describe("the source", () => {
 describe("the panel", () => {
   test("is one fixed width", () => {
     const css = read("src/panel.css");
-    const rule = /#tcg-banner \{([^}]*)\}/.exec(css)[1];
+    const rule = /#ban-panel \{([^}]*)\}/.exec(css)[1];
     expect(rule).toMatch(/\swidth: 240px;/);
     expect(css + read("src/orders.css")).not.toMatch(/(min|max)-width/);
   });
@@ -71,7 +71,7 @@ describe("the panel", () => {
 
 describe("the panel's type", () => {
   test("sets every face property itself, since TCGplayer's body is lighter", () => {
-    const rule = /#tcg-banner \{([^}]*)\}/.exec(read("src/panel.css"))[1];
+    const rule = /#ban-panel \{([^}]*)\}/.exec(read("src/panel.css"))[1];
     for (const property of ["font-family", "font-size", "font-style", "font-weight", "line-height"]) {
       expect([property, rule.includes(property + ":")]).toEqual([property, true]);
     }
@@ -81,7 +81,7 @@ describe("the panel's type", () => {
 
 describe("the order header", () => {
   test("keeps the number and its icon on one line", () => {
-    expect(read("src/orders.css")).toMatch(/span\.tcg-banner-number \{\s*white-space: nowrap;/);
+    expect(read("src/orders.css")).toMatch(/span\.ban-number \{\s*white-space: nowrap;/);
   });
 });
 
