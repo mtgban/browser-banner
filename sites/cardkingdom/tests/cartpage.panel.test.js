@@ -387,7 +387,7 @@ describe("a page that redraws itself", () => {
     const it = await mountCart({ prices: moved() });
     it.button().click();
     await it.idle();
-    const first = it.panel.ownerDocument.querySelector(".ck-banner-line");
+    const first = it.panel.ownerDocument.querySelector(".ban-line");
     await it.settle(400);
     // Still the same element: nothing marked the cart again.
     expect(first.isConnected).toBe(true);
@@ -606,14 +606,14 @@ describe("the count", () => {
     it.button().click();
     await it.idle();
     // Plain fields only: a failing expect on a node prints the whole window.
-    const at = () => [it.focused().className, it.focused().closest(".ck-banner-line")?.getAttribute("data-product")];
+    const at = () => [it.focused().className, it.focused().closest(".ban-line")?.getAttribute("data-product")];
     expect(it.label().getAttribute("role")).toBe("button");
     it.label().click();
-    expect(at()).toEqual(["btn ck-banner-update", "206649"]);
+    expect(at()).toEqual(["btn ban-update", "206649"]);
     it.label().dispatchEvent(new it.window.KeyboardEvent("keydown", { key: "Enter" }));
-    expect(at()).toEqual(["btn ck-banner-update", "224590"]);
+    expect(at()).toEqual(["btn ban-update", "224590"]);
     it.label().click();
-    expect(at()).toEqual(["btn ck-banner-update", "206649"]);
+    expect(at()).toEqual(["btn ban-update", "206649"]);
   });
 
   test("is plain text when no line is better", async () => {
@@ -622,7 +622,7 @@ describe("the count", () => {
     await it.idle();
     expect(it.label().hasAttribute("role")).toBe(false);
     it.label().click();
-    expect(!!it.focused().closest(".ck-banner-line")).toBe(false);
+    expect(!!it.focused().closest(".ban-line")).toBe(false);
   });
 });
 
@@ -652,7 +652,7 @@ describe("Update all", () => {
   test("sits under Empty Cart, counting the lines it will update", async () => {
     const it = await marked();
     expect(!!it.all().previousElementSibling.querySelector('form[action$="/sellcart/empty_cart"]')).toBe(true);
-    expect(it.all().querySelector("button").className).toBe("btn btn-default ck-banner-update-all");
+    expect(it.all().querySelector("button").className).toBe("btn btn-default ban-update-all");
     expect(it.all().textContent).toBe("Update 2 prices");
   });
 
@@ -664,7 +664,7 @@ describe("Update all", () => {
     const control = it.all().querySelector("button");
     expect([control.textContent, control.className, control.getAttribute("aria-disabled")]).toEqual([
       "Update prices",
-      "btn btn-default ck-banner-update-all disabled",
+      "btn btn-default ban-update-all disabled",
       "true",
     ]);
     expect(it.all().querySelector("#" + control.getAttribute("aria-describedby")).textContent).toBe(
@@ -813,7 +813,7 @@ describe("a signed-out cart", () => {
     expect(it.mark(206649)).toMatchObject({ verdict: "better", badge: "Update price", first: true });
     expect(it.mark(224590)).toMatchObject({ verdict: "worse", badge: "Keep price" });
     expect(it.mark(50270).verdict).toBe("wants0");
-    expect(it.window.document.querySelectorAll(".cart-item-details > .ck-banner-own").length).toBe(it.marks().length);
+    expect(it.window.document.querySelectorAll(".cart-item-details > .ban-own").length).toBe(it.marks().length);
   });
 
   test("Update price sends the product id the line's card has", async () => {
@@ -839,7 +839,7 @@ describe("a signed-out cart", () => {
     it.button().click();
     await it.idle();
     // Synthetic: the page redraws the line's details, taking the box along.
-    it.window.document.querySelector('.ck-banner-line[data-product="224590"]').closest(".ck-banner-own").remove();
+    it.window.document.querySelector('.ban-line[data-product="224590"]').closest(".ban-own").remove();
     await it.settle(400);
     expect(it.mark(224590).badge).toBe("Keep price");
   });

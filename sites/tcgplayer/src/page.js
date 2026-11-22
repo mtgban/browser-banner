@@ -54,7 +54,7 @@ globalThis.TCGB = globalThis.TCGB || {};
   function orderButton(order) {
     var button = document.createElement("button");
     button.type = "button";
-    button.className = "tcg-banner-order";
+    button.className = "ban-order";
     button.textContent = order.id;
     button.addEventListener("click", function () {
       search(order);
@@ -62,7 +62,7 @@ globalThis.TCGB = globalThis.TCGB || {};
     // The number and its Send to BAN keep to one line: the header's column
     // is just wide enough for a seller order's number alone.
     var line = document.createElement("span");
-    line.className = "tcg-banner-number";
+    line.className = "ban-number";
     line.appendChild(button);
     order.numberNode.replaceWith(line);
     return button;
@@ -171,7 +171,7 @@ globalThis.TCGB = globalThis.TCGB || {};
     }
     var button = document.createElement("button");
     button.type = "button";
-    button.className = "tcg-banner-send";
+    button.className = "ban-send";
     // The stroopwafel alone, beside the number; the name is for a screen
     // reader and the cursor.
     button.setAttribute("aria-label", "Send to BAN");
@@ -226,7 +226,7 @@ globalThis.TCGB = globalThis.TCGB || {};
   function goButton(text, act) {
     var button = document.createElement("button");
     button.type = "button";
-    button.className = "tcg-banner-go";
+    button.className = "ban-go";
     button.textContent = text;
     button.addEventListener("click", act);
     panel.actions.appendChild(button);
@@ -305,7 +305,7 @@ globalThis.TCGB = globalThis.TCGB || {};
     // every year at once, then the years. "Last 120 Days" is shown as "120
     // days" to fit the box.
     var year = document.createElement("select");
-    year.className = "tcg-banner-year";
+    year.className = "ban-year";
     year.setAttribute("aria-label", "Range");
     var ranges = filter.ranges.slice();
     var years = TCGB.yearsListed(ranges);

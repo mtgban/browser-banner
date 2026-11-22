@@ -314,14 +314,14 @@
   }
 
   function install() {
-    if (document.getElementById("ck-banner")) {
+    if (document.getElementById("ban-panel")) {
       return;
     }
     panel = CKB.panel();
     store = CKB.openStore();
 
     year = document.createElement("select");
-    year.className = "ck-banner-year";
+    year.className = "ban-year";
     year.setAttribute("aria-label", "Range");
     var now = new Date().getFullYear();
     var choices = RECENT.map(function (days) {
@@ -341,7 +341,7 @@
 
     go = document.createElement("button");
     go.type = "button";
-    go.className = "ck-banner-go";
+    go.className = "ban-go";
     go.textContent = "Download CSV";
 
     panel.actions.appendChild(year);

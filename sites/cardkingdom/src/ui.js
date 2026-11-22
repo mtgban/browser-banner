@@ -20,16 +20,16 @@ globalThis.CKB = globalThis.CKB || {};
   // the page until the caller appends root.
   CKB.panel = function () {
     var root = document.createElement("div");
-    root.id = "ck-banner";
+    root.id = "ban-panel";
     root.innerHTML =
-      '<div class="ck-banner-label" tabindex="0" aria-describedby="ck-banner-tip">' +
-      'CK BAN<i class="ck-banner-ner">ner</i><span class="ck-banner-sep"> - </span>' +
-      '<span class="ck-banner-spin" aria-hidden="true"></span>' +
-      '<b class="ck-banner-word"></b>' +
-      '<span class="ck-banner-mark" aria-hidden="true" hidden></span>' +
+      '<div class="ban-label" tabindex="0" aria-describedby="ban-tip">' +
+      'CK BAN<i class="ban-ner">ner</i><span class="ban-sep"> - </span>' +
+      '<span class="ban-spin" aria-hidden="true"></span>' +
+      '<b class="ban-word"></b>' +
+      '<span class="ban-mark" aria-hidden="true" hidden></span>' +
       "</div>" +
-      '<span class="ck-banner-tip" id="ck-banner-tip" role="tooltip"></span>' +
-      '<div class="ck-banner-actions"></div>';
+      '<span class="ban-tip" id="ban-tip" role="tooltip"></span>' +
+      '<div class="ban-actions"></div>';
 
     var hinted = "";
     var recapped = "";
@@ -39,7 +39,7 @@ globalThis.CKB = globalThis.CKB || {};
       return root.querySelector(selector);
     }
 
-    var label = at(".ck-banner-label");
+    var label = at(".ban-label");
     label.addEventListener("click", function () {
       if (jumper) {
         jumper();
@@ -53,25 +53,25 @@ globalThis.CKB = globalThis.CKB || {};
     });
 
     function working() {
-      return root.classList.contains("ck-banner-busy");
+      return root.classList.contains("ban-busy");
     }
 
     // One tooltip: what the last piece of work said while that stands, or
     // else what the panel offers. Quiet while work runs, since the heading
     // holds the progress then.
     function tip() {
-      at(".ck-banner-tip").textContent = recapped || (working() ? "" : hinted);
+      at(".ban-tip").textContent = recapped || (working() ? "" : hinted);
     }
 
     var panel = {
       root: root,
-      actions: at(".ck-banner-actions"),
+      actions: at(".ban-actions"),
 
       // word is the heading's one word; with none, the heading is just the
       // name and its mark.
       word: function (text) {
-        at(".ck-banner-word").textContent = text;
-        at(".ck-banner-sep").hidden = !text;
+        at(".ban-word").textContent = text;
+        at(".ban-sep").hidden = !text;
       },
 
       hint: function (text) {
@@ -87,10 +87,10 @@ globalThis.CKB = globalThis.CKB || {};
       // mark is the sign beside the word: "done" a tick, "failed" a red
       // cross, "" neither.
       mark: function (how) {
-        var sign = at(".ck-banner-mark");
+        var sign = at(".ban-mark");
         sign.hidden = !how;
         sign.textContent = how === "failed" ? "✗" : "✓";
-        sign.classList.toggle("ck-banner-failed", how === "failed");
+        sign.classList.toggle("ban-failed", how === "failed");
       },
 
       fail: function (message) {
@@ -106,7 +106,7 @@ globalThis.CKB = globalThis.CKB || {};
       // busy turns the spinner on, takes every control in the row away,
       // and holds the page, for as long as work runs.
       busy: function (on) {
-        root.classList.toggle("ck-banner-busy", on);
+        root.classList.toggle("ban-busy", on);
         var controls = panel.actions.querySelectorAll("button, select");
         for (var i = 0; i < controls.length; i++) {
           controls[i].disabled = on;
@@ -123,7 +123,7 @@ globalThis.CKB = globalThis.CKB || {};
       // when go is null.
       jump: function (go) {
         jumper = go;
-        label.classList.toggle("ck-banner-jumps", !!go);
+        label.classList.toggle("ban-jumps", !!go);
         if (go) {
           label.setAttribute("role", "button");
         } else {

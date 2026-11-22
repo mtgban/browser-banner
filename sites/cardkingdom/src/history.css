@@ -1,7 +1,7 @@
 /* The history pages' row: a year, and the button taking the rest. The
    select is a fixed width so the button never moves as the year changes. */
 
-#ck-banner .ck-banner-year {
+#ban-panel .ban-year {
   flex: none;
   width: 84px;
   margin: 0;
@@ -15,12 +15,12 @@
   cursor: pointer;
 }
 
-#ck-banner .ck-banner-year:focus-visible {
+#ban-panel .ban-year:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
 }
 
-#ck-banner .ck-banner-year[disabled] {
+#ban-panel .ban-year[disabled] {
   cursor: default;
   opacity: 0.55;
 }

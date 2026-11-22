@@ -210,7 +210,7 @@ describe("clicking send", () => {
     // stops, and would come up on top of the panel's own tooltip.
     const it = mount();
     expect(it.titled()).toBe(0);
-    expect(it.label().getAttribute("aria-describedby")).toBe("cm-banner-tip");
+    expect(it.label().getAttribute("aria-describedby")).toBe("ban-tip");
     it.save().click();
     await it.settle();
     expect(it.titled()).toBe(0);

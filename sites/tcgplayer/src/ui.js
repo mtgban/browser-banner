@@ -20,16 +20,16 @@ globalThis.TCGB = globalThis.TCGB || {};
   // the page until the caller appends root.
   TCGB.panel = function () {
     var root = document.createElement("div");
-    root.id = "tcg-banner";
+    root.id = "ban-panel";
     root.innerHTML =
-      '<div class="tcg-banner-label" tabindex="0" aria-describedby="tcg-banner-tip">' +
-      'TCG BAN<i class="tcg-banner-ner">ner</i><span class="tcg-banner-sep" hidden> - </span>' +
-      '<span class="tcg-banner-spin" aria-hidden="true"></span>' +
-      '<b class="tcg-banner-word"></b>' +
-      '<span class="tcg-banner-mark" aria-hidden="true" hidden></span>' +
+      '<div class="ban-label" tabindex="0" aria-describedby="ban-tip">' +
+      'TCG BAN<i class="ban-ner">ner</i><span class="ban-sep" hidden> - </span>' +
+      '<span class="ban-spin" aria-hidden="true"></span>' +
+      '<b class="ban-word"></b>' +
+      '<span class="ban-mark" aria-hidden="true" hidden></span>' +
       "</div>" +
-      '<span class="tcg-banner-tip" id="tcg-banner-tip" role="tooltip"></span>' +
-      '<div class="tcg-banner-actions"></div>';
+      '<span class="ban-tip" id="ban-tip" role="tooltip"></span>' +
+      '<div class="ban-actions"></div>';
 
     var hinted = "";
     var recapped = "";
@@ -39,25 +39,25 @@ globalThis.TCGB = globalThis.TCGB || {};
     }
 
     function working() {
-      return root.classList.contains("tcg-banner-busy");
+      return root.classList.contains("ban-busy");
     }
 
     // One tooltip: what the last piece of work said while that stands, or
     // else what the panel offers. Quiet while work runs, since the heading
     // holds the progress then.
     function tip() {
-      at(".tcg-banner-tip").textContent = recapped || (working() ? "" : hinted);
+      at(".ban-tip").textContent = recapped || (working() ? "" : hinted);
     }
 
     var panel = {
       root: root,
-      actions: at(".tcg-banner-actions"),
+      actions: at(".ban-actions"),
 
       // word is the heading's one word; with none, the heading is just the
       // name and its mark.
       word: function (text) {
-        at(".tcg-banner-word").textContent = text;
-        at(".tcg-banner-sep").hidden = !text;
+        at(".ban-word").textContent = text;
+        at(".ban-sep").hidden = !text;
       },
 
       hint: function (text) {
@@ -73,10 +73,10 @@ globalThis.TCGB = globalThis.TCGB || {};
       // mark is the sign beside the word: "done" a tick, "failed" a red
       // cross, "" neither.
       mark: function (how) {
-        var sign = at(".tcg-banner-mark");
+        var sign = at(".ban-mark");
         sign.hidden = !how;
         sign.textContent = how === "failed" ? "✗" : "✓";
-        sign.classList.toggle("tcg-banner-failed", how === "failed");
+        sign.classList.toggle("ban-failed", how === "failed");
       },
 
       fail: function (message) {
@@ -92,7 +92,7 @@ globalThis.TCGB = globalThis.TCGB || {};
       // busy turns the spinner on, takes every control in the row away,
       // and holds the page, for as long as work runs.
       busy: function (on) {
-        root.classList.toggle("tcg-banner-busy", on);
+        root.classList.toggle("ban-busy", on);
         var controls = panel.actions.querySelectorAll("button, select");
         for (var i = 0; i < controls.length; i++) {
           controls[i].disabled = on;

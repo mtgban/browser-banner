@@ -74,7 +74,7 @@ describe("the panel", () => {
     // Anchored to the right edge, a panel that grew to fit its words would
     // move its controls under the cursor.
     const css = read("src/panel.css");
-    const rule = /#ck-banner \{([^}]*)\}/.exec(css)[1];
+    const rule = /#ban-panel \{([^}]*)\}/.exec(css)[1];
     expect(rule).toMatch(/\swidth: 240px;/);
     expect(css).not.toMatch(/(min|max)-width/);
   });
