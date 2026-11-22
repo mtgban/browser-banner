@@ -53,7 +53,7 @@ globalThis.TCGB = globalThis.TCGB || {};
   }
 
   // One row per order. The first three are the columns go-mtgban's
-  // tcgHistory wrote and ck-banner's history file shares, under the same
+  // tcgHistory wrote and Card Kingdom's history file shares, under the same
   // names and meaning the same thing; Amount is what was paid, net of
   // refunds. Subtotal, Shipping, Sales Tax and Refund, a negative, add up
   // to Total. Tax Refund (est.) is the part of Refund that was tax, beside

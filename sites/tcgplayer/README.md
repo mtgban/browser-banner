@@ -1,4 +1,4 @@
-# tcg-banner
+# BANner for TCGplayer
 
 **TCG BANner** is a browser extension for your TCGplayer order history
 (`store.tcgplayer.com/myaccount/orderhistory`). It does three things:

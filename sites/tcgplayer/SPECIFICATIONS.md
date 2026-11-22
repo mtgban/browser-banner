@@ -1,4 +1,4 @@
-# tcg-banner specification
+# BANner for TCGplayer: specification
 
 What the extension does, what it reads from TCGplayer, and the rules it
 keeps. Every markup fact here was read from TCGplayer's own pages of a
@@ -239,7 +239,7 @@ cards file of section 6 goes to mtgban alone and is written as read.
 **`tcg-orders-<year>.csv`**, `tcg-orders-all.csv` for every year, or
 `tcg-orders-last-30-days-<yyyy-mm-dd>.csv` for a relative range, dated the
 day it was read, one row per order, in TCGplayer's order. The
-first three are the columns go-mtgban's `tcgHistory` wrote and ck-banner's
+first three are the columns go-mtgban's `tcgHistory` wrote and Card Kingdom's
 history file shares, under the same names and meaning:
 
 | Column | Value |
@@ -283,7 +283,7 @@ number: the BAN stroopwafel as a small round button, named "Send to BAN"
 for a screen reader and on hover. The number and the icon share a span that
 does not wrap, so the icon stays on the number's line, running past the
 header's column if it has to. The lines are on the page already, so the click opens the tab with
-nothing asynchronous in front of `window.open`. The protocol is cm-banner's:
+nothing asynchronous in front of `window.open`. The protocol is Cardmarket's:
 
 ```
 click       window.open("https://mtgban.com/upload/handoff")
@@ -335,7 +335,7 @@ lands in whichever mode, uploader or buylist, the reader last used.
 
 ## 7. The panel
 
-ck-banner's panel: the stroopwafel and "TCG BANner", one word, a mark, a
+Card Kingdom's panel: the stroopwafel and "TCG BANner", one word, a mark, a
 drawn tooltip, one row (the range, *Download CSV*). Until it is asked for
 something, and again when the year changes, the word is `ready` with a
 tick, and with no word the heading drops its dash. On a list a search has

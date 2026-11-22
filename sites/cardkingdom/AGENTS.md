@@ -1,17 +1,17 @@
 # AGENTS.md
 
-Guidance for AI coding agents working on **ck-banner**, a browser extension
-that compares a Card Kingdom sell cart with Card Kingdom's price list and
-exports order and selling history as CSV. Read `SPECIFICATIONS.md` for what it
-does and what is known about Card Kingdom's pages; this file is about how to
-work on it without breaking it.
+Guidance for AI coding agents working on Card Kingdom's part of **BANner**,
+the browser extension: it compares a Card Kingdom sell cart with Card
+Kingdom's price list and exports order and selling history as CSV. Read
+`SPECIFICATIONS.md` for what it does and what is known about Card Kingdom's
+pages; this file is about how to work on it without breaking it.
 
 ## The one rule that matters
 
 **Verify against a saved Card Kingdom page, not against the fixture.**
 
 A fixture is a reconstruction, and a reconstruction drifts toward whatever the
-code already does. The sibling extension, cm-banner, learned this three times:
+code already does. Cardmarket's side of the extension learned this three times:
 a parser and its fixture agreed with each other and were both wrong, until a
 real page showed it. When you change a parser, ask for a saved page (`Cmd-S`,
 complete) and run against it.
@@ -145,7 +145,8 @@ are go-mtgban's (`cardkingdom/utils.go`). What the endpoint does to a product
 already in the cart is not known; `SPECIFICATIONS.md`, "Update price", says
 how the extension copes with either answer. The price
 list is the one go-mtgban's CK scraper reads, at the URL go-cardkingdom
-publishes. cm-banner is the sibling: share its conventions, not its code.
+publishes. Cardmarket's side is the sibling: share its conventions, not its
+code.
 
 Only public repositories are named in this one.
 

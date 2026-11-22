@@ -10,8 +10,8 @@ globalThis.CKB = globalThis.CKB || {};
 (function (CKB) {
   "use strict";
 
-  // PACE is the pause before each page after the first. It is cm-banner's
-  // figure for Cardmarket, where three requests inside a second drew a
+  // PACE is the pause before each page after the first. It is the
+  // Cardmarket side's figure, where three requests inside a second drew a
   // challenge; a full sales walk on the live site decides it for 0.1.0.
   var PACE = 1200;
 

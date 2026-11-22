@@ -1,10 +1,11 @@
 # AGENTS.md
 
-Guidance for AI coding agents working on **tcg-banner**, a browser extension
-for a TCGplayer buyer's order history: a year saved as CSV, every order
-number made a search for that order, and an order's cards sent to mtgban's
-uploader. Read `SPECIFICATIONS.md` for what it does and what is known about
-TCGplayer's page; this file is about how to work on it without breaking it.
+Guidance for AI coding agents working on TCGplayer's part of **BANner**, the
+browser extension: it handles a TCGplayer buyer's order history: a year saved
+as CSV, every order number made a search for that order, and an order's cards
+sent to mtgban's uploader. Read `SPECIFICATIONS.md` for what it does and what
+is known about TCGplayer's page; this file is about how to work on it without
+breaking it.
 
 ## The one rule that matters
 
@@ -129,13 +130,13 @@ section 6). A header holding "number" becomes the card's variant, and one of
 exactly "TCGplayer Id" is a SKU that wipes the product id. Check that file
 before adding or renaming a column.
 
-The handoff protocol is the one cm-banner speaks; mtgban-website's
+The handoff protocol is the one Cardmarket's side speaks; mtgban-website's
 `/upload/handoff` must list `https://store.tcgplayer.com` in its
 `handoff_origins` (infrastructure config, not code) or the page never
 answers. When a change here needs one there, land the site side first.
 
-ck-banner and cm-banner are the siblings: share their conventions, not their
-code.
+Card Kingdom's and Cardmarket's sides are the siblings: share their
+conventions, not their code.
 
 ## Commits
 

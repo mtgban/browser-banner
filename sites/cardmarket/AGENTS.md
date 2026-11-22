@@ -1,10 +1,10 @@
 # AGENTS.md
 
-Guidance for AI coding agents working on **cm-banner**, a browser extension
-that reads a Cardmarket seller's offers and gets them to mtgban's upload.
-Read `SPECIFICATIONS.md` for what it does and what is known about
-Cardmarket's markup; this file is about how to work on it without breaking
-it.
+Guidance for AI coding agents working on Cardmarket's part of **BANner**, the
+browser extension: it reads a Cardmarket seller's offers and gets them to
+mtgban's upload. Read `SPECIFICATIONS.md` for what it does and what is known
+about Cardmarket's markup; this file is about how to work on it without
+breaking it.
 
 ## The one rule that matters
 

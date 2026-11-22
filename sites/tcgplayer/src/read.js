@@ -458,7 +458,7 @@ globalThis.TCGB = globalThis.TCGB || {};
     } else if (heading === NO_MATCH) {
       list.empty = "nomatch";
     } else {
-      throw new Error("The order list's heading is not one tcg-banner reads");
+      throw new Error("The order list's heading is not one BANner reads");
     }
 
     // The last page's own LAST is disabled and links nowhere.
@@ -467,7 +467,7 @@ globalThis.TCGB = globalThis.TCGB || {};
     if (last) {
       var n = /[?&]PageNumber=(\d+)$/.exec(last.getAttribute("href") || "");
       if (!n) {
-        throw new Error("The order list's pager is not one tcg-banner reads");
+        throw new Error("The order list's pager is not one BANner reads");
       }
       pageLast = Number(n[1]);
     }
