@@ -71,7 +71,9 @@ export function pageHTML({ range = "Last 30 Days", search = "", total = 31, n = 
       for (const node of title.parentNode.childNodes) {
         if (node.nodeType !== 3 || !node.textContent.trim()) continue;
         if (label === "Order Number") node.textContent = ` ${hex(g, 8)}-100000-10000 `;
-        if (label === "TCGPLAYER DIRECT #") node.textContent = ` 261120-${hex(g, 4)} `;
+        // Each year's numbers start with its own two digits, so an order is
+        // one year's alone, as TCGplayer's are.
+        if (label === "TCGPLAYER DIRECT #") node.textContent = ` ${/^\d{4}$/.test(range) ? range.slice(2) : "26"}1120-${hex(g, 4)} `;
       }
     }
     if (/^\d{4}$/.test(range)) {

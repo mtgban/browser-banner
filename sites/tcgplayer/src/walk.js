@@ -1,5 +1,5 @@
-// Reads every order placed in one range: a year, or the last 30, 90 or 120
-// days.
+// Reads every order placed in one range: a year, the last 30, 90 or 120
+// days, or every year TCGplayer lists, one after another.
 //
 // TCGplayer filters the history by a range held in the session, so the walk
 // sets the range itself, reads every page checking each one still names
@@ -13,6 +13,8 @@ globalThis.TCGB = globalThis.TCGB || {};
   "use strict";
 
   TCGB.CANCELLED = "Stopped; nothing was saved";
+  // ALL is the panel's own range: every year the page's dropdown lists.
+  TCGB.ALL = "All years";
   TCGB.MOVED = "The order list changed while it was read; try again";
 
   // BUSY_WAIT is how long a walk TCGplayer asked to slow down waits before
@@ -23,20 +25,42 @@ globalThis.TCGB = globalThis.TCGB || {};
     throw new Error(message);
   }
 
-  // walkRange answers with {orders, pending, pages, restore}: the range's
-  // orders in TCGplayer's order, how many were pending and left out, how
-  // many pages were read, and "" or why the visitor's range could not be
-  // put back. It rejects when the list cannot be read whole; the error then
+  // walkRange answers with {orders, pending, pages, restore, years}: the
+  // range's orders in TCGplayer's order, how many were pending and left out,
+  // how many pages were read, "" or why the visitor's range could not be put
+  // back, and each year's own {orders, pending, pages} when years were
+  // walked. It rejects when the list cannot be read whole; the error then
   // carries restore too.
   //
-  // hooks.step(n, of) says which page is being read; hooks.stopped() is
-  // asked before each request and stops the walk when it answers true;
-  // hooks.waiting(ms) says the range will be put back after a pause.
-  TCGB.walkRange = function (range, hooks) {
+  // TCGB.ALL walks every year the dropdown lists, newest first, setting each
+  // in turn and putting the visitor's range back once, at the end.
+  //
+  // hooks.step(n, of, range) says which page of which range is being read;
+  // hooks.stopped() is asked before each request and stops the walk when it
+  // answers true; hooks.waiting(ms) says the range will be put back after a
+  // pause.
+  // yearsListed is the years among the dropdown's ranges, in its order.
+  TCGB.yearsListed = function (ranges) {
+    return ranges.filter(function (range) {
+      return /^\d{4}$/.test(range);
+    });
+  };
+
+  // allYearsCost is the fewest requests a walk of every listed year makes:
+  // page 1 read, each year set and its first page read, the range put back
+  // and checked. A year of more than one page adds one request a page.
+  TCGB.allYearsCost = function (ranges) {
+    return 2 * TCGB.yearsListed(ranges).length + 3;
+  };
+
+  TCGB.walkRange = function (asked, hooks) {
+    // The range being walked: the one asked for, or each year in turn.
+    var range = asked;
+    var ranges = [asked];
     // A year's orders are each checked to be dated in it. A relative range
     // has no such check: where TCGplayer puts its day boundary is not
     // known, so it rests on the heading and the counts.
-    var year = /^\d{4}$/.test(range) ? range : "";
+    var year = "";
     var token = "";
     var original = null;
     var requests = 0;
@@ -68,6 +92,9 @@ globalThis.TCGB = globalThis.TCGB || {};
     var per = 0;
     var total = 0;
     var pages = 0;
+    var pagesRead = 0;
+    var years = {};
+    var mine = null;
 
     // take checks page n against the list page 1 fixed, and keeps its
     // orders.
@@ -110,20 +137,50 @@ globalThis.TCGB = globalThis.TCGB || {};
         }
         if (o.pending) {
           pending++;
+          mine.pending++;
         } else {
           orders.push(o);
+          mine.orders.push(o);
         }
       }
     }
 
     function walk(n) {
       if (hooks.step) {
-        hooks.step(n, pages || null);
+        hooks.step(n, pages || null, range);
       }
       return read(n).then(function (page) {
         take(page, n);
         return n < pages ? walk(n + 1) : undefined;
       });
+    }
+
+    // each sets range i of the walk and reads every page of it, then the
+    // next.
+    function each(i) {
+      if (i >= ranges.length) {
+        return undefined;
+      }
+      range = ranges[i];
+      year = /^\d{4}$/.test(range) ? range : "";
+      per = 0;
+      total = 0;
+      pages = 0;
+      mine = { orders: [], pending: 0, pages: 0 };
+      return ask(function () {
+        return TCGB.setFilter(token, range, "", true);
+      })
+        .then(function () {
+          return walk(1);
+        })
+        .then(function () {
+          mine.pages = pages || 1;
+          pagesRead += mine.pages;
+          if (year) {
+            years[year] = mine;
+          }
+          return each(i + 1);
+        });
     }
 
     // left says the list stayed on the range walked, and what to pick to
@@ -161,16 +218,16 @@ globalThis.TCGB = globalThis.TCGB || {};
     return read(1)
       .then(function (page) {
         original = { range: page.filter.range, search: page.filter.search };
-        if (page.filter.ranges.indexOf(range) < 0) {
-          refuse("TCGplayer does not list " + range);
+        if (asked === TCGB.ALL) {
+          ranges = TCGB.yearsListed(page.filter.ranges);
+          if (!ranges.length) {
+            refuse("TCGplayer lists no years");
+          }
+        } else if (page.filter.ranges.indexOf(asked) < 0) {
+          refuse("TCGplayer does not list " + asked);
         }
         started = true;
-        return ask(function () {
-          return TCGB.setFilter(token, range, "", true);
-        });
-      })
-      .then(function () {
-        return walk(1);
+        return each(0);
       })
       .then(
         function () {
@@ -178,7 +235,7 @@ globalThis.TCGB = globalThis.TCGB || {};
           // going back.
           hooks = {};
           return restore().then(function (restored) {
-            return { orders: orders, pending: pending, pages: pages || 1, restore: restored };
+            return { orders: orders, pending: pending, pages: pagesRead, restore: restored, years: years };
           });
         },
         function (err) {
