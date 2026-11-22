@@ -1178,8 +1178,8 @@
   {
     "guard": "an invoice's file is named for its order",
     "file": "src/invoicepage.js",
-    "find": "\"ck-sale-\" + id[1] + \".csv\"",
-    "replace": "\"ck-sale.csv\"",
+    "find": "kind.file + id[2] + \".csv\"",
+    "replace": "kind.file + \".csv\"",
     "expectFailing": "CSV saves the lines with their ids, named for the order"
   },
   {
@@ -1199,7 +1199,7 @@
   {
     "guard": "an invoice sends what CSV saves",
     "file": "src/invoicepage.js",
-    "find": "CKB.handOff(\"magic\", CKB.invoiceCSV(lines, list), lines.length,",
+    "find": "CKB.handOff(\"magic\", kind.csv(lines, list), lines.length,",
     "replace": "CKB.handOff(\"magic\", \"\", lines.length,",
     "expectFailing": "BAN hands the CSV's rows to mtgban once it is listening"
   },
@@ -1209,5 +1209,82 @@
     "find": "!(invoice.lines.length || invoice.unreadable)",
     "replace": "false",
     "expectFailing": "stays off a page with no invoice lines, or no invoice"
+  },
+  {
+    "guard": "a purchase line's foil is its card's ending",
+    "file": "src/invoice.js",
+    "find": "foil: / Foil$/.test(card),",
+    "replace": "foil: false,",
+    "expectFailing": "reads every line of every section, a graded one with no condition"
+  },
+  {
+    "guard": "a purchase line's condition is one CK writes",
+    "file": "src/invoice.js",
+    "find": "!CONDITION.test(condition) || ",
+    "replace": "",
+    "expectFailing": "counts a purchase line it cannot read whole, and keeps the rest"
+  },
+  {
+    "guard": "a purchase line whose total is not its quantity times its price is not kept",
+    "file": "src/invoice.js",
+    "find": " ||\n          total !== Number(qty) * each",
+    "replace": "",
+    "expectFailing": "counts a purchase line it cannot read whole, and keeps the rest"
+  },
+  {
+    "guard": "a purchase card is split at each colon in turn",
+    "file": "src/invoice.js",
+    "find": "at = line.card.indexOf(\": \", at + 1)",
+    "replace": "at = -1",
+    "expectFailing": "splits each card where it is found, whatever colons its name or edition hold"
+  },
+  {
+    "guard": "two splits that each find a card are none",
+    "file": "src/invoice.js",
+    "find": "        if (found) {\n          return null;\n        }\n",
+    "replace": "",
+    "expectFailing": "finds nothing where two splits each find a card"
+  },
+  {
+    "guard": "a split edition's Foil is cut and makes it foil",
+    "file": "src/invoice.js",
+    "find": "      if (foil) {\n        edition = edition.slice(0, -\" Foil\".length);\n      }\n",
+    "replace": "",
+    "expectFailing": "splits each card where it is found, whatever colons its name or edition hold"
+  },
+  {
+    "guard": "a found purchase line is written split",
+    "file": "src/csv.js",
+    "find": "{ name: f.name, edition: f.edition }",
+    "replace": "{}",
+    "expectFailing": "writes each found line split into name and edition, with its ids and real foil"
+  },
+  {
+    "guard": "a found purchase line is written with its row",
+    "file": "src/csv.js",
+    "find": "      return found[i++];",
+    "replace": "      i++;\n      return null;",
+    "expectFailing": "writes each found line split into name and edition, with its ids and real foil"
+  },
+  {
+    "guard": "a purchase invoice's file is its own",
+    "file": "src/invoicepage.js",
+    "find": "file: \"ck-purchase-\" }",
+    "replace": "file: \"ck-sale-\" }",
+    "expectFailing": "says how many lines the list has, and saves them named for the order"
+  },
+  {
+    "guard": "a purchase invoice is read as one",
+    "file": "src/invoicepage.js",
+    "find": "invoice: { read: CKB.readPurchaseInvoice",
+    "replace": "invoice: { read: CKB.readSellInvoice",
+    "expectFailing": "says how many lines the list has, and saves them named for the order"
+  },
+  {
+    "guard": "a purchase invoice's lines are found as purchases",
+    "file": "src/invoicepage.js",
+    "find": "find: CKB.purchaseRow",
+    "replace": "find: CKB.invoiceRow",
+    "expectFailing": "says how many lines the list has, and saves them named for the order"
   }
 ]

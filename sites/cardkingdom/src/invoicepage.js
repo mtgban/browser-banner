@@ -1,7 +1,7 @@
-// Saves a sell invoice's cards as CSV and sends them to mtgban's upload
-// (SPECIFICATIONS.md, section 17).
+// Saves an invoice's cards as CSV and sends them to mtgban's upload, a sell
+// invoice's or a purchase invoice's (SPECIFICATIONS.md, section 17).
 //
-// The invoice names no product, so each line's Scryfall id comes from the
+// An invoice names no product, so each line's Scryfall id comes from the
 // price list, found by its edition, name and foil: read on a click and kept
 // for an hour, the same list the carts use. CSV and BAN are greyed out until
 // a list is in hand, so the rows always carry the ids the list gives them.
@@ -9,10 +9,17 @@
 (function (CKB) {
   "use strict";
 
-  var id = /^\/myaccount\/po_invoice\/(\d+)\/?$/.exec(location.pathname);
+  // Each kind's reader, finder and file, by the path's first part.
+  var KINDS = {
+    po_invoice: { read: CKB.readSellInvoice, find: CKB.invoiceRow, csv: CKB.invoiceCSV, file: "ck-sale-" },
+    invoice: { read: CKB.readPurchaseInvoice, find: CKB.purchaseRow, csv: CKB.purchaseCSV, file: "ck-purchase-" },
+  };
+
+  var id = /^\/myaccount\/(po_invoice|invoice)\/(\d+)\/?$/.exec(location.pathname);
   if (!id) {
     return;
   }
+  var kind = KINDS[id[1]];
 
   var panel = null;
   var csv = null;
@@ -26,7 +33,7 @@
   }
 
   function read() {
-    return CKB.readSellInvoice(document) || { lines: [], unreadable: 0 };
+    return kind.read(document) || { lines: [], unreadable: 0 };
   }
 
   // say puts how the invoice stands against the list in the tooltip: how
@@ -34,7 +41,7 @@
   function say(invoice) {
     var found = 0;
     for (var i = 0; i < invoice.lines.length; i++) {
-      if (CKB.invoiceRow(invoice.lines[i], list)) {
+      if (kind.find(invoice.lines[i], list)) {
         found++;
       }
     }
@@ -120,7 +127,7 @@
     if (reading || !list) {
       return;
     }
-    CKB.download(CKB.invoiceCSV(read().lines, list), "ck-sale-" + id[1] + ".csv");
+    CKB.download(kind.csv(read().lines, list), kind.file + id[2] + ".csv");
   }
 
   // sendToBan hands the rows CSV would save to mtgban's upload, Magic's, in
@@ -133,7 +140,7 @@
     var lines = read().lines;
     panel.clear();
     panel.recap("Waiting for mtgban's upload page to take the order");
-    CKB.handOff("magic", CKB.invoiceCSV(lines, list), lines.length, function (error) {
+    CKB.handOff("magic", kind.csv(lines, list), lines.length, function (error) {
       // The later send speaks for itself.
       if (error === CKB.REPLACED) {
         return;
@@ -158,7 +165,7 @@
   }
 
   function install() {
-    var invoice = CKB.readSellInvoice(document);
+    var invoice = kind.read(document);
     if (document.getElementById("ban-panel") || !invoice || !(invoice.lines.length || invoice.unreadable)) {
       return;
     }

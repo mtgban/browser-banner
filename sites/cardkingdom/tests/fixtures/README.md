@@ -10,6 +10,8 @@ see SPECIFICATIONS.md, section 14. None holds an account's own data.
 | `pricelist.json` | CK's 2026-09-17 price list | the rows of the items the carts hold, as published |
 | `sell-invoice.html` | a saved sell invoice | CK's table; every item is drawn from `invoice-pricelist.json`, the order id and totals synthetic |
 | `invoice-pricelist.json` | CK's 2026-11-22 price list | the rows of the items the invoice holds, as published |
+| `purchase-invoice.html` | a saved purchase invoice | CK's table; every item is drawn from `purchase-pricelist.json`, the order id and totals synthetic |
+| `purchase-pricelist.json` | CK's 2026-11-22 price list | the rows of the items the purchase invoice holds, as published |
 
 Tests that need a row the fixtures lack (another status, a price that moved)
 edit a copy in the test and say so there.

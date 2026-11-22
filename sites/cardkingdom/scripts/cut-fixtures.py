@@ -355,7 +355,7 @@ class Catalogue:
     def draw(self, shape, side, qty, condition="NM"):
         def fits(r):
             foil = r["is_foil"] == "true"
-            if r["id"] in self.used or r["name"] in self.names or "Foil" in r["edition"].split() or ":" in r["name"]:
+            if r["id"] in self.used or r["name"] in self.names or "Foil" in r["edition"].split() or (":" in r["name"]) != (shape == "colon name"):
                 return False
             if side == "sell":
                 price, stock = cents(r["price_buy"]), r["qty_buying"]
@@ -378,6 +378,8 @@ class Catalogue:
                 # not foil.
                 "variation foil": foil and re.search(r"(^|[^-])\bFoil\b", r["variation"]),
                 "etched": not foil and "Foil Etched" in r["variation"],
+                "colon name": not foil and not r["variation"],
+                "colon edition": not foil and not r["variation"] and ":" in r["edition"],
             }[shape]
 
         row = self.rng.choice([r for r in self.rows if fits(r)])
@@ -672,6 +674,90 @@ def cut_sell_invoice(path, catalogue, first_id):
     return out
 
 
+# The purchase invoice's sections, CK's by condition and one of graded
+# cards, and per line a shape and a quantity.
+PURCHASE_INVOICE = (
+    ("NM", (("plain", 1), ("foil", 2), ("variation foil", 1), ("colon name", 1), ("colon edition", 3))),
+    ("EX", (("plain", 2),)),
+    ("graded", (("foil", 1),)),
+)
+
+SAYS_FOIL = re.compile(r"(^|[^-])\bFoil\b")
+
+
+def purchase_card(row):
+    """A line's card as the purchase invoice writes it: "Name (Variation):
+    Edition", " Foil" after a foil's edition unless the variation says so."""
+    foil = row["is_foil"] == "true"
+    card = row["name"] + (f" ({row['variation']})" if row["variation"] else "") + ": " + row["edition"]
+    return card + (" Foil" if foil and not SAYS_FOIL.search(row["variation"]) else "")
+
+
+def cut_purchase_invoice(path, catalogue, first_id):
+    """CK's own purchase invoice table with none of the account's items:
+    each section and line is a copy of a saved one, refilled with an item
+    drawn from a price list, at its price for the section's condition; a
+    graded line is written as the saved graded ones are. The order id is
+    renumbered and the totals recomputed; nothing above the table is kept."""
+    root = parse(path)
+    heading = only((n for n in walk(root) if n.tag == "h1" and "Order #" in text(n)), "order heading")
+    original = re.search(r"#(\d+)", text(heading)).group(1)
+    wrapper = only((n for n in walk(root) if n.tag == "div" and classed(n, "invoiceListWrapper")), "invoice list")
+    table = only((n for n in wrapper.kids if isinstance(n, Node) and n.tag == "table"), "invoice table")
+    body = only((n for n in table.kids if isinstance(n, Node) and n.tag == "tbody"), "invoice body")
+    rows = [k for k in body.kids if isinstance(k, Node) and k.tag == "tr"]
+    cells = lambda tr: [k for k in tr.kids if isinstance(k, Node) and k.tag == "td"]
+    private = [text(cells(tr)[0]).strip() for tr in rows if any(classed(td, "Description") for td in cells(tr))]
+    section = next(tr for tr in rows if any(n.tag == "h3" for n in walk(tr)))
+    rule = next(tr for tr in rows if any(n.tag == "hr" for n in walk(tr)))
+    columns = next(tr for tr in rows if text(cells(tr)[0]).strip() == "Description")
+    line = next(tr for tr in rows if any(classed(td, "Description") for td in cells(tr)))
+    footer = rows[rows.index(next(tr for tr in rows if text(tr).strip().startswith("Subtotal"))):]
+    if len(footer) != 4:
+        sys.exit("the invoice does not end in Subtotal, Shipping, Tax and Total")
+
+    kept, subtotal = [], 0
+    for condition, lines in PURCHASE_INVOICE:
+        if kept:
+            kept.append(clone(rule, body))
+        head = clone(section, body)
+        only((n for n in walk(head) if n.tag == "h3"), "section name").kids = [" PRODUCT " if condition == "graded" else f" {condition} SINGLES "]
+        kept.append(head)
+        if condition != "graded":
+            kept.append(clone(columns, body))
+        for shape, qty in lines:
+            priced = "NM" if condition == "graded" else condition
+            row = catalogue.draw(shape, "buy", qty, priced)
+            each = cents(row["condition_values"][priced.lower() + "_price"])
+            tr = clone(line, body)
+            desc, style, count, price, total = cells(tr)
+            if condition == "graded":
+                desc.kids = [f"{row['name']} ({row['edition']} Foil CGC 8.5) #{random.Random(row['id']).randint(1, 9999):04d}"]
+                style.kids = []
+            else:
+                desc.kids = [purchase_card(row)]
+                style.kids = [condition]
+            count.kids = [str(qty)]
+            price.kids = [dollars(each)]
+            total.kids = [" " + dollars(qty * each)]
+            subtotal += qty * each
+            kept.append(tr)
+    only((td for td in cells(footer[0]) if td.attr("colspan") is None), "subtotal").kids = [dollars(subtotal)[1:]]
+    only((td for td in cells(footer[1]) if td.attr("id") == "shipping_cost"), "shipping").kids = ["0.00"]
+    only((td for td in cells(footer[3]) if td.attr("id") == "order_total"), "total").kids = ["USD " + dollars(subtotal)]
+    spaced = []
+    for tr in kept + footer:
+        spaced += [tr, " "]
+    body.kids = spaced[:-1]
+
+    heading.kids = [f"My Account / Order #{first_id}"]
+    out = serialize(heading, Verbatim()) + " " + '<div class="invoiceListWrapper">' + serialize(table, Verbatim()) + "</div>"
+    check(out, sorted(private, key=len, reverse=True))
+    if re.search(r"\b" + original + r"\b", out):
+        sys.exit("refusing to write, the cut still holds the order id")
+    return out
+
+
 def write(name, body, source, what):
     head = f"<!-- Cut by scripts/cut-fixtures.py from a saved {source} page. {what} -->\n"
     with open(os.path.join(OUT, name), "w", encoding="utf-8") as f:
@@ -701,11 +787,12 @@ def main():
     ap.add_argument("--cart", help="saved /sellcart page")
     ap.add_argument("--buy", help="saved /cart page")
     ap.add_argument("--sellinvoice", help="saved /myaccount/po_invoice/<id> page")
+    ap.add_argument("--purchaseinvoice", help="saved /myaccount/invoice/<id> page")
     ap.add_argument("--prices", help="a CK price list, to draw the carts' and invoices' items from")
     args = ap.parse_args()
-    if not (args.orders or args.sales or args.cart or args.buy or args.sellinvoice):
+    if not (args.orders or args.sales or args.cart or args.buy or args.sellinvoice or args.purchaseinvoice):
         ap.error("give at least one saved page")
-    if (args.cart or args.buy or args.sellinvoice) and not args.prices:
+    if (args.cart or args.buy or args.sellinvoice or args.purchaseinvoice) and not args.prices:
         ap.error("a cart or an invoice needs --prices to draw its items from")
     os.makedirs(OUT, exist_ok=True)
 
@@ -741,6 +828,14 @@ def main():
         with open(os.path.join(OUT, "invoice-pricelist.json"), "w", encoding="utf-8") as f:
             f.write(json.dumps({"meta": catalogue.meta, "data": rows}, indent=1) + "\n")
         print("wrote invoice-pricelist.json")
+    if args.purchaseinvoice:
+        catalogue = Catalogue(args.prices, set())
+        catalogue.names = {re.split(r" \(|: ", text(n).strip())[0] for n in walk(parse(args.purchaseinvoice)) if classed(n, "Description")}
+        write("purchase-invoice.html", cut_purchase_invoice(args.purchaseinvoice, catalogue, 4000001), "purchase invoice", INVOICE)
+        rows = sorted(catalogue.drawn, key=lambda r: r["id"])
+        with open(os.path.join(OUT, "purchase-pricelist.json"), "w", encoding="utf-8") as f:
+            f.write(json.dumps({"meta": catalogue.meta, "data": rows}, indent=1) + "\n")
+        print("wrote purchase-pricelist.json")
 
 
 if __name__ == "__main__":

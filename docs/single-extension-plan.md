@@ -1,9 +1,8 @@
 # One extension for Cardmarket, Card Kingdom and TCGplayer
 
 Status: plan, reviewed once (Fable, 2026-11-21) and revised. PRs 1 to 10
-are done, and so are P1, P3 (section 5) and section 7's cleanup. P2 is done
-for sell invoices; purchase invoices wait for a saved page of ordinary
-singles. P4 is for later.
+are done, and so are P1, P2, P3 (section 5) and section 7's cleanup. P4 is
+for later.
 
 A first version of PR 1 went to cm-banner as mtgban/cm-banner#8 and was
 closed when the home became a new repository.
@@ -222,9 +221,8 @@ saved page of it (AGENTS.md's one rule).
 - **P2, CK invoice pages** (`/myaccount/invoice/<id>`,
   `/myaccount/po_invoice/<id>`): Download CSV of the order's cards and Send
   to BAN, as tcg's single-order view does. Needs saved invoice pages and a
-  new `matches` entry. Done for sell invoices, each line found in the price
-  list by its card; a purchase invoice puts the edition in the card's
-  brackets, and the one saved held graded cards alone.
+  new `matches` entry. Done: each line is found in the price list by its
+  card, a purchase line's card split at whichever ": " finds it.
 - **P3, ranges.** CK gains the last 30/90/120 days, never kept in
   IndexedDB (ck keys kept files by year, and a moving range has no stable
   key; tcg already keeps only years). tcg gains All years, which costs one

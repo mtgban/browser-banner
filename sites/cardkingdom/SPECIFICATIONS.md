@@ -26,8 +26,9 @@ row of buttons):
 - **History** (`/myaccount/order_history`, `/myaccount/selling_history`): a
   year picker and *Download CSV*, writing every paid purchase that shipped or
   every paid sale that was completed.
-- **Sell invoice** (`/myaccount/po_invoice/<id>`): the order's cards saved as
-  a CSV, or handed to mtgban's upload with *BAN*, each with its Scryfall id
+- **Invoices** (`/myaccount/po_invoice/<id>` for a sale,
+  `/myaccount/invoice/<id>` for a purchase): the order's cards saved as a
+  CSV, or handed to mtgban's upload with *BAN*, each with its Scryfall id
   from the price list (section 17).
 
 Both carts work for a visitor who is not signed in: such a cart has no *Save
@@ -43,7 +44,8 @@ Manifest V3, no `permissions`, `host_permissions`, `background` or
 unless `location.pathname` is `/sellcart` or `/cart`, with or without a
 trailing slash, so it never runs on the carts' form targets
 (`/sellcart/lineitem/...`, `/cart/lineitem/...`, `/sellcart/empty_cart`).
-The invoice script returns unless the path is `/myaccount/po_invoice/<id>`.
+The invoice script returns unless the path is `/myaccount/po_invoice/<id>`
+or `/myaccount/invoice/<id>`.
 
 ## 3. The sell cart
 
@@ -488,7 +490,10 @@ script checks its own output for an id, an address line or a link it should
 have removed, and writes nothing if it finds one. A sell invoice is cut the
 same way: CK's table, each group and line refilled with an item drawn from a
 price list, the order id renumbered and the totals recomputed, and nothing
-above the table kept; its items' rows are `invoice-pricelist.json`.
+above the table kept; its items' rows are `invoice-pricelist.json`. A
+purchase invoice is cut the same way, section by section, with one graded
+line written as the saved graded ones are; its rows are
+`purchase-pricelist.json`.
 `tests/repo.test.js` scans every fixture for what a cut must never keep.
 
 ## 15. Build order
@@ -533,14 +538,12 @@ that day, which CI never has.
   "Not updated" and the cart locks (section 7).
 - Sealed lines in either cart.
 - Whether CK reprices a buy cart line on its own.
-- The purchase invoice (`/myaccount/invoice/<id>`). Its lines put the edition
-  inside the card's brackets, "Name (Edition Foil CGC 8.5) #0000", and the one
-  saved page held graded cards alone, which the price list does not carry. It
-  waits for a saved invoice of ordinary singles.
 - A sell invoice once CK has graded the order: whether its lines keep the
   "2 NM @ $19.00" shape. Until then a line of another shape is unreadable.
 
-## 17. The sell invoice
+## 17. The invoices
+
+### 17.1 The sell invoice
 
 `/myaccount/po_invoice/<id>`, linked from the selling history (section 8),
 holds one table, `table.orderContents`. Its lines are grouped under a heading
@@ -570,5 +573,31 @@ the cart file's columns (section 11), Foil being the found row's; *BAN* hands
 the same rows to mtgban's upload, Magic's, as the carts do. Escape stops a
 read.
 
-A saved invoice of 36 lines read whole, added up to its Subtotal, and was
-found line for line in that day's list.
+Two saved sell invoices, of 36 and 12 lines, read whole, added up to their
+Subtotals, and were found line for line in that day's list.
+
+### 17.2 The purchase invoice
+
+`/myaccount/invoice/<id>`, linked from the order history, holds the same
+`table.orderContents`, in sections by condition ("NM SINGLES", "VG
+SINGLES"), a rule between them, each with a header row: Description, Style,
+Qty, Price, Total. A line's Description writes its card as "Name
+(Variation): Edition", " Foil" after a foil's edition unless the variation
+says Foil ("Rafiq of the Many: Double Masters 2022 Foil", "Sterling Grove
+(Judge Foil): Promotional"); Style is its condition. Graded cards are a
+"PRODUCT" section with no Style, written "Name (Edition Foil CGC 8.5)
+#0000"; the price list does not carry them. A line is unreadable as a sell
+line is, or when its Style is none of NM, EX, VG and G and not empty.
+
+Card names and editions both hold ": " ("Sidequest: Catch a Fish: Final
+Fantasy", "Bitter Downfall: The Lord of the Rings: Tales of Middle-earth"),
+so the card is split at each ": " in turn, each half found as a sell line
+is, and the one split that finds a row is the card; none, or more than one,
+is not found. Written this way, no row of the list (2026-11-22, 154,942
+rows, 290 of them names with ": ") is found at two splits. A line found is
+written with the name and edition it split into; one not found is written
+with its card whole as the name and no edition.
+
+The panel is the sell invoice's, and *CSV* saves `ck-purchase-<id>.csv`.
+Three saved purchase invoices read whole and added up to their Subtotals;
+every line of ordinary singles was found, and the graded cards were not.

@@ -93,6 +93,23 @@ globalThis.CKB = globalThis.CKB || {};
     });
   };
 
+  // purchaseCSV writes a purchase invoice's lines, as readPurchaseInvoice
+  // reads them, the same way: a line purchaseRow finds is written with the
+  // name and edition it split the card into, and one it does not with the
+  // card whole as its name and no edition.
+  CKB.purchaseCSV = function (lines, list) {
+    var found = [];
+    var named = lines.map(function (l) {
+      var f = list ? CKB.purchaseRow(l, list) : null;
+      found.push(f);
+      return f ? Object.assign({}, l, { name: f.name, edition: f.edition }) : l;
+    });
+    var i = 0;
+    return lineTable(named, function () {
+      return found[i++];
+    });
+  };
+
   CKB.csvColumns = function () {
     var names = [];
     for (var i = 0; i < COLUMNS.length; i++) {
