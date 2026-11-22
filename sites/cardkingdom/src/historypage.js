@@ -12,7 +12,7 @@
 // button then offers Rebuild, which always reads the list again. A range of
 // recent days is never kept: the same range holds other orders tomorrow.
 
-(function (CKB) {
+(function (CKB, BAN) {
   "use strict";
 
   var PAGES = {
@@ -72,10 +72,6 @@
     return c.year === null ? "" : " " + page.within + " " + c.year;
   }
 
-  function ymd(date) {
-    return date.year + "-" + String(date.month).padStart(2, "0") + "-" + String(date.day).padStart(2, "0");
-  }
-
   function plural(n, one, many) {
     return n + " " + (n === 1 ? one : many);
   }
@@ -106,7 +102,7 @@
       left.push(picked.otherYears + " from other years");
     }
     if (picked.earlier) {
-      left.push(picked.earlier + " from before " + ymd(picked.since));
+      left.push(picked.earlier + " from before " + BAN.ymd(picked.since));
     }
     return (
       "Saved " + name + ": " + plural(picked.rows.length, "order", "orders") + ", " + page.basis + ". " +
@@ -126,22 +122,13 @@
     return page.none + (c.year === null ? "" : " in " + c.year);
   }
 
-  // fileName names a choice's file. A range of recent days carries the day
-  // it was read, since the same range holds other orders tomorrow.
-  function fileName(c, today) {
-    if (c.days) {
-      return "ck-" + page.kind + "-last-" + c.days + "-days-" + ymd(today) + ".csv";
-    }
-    return "ck-" + page.kind + "-" + (c.year === null ? "all" : c.year) + ".csv";
-  }
-
   // finish saves the walk's file, when it found orders, and answers with
   // what is kept of it: a walk that found none is kept as that answer.
   function finish(walked, c, today, since) {
     var y = c.year;
     var picked = CKB.pick(walked.rows, page.kind, y, since);
     picked.since = since;
-    var name = fileName(c, today);
+    var name = BAN.rangeFile("ck-" + page.kind, c, today);
     var file = { name: name, csv: "", count: picked.rows.length, read: pagesRead(walked) };
     if (picked.rows.length) {
       file.csv = CKB.toCSV(picked.rows);
@@ -320,9 +307,6 @@
     panel = CKB.panel();
     store = CKB.openStore();
 
-    year = document.createElement("select");
-    year.className = "ban-year";
-    year.setAttribute("aria-label", "Range");
     var now = new Date().getFullYear();
     var choices = RECENT.map(function (days) {
       return ["days:" + days, days + " days"];
@@ -331,13 +315,7 @@
     for (var y = now; y >= FIRST_YEAR; y--) {
       choices.push([String(y), String(y)]);
     }
-    for (var i = 0; i < choices.length; i++) {
-      var option = document.createElement("option");
-      option.value = choices[i][0];
-      option.textContent = choices[i][1];
-      year.appendChild(option);
-    }
-    year.value = String(now);
+    year = BAN.rangePicker(choices, String(now));
 
     go = document.createElement("button");
     go.type = "button";
@@ -368,4 +346,4 @@
   } else {
     install();
   }
-})(globalThis.CKB);
+})(globalThis.CKB, globalThis.BAN);

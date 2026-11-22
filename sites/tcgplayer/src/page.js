@@ -7,7 +7,7 @@
 
 globalThis.TCGB = globalThis.TCGB || {};
 
-(function (TCGB) {
+(function (TCGB, BAN) {
   "use strict";
 
   // The manifest names the host alone, and the path is decided here, read
@@ -265,22 +265,19 @@ globalThis.TCGB = globalThis.TCGB || {};
     return /^\d{4}$/.test(range);
   }
 
-  // fileName names a range's file. A relative range's carries the day it
-  // was read, since the same range holds other orders tomorrow.
+  // fileName names a range's file: a year, every year, or "Last 30 Days"
+  // and its like, whose file carries the day it was read. A relative range
+  // of another shape is named by its own words, dated the same way.
   function fileName(range) {
-    if (isYear(range)) {
-      return "tcg-orders-" + range + ".csv";
+    var days = /^Last (\d+) Days$/.exec(range);
+    if (isYear(range) || range === TCGB.ALL || days) {
+      return BAN.rangeFile(
+        "tcg-orders",
+        { year: isYear(range) ? Number(range) : null, days: days ? Number(days[1]) : null },
+        BAN.today(),
+      );
     }
-    if (range === TCGB.ALL) {
-      return "tcg-orders-all.csv";
-    }
-    var d = new Date();
-    var day = [d.getFullYear(), d.getMonth() + 1, d.getDate()]
-      .map(function (n) {
-        return String(n).padStart(2, "0");
-      })
-      .join("-");
-    return "tcg-orders-" + range.toLowerCase().replace(/ /g, "-") + "-" + day + ".csv";
+    return "tcg-orders-" + range.toLowerCase().replace(/ /g, "-") + "-" + BAN.ymd(BAN.today()) + ".csv";
   }
 
   function rangePanel() {
@@ -304,21 +301,17 @@ globalThis.TCGB = globalThis.TCGB || {};
     // TCGplayer's own ranges in its own order: the relative ones, then
     // every year at once, then the years. "Last 120 Days" is shown as "120
     // days" to fit the box.
-    var year = document.createElement("select");
-    year.className = "ban-year";
-    year.setAttribute("aria-label", "Range");
     var ranges = filter.ranges.slice();
     var years = TCGB.yearsListed(ranges);
     if (years.length) {
       ranges.splice(ranges.indexOf(years[0]), 0, TCGB.ALL);
     }
-    for (var y = 0; y < ranges.length; y++) {
-      var option = document.createElement("option");
-      option.value = ranges[y];
-      option.textContent = ranges[y].replace(/^Last (\d+) Days$/, "$1 days");
-      year.appendChild(option);
-    }
-    year.value = filter.range;
+    var year = BAN.rangePicker(
+      ranges.map(function (range) {
+        return [range, range.replace(/^Last (\d+) Days$/, "$1 days")];
+      }),
+      filter.range,
+    );
     panel.hint(hintFor(year.value));
     panel.actions.appendChild(year);
     goButton("Download CSV", function () {
@@ -422,4 +415,4 @@ globalThis.TCGB = globalThis.TCGB || {};
   idle();
 
   document.body.appendChild(panel.root);
-})(globalThis.TCGB);
+})(globalThis.TCGB, globalThis.BAN);

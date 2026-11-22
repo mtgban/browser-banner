@@ -60,7 +60,7 @@ src/handoff.js   BAN: core/handoff.js's sender, Magic only, with CK's words
 src/cartpage.js  content script: Load prices, the marks, Update price and all
 src/cart.css     the marks, four classes deep to outrank CK's own reset
 src/ui.js        core/ui.js's panel and download, the panel headed CK
-src/historypage.js  content script: year picker and Download CSV
+src/historypage.js  content script: range picker (core/ranges.js), Download CSV
 src/panel.css    what this panel adds to core/panel.css; src/history.css
 scripts/cut-fixtures.py  cuts tests/fixtures/ from saved pages, locally only
 tests/mutations.json  each guard, the text that breaks it, the test that fails
