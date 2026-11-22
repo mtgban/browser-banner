@@ -1,2 +1,7 @@
 node_modules/
 *.csv
+# Saved store pages carry a signed-in session and personal data.
+*_files/
+saved-pages/
+*.har
+*.saved.html

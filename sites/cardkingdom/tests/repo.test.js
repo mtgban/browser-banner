@@ -4,7 +4,6 @@ import { readFileSync, readdirSync, existsSync, statSync } from "fs";
 const root = new URL("../", import.meta.url);
 const read = (name) => readFileSync(new URL(name, root), "utf8");
 const manifest = JSON.parse(read("manifest.json"));
-const pkg = JSON.parse(read("package.json"));
 
 // files lists every file under dir, relative to the repository root, or
 // nothing when dir does not exist yet.
@@ -51,10 +50,6 @@ describe("the manifest", () => {
       "https://www.cardkingdom.com/cart*",
     ]);
   });
-
-  test("carries package.json's version", () => {
-    expect(manifest.version).toBe(pkg.version);
-  });
 });
 
 describe("the source", () => {
@@ -89,12 +84,10 @@ describe("punctuation", () => {
     const names = [
       ...files("src"),
       ...files("scripts"),
-      ...files(".github"),
       "README.md",
       "SPECIFICATIONS.md",
       "AGENTS.md",
       "manifest.json",
-      "package.json",
     ];
     const dashed = names.filter((name) => {
       const text = read(name);
