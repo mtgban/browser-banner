@@ -33,3 +33,19 @@ test("CI runs the guards of every site that has them, and no others", () => {
     .sort();
   expect(ran).toEqual(guarded);
 });
+
+// A manifest is what the browsers read; a typo in a path it names is a broken
+// install rather than a failing test, so every site's is checked here.
+test("every manifest names only files that exist", () => {
+  const missing = readdirSync(new URL("sites/", root))
+    .filter((site) => existsSync(new URL("sites/" + site + "/manifest.json", root)))
+    .flatMap((site) => {
+      const manifest = JSON.parse(readFileSync(new URL("sites/" + site + "/manifest.json", root), "utf8"));
+      const named = Object.values(manifest.icons || {});
+      for (const cs of manifest.content_scripts || []) {
+        named.push(...(cs.js || []), ...(cs.css || []));
+      }
+      return named.map((name) => "sites/" + site + "/" + name).filter((path) => !existsSync(new URL(path, root)));
+    });
+  expect(missing).toEqual([]);
+});
