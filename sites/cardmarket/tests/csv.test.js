@@ -95,14 +95,14 @@ describe("end to end", () => {
 describe("where the extension runs", () => {
   const manifest = siteManifest("cardmarket");
 
-  test("only on a seller's offers pages, and nowhere else", () => {
+  test("only on a seller's offers pages and the visitor's orders, and nowhere else", () => {
     // The site receives its own rows now, on a page it owns, so this runs on
     // Cardmarket and has no business anywhere else. A host creeping back in
     // is a permission creeping back in.
-    expect(manifest.content_scripts.length).toBe(1);
-    const hosts = manifest.content_scripts[0].matches;
-    expect(hosts.every((m) => m.startsWith("https://www.cardmarket.com/"))).toBe(true);
-    expect(hosts.every((m) => m.includes("/Users/*/Offers/"))).toBe(true);
+    expect(manifest.content_scripts.map((cs) => cs.matches)).toEqual([
+      ["https://www.cardmarket.com/*/*/Users/*/Offers/*"],
+      ["https://www.cardmarket.com/*/*/Orders/*"],
+    ]);
   });
 
   test("on every game Cardmarket sells, and naming none of them", () => {

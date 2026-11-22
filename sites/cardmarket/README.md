@@ -14,6 +14,10 @@ On a seller's offers page - `cardmarket.com/<lang>/<Game>/Users/<seller>/Offers/
 a panel appears in the bottom right. It appears only for a game BAN prices; on any other there is nowhere to send the
 rows, so there is no panel either.
 
+On one of your own purchases - `cardmarket.com/<lang>/<Game>/Orders/<id>` -
+the panel counts the order's cards and offers *Send to BAN* and *CSV*, with
+the same columns as the offers' file and the prices in dollars.
+
 **Escape** stops a read and puts the panel back - spinner off, buttons back,
 nothing kept. A read that was stopped half way is not a shorter export, so its
 rows go with it. The key does nothing when there is nothing of ours running.
