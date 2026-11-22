@@ -4,8 +4,8 @@
 // The list is read only on a click and kept for an hour (store.js); a cart
 // opened while a kept list is fresh is marked at once, with no request. CSV
 // saves the cart as it stands, with each line's Scryfall id from the list,
-// once there is one in hand. The
-// one thing that changes a cart is Update price on a better sell line
+// once there is one in hand, and BAN sends those same rows to mtgban's
+// upload. The one thing that changes a cart is Update price on a better sell line
 // (update.js), CK's answer deciding what happened: one line per click, or
 // every better line in turn from Update all, under Empty Cart.
 
@@ -51,6 +51,7 @@
   var panel = null;
   var button = null;
   var csv = null;
+  var ban = null;
   var list = null;
   var reading = null;
   var shown = "";
@@ -656,6 +657,7 @@
     var left = list ? list.fetchedAt + CKB.LIST_TTL - Date.now() : 0;
     button.disabled = left > 0 && !newer;
     csv.disabled = false;
+    ban.disabled = false;
     clearTimeout(expiry);
     if (left > 0) {
       expiry = setTimeout(refreshable, left);
@@ -693,6 +695,7 @@
 
   function idle() {
     csv.disabled = true;
+    ban.disabled = true;
     panel.jump(null);
     panel.word("");
     panel.clear();
@@ -707,6 +710,32 @@
       return;
     }
     CKB.download(CKB.cartCSV(CKB.readCart(document, location.href, side), list), "ck-" + side + "-cart.csv");
+  }
+
+  // sendToBan hands the rows CSV would save to mtgban's upload, Magic's, in
+  // a tab of its own. It runs straight from the click: window.open needs
+  // one. Greyed out with CSV, so the rows always carry their Scryfall ids.
+  function sendToBan() {
+    if (reading || writing) {
+      return;
+    }
+    var lines = CKB.readCart(document, location.href, side);
+    // Until mtgban's page says it is listening, which it does only once the
+    // reader is signed in there with the upload open to them.
+    panel.clear();
+    panel.recap("Waiting for mtgban's upload page to take the cart");
+    CKB.handOff("magic", CKB.cartCSV(lines, list), lines.length, function (error) {
+      // The later send speaks for itself.
+      if (error === CKB.REPLACED) {
+        return;
+      }
+      if (error) {
+        panel.fail(error);
+        return;
+      }
+      panel.mark("done");
+      panel.recap("Sent " + lines.length + (lines.length === 1 ? " line" : " lines") + " to BAN");
+    });
   }
 
   // check reads the list and marks the cart with it, and then, once the
@@ -810,6 +839,13 @@
     csv.textContent = "CSV";
     csv.addEventListener("click", saveCSV);
     panel.actions.appendChild(csv);
+    ban = document.createElement("button");
+    ban.type = "button";
+    ban.className = "ck-banner-go ck-banner-ban";
+    ban.textContent = "BAN";
+    ban.setAttribute("aria-label", "Send to BAN");
+    ban.addEventListener("click", sendToBan);
+    panel.actions.appendChild(ban);
     panel.root.hidden = !CKB.readCart(document, location.href, side).length;
     document.body.appendChild(panel.root);
     idle();

@@ -12,7 +12,9 @@
 - **On the buy cart** (`/cart`) it does the same the other way round: each line
   is checked against the list's price for its condition, and a line the list
   now sells for less is marked as a price drop. Both carts work signed out,
-  and either can be saved as a CSV, with each card's Scryfall id.
+  and either can be saved as a CSV, with each card's Scryfall id, or sent
+  to BAN with *BAN*, which hands the same rows to mtgban's upload page in a
+  tab of its own.
 - **On order and selling history** (`/myaccount/order_history`,
   `/myaccount/selling_history`) you pick a year, or the last 30, 90 or 120
   days, and download a CSV of every paid purchase that shipped, or every paid
@@ -31,8 +33,9 @@ extension reads or sends goes to the Card Kingdom page it is running on, as
 the signed-in user. On a click it reads the price list (no cookies sent); on
 the history pages it reads the history's own pages one at a time; *Update
 price* sends one request per click, and *Update all* one per line, one at a
-time. Nothing leaves your browser for anywhere
-else.
+time. *BAN* opens mtgban's `/upload/handoff` in a tab of its own and
+passes it the cart with `postMessage`; that page uploads it with your mtgban
+session. Nothing else leaves your browser.
 
 ## Installing it
 
