@@ -48,7 +48,7 @@ the test itself and says so there; the fixture files stay as cut.
 
 ```
 src/net.js       core/net.js named for Card Kingdom, and the pace
-src/money.js     "$1,234.56" to cents and back; CK's dates to their parts
+src/money.js     CK's dates to their parts; money is core/money.js's
 src/csv.js       the history and cart CSVs' columns; core/csv.js quotes them
 src/history.js   history pages: rows, which are exported, the walk, the kept file
 src/cart.js      both carts' lines, each read whole or marked unreadable

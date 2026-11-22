@@ -1,60 +1,23 @@
-// Reads the money and dates Card Kingdom prints.
+// Reads the money and dates Card Kingdom prints: the money and the calendar
+// are core/money.js's, and the dates and the price list's numbers its own.
 //
-// Both are read by shape and arithmetic, never by parseFloat or Date.parse:
-// those accept what the page should not be trusted to print ("$1.234", a
-// locale's own date order), and a value read wrong is worse than one refused.
+// Dates are read by shape and arithmetic, never by Date.parse: it accepts a
+// locale's own date order, and a value read wrong is worse than one refused.
 
 globalThis.CKB = globalThis.CKB || {};
 
-(function (CKB) {
+(function (CKB, BAN) {
   "use strict";
-
-  // "$1,234.56" or "$0.02": dollars, grouped or not, and exactly two cents.
-  var MONEY = /^\$([1-9]\d{0,2}(?:,\d{3})+|\d+)\.(\d{2})$/;
 
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   // "Mar 14, 2026 10:36 AM" or "Mar 5, 2026". Days are not padded, hours are.
   var WHEN = /^([A-Z][a-z]{2}) (\d{1,2}), (\d{4})(?: (\d{1,2}):(\d{2}) ([AP]M))?$/;
 
-  function daysIn(year, month) {
-    if (month === 2) {
-      return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 29 : 28;
-    }
-    return [4, 6, 9, 11].indexOf(month) >= 0 ? 30 : 31;
-  }
-
-  // daysBefore is the calendar date n days before date, both {year, month,
-  // day}.
-  CKB.daysBefore = function (date, n) {
-    var year = date.year;
-    var month = date.month;
-    var day = date.day - n;
-    while (day < 1) {
-      month--;
-      if (month < 1) {
-        month = 12;
-        year--;
-      }
-      day += daysIn(year, month);
-    }
-    return { year: year, month: month, day: day };
-  };
-
-  // today is the browser's date, {year, month, day}.
-  CKB.today = function () {
-    var now = new Date();
-    return { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
-  };
-
-  // cents reads "$1,234.56" as 123456, and answers null for any other shape.
-  CKB.cents = function (text) {
-    var m = MONEY.exec(String(text).trim());
-    if (!m) {
-      return null;
-    }
-    return Number(m[1].replace(/,/g, "")) * 100 + Number(m[2]);
-  };
+  CKB.cents = BAN.cents;
+  CKB.dollars = BAN.dollars;
+  CKB.daysBefore = BAN.daysBefore;
+  CKB.today = BAN.today;
 
   // listCents reads a price list's "6.4" or "599.99" as cents, and answers
   // null for any other shape: no sign, no grouping, at most two decimals.
@@ -64,15 +27,6 @@ globalThis.CKB = globalThis.CKB || {};
       return null;
     }
     return Number(m[1]) * 100 + Number(((m[2] || "") + "00").slice(0, 2));
-  };
-
-  // dollars writes cents the way Card Kingdom prints them, with a leading
-  // minus for a difference that goes down.
-  CKB.dollars = function (cents) {
-    var sign = cents < 0 ? "-" : "";
-    var abs = Math.abs(cents);
-    var whole = String(Math.floor(abs / 100)).replace(/\B(?=(\d{3})+$)/g, ",");
-    return sign + "$" + whole + "." + String(abs % 100).padStart(2, "0");
   };
 
   // when reads a date into {year, month, day, hour, minute}, hour and minute
@@ -86,7 +40,7 @@ globalThis.CKB = globalThis.CKB || {};
     var year = Number(m[3]);
     var month = MONTHS.indexOf(m[1]) + 1;
     var day = Number(m[2]);
-    if (month === 0 || day < 1 || day > daysIn(year, month)) {
+    if (month === 0 || day < 1 || day > BAN.daysIn(year, month)) {
       return null;
     }
     var parts = { year: year, month: month, day: day, hour: null, minute: null };
@@ -102,4 +56,4 @@ globalThis.CKB = globalThis.CKB || {};
     }
     return parts;
   };
-})(globalThis.CKB);
+})(globalThis.CKB, globalThis.BAN);

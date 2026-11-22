@@ -1,7 +1,7 @@
 [
   {
     "guard": "a price with three decimals is refused",
-    "file": "src/money.js",
+    "file": "../../core/money.js",
     "find": "\\.(\\d{2})$/;",
     "replace": "\\.(\\d{2,3})$/;",
     "expectFailing": "refuses three decimals"
@@ -960,8 +960,8 @@
   },
   {
     "guard": "counting back days follows the calendar",
-    "file": "src/money.js",
-    "find": "      day += daysIn(year, month);",
+    "file": "../../core/money.js",
+    "find": "      day += BAN.daysIn(year, month);",
     "replace": "      day += 30;",
     "expectFailing": "goes back across a month and a year by the calendar"
   },
