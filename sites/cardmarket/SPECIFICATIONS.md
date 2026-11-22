@@ -24,7 +24,6 @@ src/parse.js     DOM → offers
 src/pages.js     one page → every page
 src/csv.js       offers → CSV text
 src/content.js   the panel, and the two things its buttons do
-icons/           the BAN stroopwafel at 16/32/48/128
 tests/           bun + happy-dom, run in CI
 ```
 

@@ -47,8 +47,6 @@ the test itself and says so there; the fixture files stay as cut.
 ## Layout
 
 ```
-manifest.json    MV3; no permissions, and a test keeps it that way
-icons/           the BAN stroopwafel, shared with cm-banner
 src/net.js       one page at a time: pace, deadline, Cloudflare challenge
 src/money.js     "$1,234.56" to cents and back; CK's dates to their parts
 src/csv.js       the history and cart CSVs: their columns and Go's quoting
