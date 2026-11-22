@@ -1,8 +1,8 @@
 # One extension for Cardmarket, Card Kingdom and TCGplayer
 
-Status: plan, reviewed once (Fable, 2026-11-21) and revised. PRs 1 to 5
-are done (the three imports, Cardmarket's guards, one manifest), and so are
-P1 and P3 (section 5). PRs 6 to 10 wait for the owner.
+Status: plan, reviewed once (Fable, 2026-11-21) and revised. PRs 1 to 10
+are done, and so are P1 and P3 (section 5); P4 is for later. What is left
+is section 7's cleanup.
 
 A first version of PR 1 went to cm-banner as mtgban/cm-banner#8 and was
 closed when the home became a new repository.

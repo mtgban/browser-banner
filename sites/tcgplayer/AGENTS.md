@@ -35,7 +35,7 @@ by `scripts/cut-fixtures.mjs`, never by editing a saved page down;
 ## Layout
 
 ```
-src/money.js     "$1,234.56" to cents and back; "November 09, 2026" to parts
+src/money.js     "November 09, 2026" to parts, counts; money is core/money.js's
 src/csv.js       the orders and cards CSVs' columns; core/csv.js quotes them
 src/read.js      a page: the filter, the list's heading, every order and line
 src/net.js       core/net.js named for TCGplayer, a page, and the filter POST

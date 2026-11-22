@@ -1,7 +1,7 @@
 [
   {
     "guard": "a price with three decimals is refused",
-    "file": "src/money.js",
+    "file": "../../core/money.js",
     "find": "\\.(\\d{2})$/;",
     "replace": "\\.(\\d{2,3})$/;",
     "expectFailing": "refuses three decimals"

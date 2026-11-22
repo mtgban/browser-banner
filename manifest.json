@@ -47,6 +47,7 @@
       "js": [
         "core/net.js",
         "core/csv.js",
+        "core/money.js",
         "sites/cardkingdom/src/net.js",
         "sites/cardkingdom/src/money.js",
         "sites/cardkingdom/src/csv.js",
@@ -71,6 +72,7 @@
       "js": [
         "core/net.js",
         "core/csv.js",
+        "core/money.js",
         "sites/cardkingdom/src/net.js",
         "sites/cardkingdom/src/money.js",
         "sites/cardkingdom/src/csv.js",
@@ -99,6 +101,7 @@
       "js": [
         "core/net.js",
         "core/csv.js",
+        "core/money.js",
         "sites/tcgplayer/src/money.js",
         "sites/tcgplayer/src/csv.js",
         "sites/tcgplayer/src/read.js",
