@@ -8,7 +8,7 @@
   },
   {
     "guard": "a value with a comma is quoted",
-    "file": "src/csv.js",
+    "file": "../../core/csv.js",
     "find": "if (/[\",\\r\\n]/.test(text)) {",
     "replace": "if (/[\"\\r\\n]/.test(text)) {",
     "expectFailing": "a comma is quoted"
@@ -57,8 +57,8 @@
   },
   {
     "guard": "a Cloudflare challenge is not read as a refusal",
-    "file": "src/net.js",
-    "find": "if (response.headers.get(\"cf-mitigated\") === \"challenge\") {",
+    "file": "../../core/net.js",
+    "find": "if (net.challenged(response)) {",
     "replace": "if (false) {",
     "expectFailing": "a Cloudflare challenge is told apart from an ordinary refusal"
   },
@@ -404,5 +404,12 @@
     "find": "games.indexOf(game) >= 0 && ",
     "replace": "",
     "expectFailing": "an order with nothing to send gets none"
+  },
+  {
+    "guard": "TCGplayer's 429 is a request to slow down",
+    "file": "../../core/net.js",
+    "find": "if (opts.slowDown && response.status === 429) {",
+    "replace": "if (false) {",
+    "expectFailing": "a 429 says to slow down"
   }
 ]

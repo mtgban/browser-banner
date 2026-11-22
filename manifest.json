@@ -21,6 +21,8 @@
         "https://www.cardmarket.com/*/*/Users/*/Offers/*"
       ],
       "js": [
+        "core/net.js",
+        "core/csv.js",
         "sites/cardmarket/src/rates.js",
         "sites/cardmarket/src/parse.js",
         "sites/cardmarket/src/pages.js",
@@ -43,6 +45,8 @@
         "https://www.cardkingdom.com/myaccount/selling_history*"
       ],
       "js": [
+        "core/net.js",
+        "core/csv.js",
         "sites/cardkingdom/src/net.js",
         "sites/cardkingdom/src/money.js",
         "sites/cardkingdom/src/csv.js",
@@ -65,6 +69,8 @@
         "https://www.cardkingdom.com/cart*"
       ],
       "js": [
+        "core/net.js",
+        "core/csv.js",
         "sites/cardkingdom/src/net.js",
         "sites/cardkingdom/src/money.js",
         "sites/cardkingdom/src/csv.js",
@@ -91,6 +97,8 @@
         "https://store.tcgplayer.com/*"
       ],
       "js": [
+        "core/net.js",
+        "core/csv.js",
         "sites/tcgplayer/src/money.js",
         "sites/tcgplayer/src/csv.js",
         "sites/tcgplayer/src/read.js",

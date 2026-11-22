@@ -47,9 +47,9 @@ the test itself and says so there; the fixture files stay as cut.
 ## Layout
 
 ```
-src/net.js       one page at a time: pace, deadline, Cloudflare challenge
+src/net.js       core/net.js named for Card Kingdom, and the pace
 src/money.js     "$1,234.56" to cents and back; CK's dates to their parts
-src/csv.js       the history and cart CSVs: their columns and Go's quoting
+src/csv.js       the history and cart CSVs' columns; core/csv.js quotes them
 src/history.js   history pages: rows, which are exported, the walk, the kept file
 src/cart.js      both carts' lines, each read whole or marked unreadable
 src/prices.js    the price list: fetch, reduce to arrays by id, look up

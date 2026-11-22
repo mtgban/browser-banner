@@ -4,16 +4,8 @@
 
 globalThis.TCGB = globalThis.TCGB || {};
 
-(function (TCGB) {
+(function (TCGB, BAN) {
   "use strict";
-
-  function field(value) {
-    var text = value === undefined || value === null ? "" : String(value);
-    if (/[",\r\n]/.test(text)) {
-      return '"' + text.replace(/"/g, '""') + '"';
-    }
-    return text;
-  }
 
   // text keeps a spreadsheet from running free text as a formula: a seller
   // names their own store, and "=HYPERLINK(...)" is a name like any other.
@@ -21,13 +13,15 @@ globalThis.TCGB = globalThis.TCGB || {};
     return /^[=+\-@\t\r]/.test(value) ? "'" + value : value;
   }
 
+  // table writes the columns' names and one line per row, quoted by
+  // core/csv.js, every row ended by LF.
   function table(columns, rows) {
-    var lines = [columns.map(function (c) { return field(c[0]); }).join(",")];
+    var lines = [columns.map(function (c) { return c[0]; })];
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
-      lines.push(columns.map(function (c) { return field(c[1](row)); }).join(","));
+      lines.push(columns.map(function (c) { return c[1](row); }));
     }
-    return lines.join("\n") + "\n";
+    return BAN.csv(lines, "\n");
   }
 
   // taxState is the state an order's "Sales Tax (NY)" row names. A plain
@@ -119,4 +113,4 @@ globalThis.TCGB = globalThis.TCGB || {};
   TCGB.cardsCSV = function (lines) {
     return table(CARDS, lines);
   };
-})(globalThis.TCGB);
+})(globalThis.TCGB, globalThis.BAN);

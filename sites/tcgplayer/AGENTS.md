@@ -36,9 +36,9 @@ by `scripts/cut-fixtures.mjs`, never by editing a saved page down;
 
 ```
 src/money.js     "$1,234.56" to cents and back; "November 09, 2026" to parts
-src/csv.js       the orders and cards CSVs: their columns and Go's quoting
+src/csv.js       the orders and cards CSVs' columns; core/csv.js quotes them
 src/read.js      a page: the filter, the list's heading, every order and line
-src/net.js       one request at a time: a page, or the filter POST
+src/net.js       core/net.js named for TCGplayer, a page, and the filter POST
 src/walk.js      a year: set it, read every page, put the visitor's range back
 src/handoff.js   core/handoff.js's sender, Magic only, with TCGplayer's words
 src/ui.js        core/ui.js's panel and download, the panel headed TCG

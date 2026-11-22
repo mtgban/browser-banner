@@ -19,7 +19,7 @@
 
 globalThis.MKM = globalThis.MKM || {};
 
-(function (MKM) {
+(function (MKM, BAN) {
   "use strict";
 
   var NEXT = 'a[data-direction="next"]';
@@ -35,47 +35,16 @@ globalThis.MKM = globalThis.MKM || {};
   // export.
   var PACE = 1200;
 
-  // TIMEOUT bounds one request. A connection that is accepted and then
-  // goes quiet is the one failure with no symptom: the walk waits, the
-  // spinner turns, and nothing arrives to stop it - so a read that has
-  // gone nowhere for half a minute is treated as a read that failed,
-  // which at least keeps whatever came before it.
-  var TIMEOUT = 30000;
-
-  // deadline is the signal for that, where the browser has one. All three
-  // this runs on do; the guard is for the test harness and for whatever
-  // ships next.
-  function deadline() {
-    if (typeof AbortSignal === "undefined" || !AbortSignal.timeout) {
-      return undefined;
-    }
-    return AbortSignal.timeout(TIMEOUT);
-  }
-
-  // CHALLENGE is what the panel says when Cloudflare wants the visitor
-  // rather than us. Phrased as something to do, because there is something
-  // to do and it is not "try again immediately".
-  MKM.CHALLENGE = "Cardmarket is checking the browser; reload and try again";
-
-  // challenged says whether Cloudflare answered instead of Cardmarket. It
-  // comes back as a 403 or a 429 carrying a "Just a moment..." page, told
-  // apart from an ordinary refusal by the header Cloudflare sets on it.
-  //
-  // Retrying is the wrong move. This is not a rate limit that lapses while
-  // we wait, and nothing in an extension can answer a challenge meant for
-  // a person.
-  function challenged(response) {
-    return response.headers.get("cf-mitigated") === "challenge";
-  }
-
-  function after(ms) {
-    if (!ms) {
-      return Promise.resolve();
-    }
-    return new Promise(function (resume) {
-      setTimeout(resume, ms);
-    });
-  }
+  // The requests are core/net.js's, named for Cardmarket: a deadline on
+  // each, a Cloudflare challenge told apart from an ordinary refusal and
+  // said as something to do, since there is something to do and it is not
+  // "try again immediately". Retrying is the wrong move: a challenge is not
+  // a rate limit that lapses while we wait, and nothing in an extension can
+  // answer one meant for a person.
+  var net = BAN.net("Cardmarket");
+  MKM.CHALLENGE = net.CHALLENGE;
+  var deadline = net.deadline;
+  var after = net.after;
 
   // nextPageURL answers with the next page's address, or "" at the end.
   //
@@ -165,42 +134,12 @@ globalThis.MKM = globalThis.MKM || {};
     return digits ? parseInt(digits, 10) : 0;
   }
 
-  // fetchPage asks for a page the way clicking "next" would.
-  //
-  // The request goes from cardmarket.com to cardmarket.com, so it is
-  // same-origin, needs no permission and carries the session. That is also
-  // what makes it acceptable to Cardmarket: the same request made from
-  // outside a browser is answered with a 403.
-  function fetchPage(url) {
-    return fetch(url, {
-      credentials: "same-origin",
-      signal: deadline(),
-      // Asked for the way a page load asks for it. A request for an HTML
-      // page that says it will take anything is one of the things that
-      // makes a fetch look unlike somebody reading.
-      headers: { Accept: "text/html,application/xhtml+xml" },
-    })
-      .then(function (response) {
-        if (challenged(response)) {
-          throw new Error(MKM.CHALLENGE);
-        }
-        if (!response.ok) {
-          throw new Error("Cardmarket answered " + response.status);
-        }
-        return response.text();
-      })
-      .then(function (text) {
-        return new DOMParser().parseFromString(text, "text/html");
-      })
-      .catch(function (err) {
-        // The browser's own wording for this is "signal timed out", which
-        // names the mechanism rather than what happened.
-        if (err && err.name === "TimeoutError") {
-          throw new Error("Cardmarket did not answer in time");
-        }
-        throw err;
-      });
-  }
+  // fetchPage asks for a page the way clicking "next" would. The request
+  // goes from cardmarket.com to cardmarket.com, so it is same-origin, needs
+  // no permission and carries the session. That is also what makes it
+  // acceptable to Cardmarket: the same request made from outside a browser
+  // is answered with a 403.
+  var fetchPage = net.fetchPage;
 
   // walkPages reads the seller's whole list, from the first page to the
   // last, and answers with the offers and what it cost to get them.
@@ -351,4 +290,4 @@ globalThis.MKM = globalThis.MKM || {};
   MKM.totalSaid = totalSaid;
   MKM.capped = capped;
   MKM.fetchPage = fetchPage;
-})(globalThis.MKM);
+})(globalThis.MKM, globalThis.BAN);

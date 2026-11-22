@@ -7,7 +7,7 @@
 
 globalThis.CKB = globalThis.CKB || {};
 
-(function (CKB) {
+(function (CKB, BAN) {
   "use strict";
 
   // [header, field of a history row]
@@ -19,30 +19,10 @@ globalThis.CKB = globalThis.CKB || {};
     ["Amount", "amount"],
   ];
 
-  // field quotes what has to be quoted and nothing else.
-  function field(value) {
-    var text = value === undefined || value === null ? "" : String(value);
-    if (/[",\r\n]/.test(text)) {
-      return '"' + text.replace(/"/g, '""') + '"';
-    }
-    return text;
-  }
-
-  function row(values) {
-    var quoted = [];
-    for (var i = 0; i < values.length; i++) {
-      quoted.push(field(values[i]));
-    }
-    return quoted.join(",");
-  }
-
-  // table writes a header and one line per row of values.
+  // table writes a header and one line per row of values, quoted by
+  // core/csv.js, every row ended by LF.
   function table(header, rows) {
-    var lines = [row(header)];
-    for (var i = 0; i < rows.length; i++) {
-      lines.push(row(rows[i]));
-    }
-    return lines.join("\n") + "\n";
+    return BAN.csv([header].concat(rows), "\n");
   }
 
   // toCSV writes the header and one line per history row, in the order given.
@@ -107,4 +87,4 @@ globalThis.CKB = globalThis.CKB || {};
     }
     return names;
   };
-})(globalThis.CKB);
+})(globalThis.CKB, globalThis.BAN);
