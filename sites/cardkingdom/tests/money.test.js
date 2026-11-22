@@ -91,3 +91,17 @@ describe("dates", () => {
     }
   });
 });
+
+describe("counting back days", () => {
+  test("goes back across a month and a year by the calendar", () => {
+    expect(CKB.daysBefore({ year: 2026, month: 2, day: 25 }, 30)).toEqual({ year: 2026, month: 1, day: 26 });
+    expect(CKB.daysBefore({ year: 2026, month: 1, day: 5 }, 30)).toEqual({ year: 2025, month: 12, day: 6 });
+    expect(CKB.daysBefore({ year: 2026, month: 3, day: 1 }, 1)).toEqual({ year: 2026, month: 2, day: 28 });
+    expect(CKB.daysBefore({ year: 2024, month: 3, day: 1 }, 1)).toEqual({ year: 2024, month: 2, day: 29 });
+    expect(CKB.daysBefore({ year: 2026, month: 5, day: 31 }, 120)).toEqual({ year: 2026, month: 1, day: 31 });
+  });
+
+  test("zero days is the day itself", () => {
+    expect(CKB.daysBefore({ year: 2026, month: 2, day: 25 }, 0)).toEqual({ year: 2026, month: 2, day: 25 });
+  });
+});

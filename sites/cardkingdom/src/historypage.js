@@ -2,13 +2,15 @@
 // history pages.
 //
 // The click walks the list from page 1 (history.js) and saves the chosen
-// year's shipped or completed, paid orders. A walk that was refused or
-// cancelled saves no file, and neither does one that found no orders.
+// year's, or the last 30, 90 or 120 days', shipped or completed, paid
+// orders. A walk that was refused or cancelled saves no file, and neither
+// does one that found no orders.
 //
-// What a whole walk found is kept (store.js), no orders included, so it
-// replaces what was kept before. The next click reads page 1 alone, and
-// while page 1 is as it was the kept answer is given at once; the button
-// then offers Rebuild, which always reads the list again.
+// What a whole walk of a year found is kept (store.js), no orders included,
+// so it replaces what was kept before. The next click reads page 1 alone,
+// and while page 1 is as it was the kept answer is given at once; the
+// button then offers Rebuild, which always reads the list again. A range of
+// recent days is never kept: the same range holds other orders tomorrow.
 
 (function (CKB) {
   "use strict";
@@ -35,6 +37,10 @@
   // The year Card Kingdom opened, so no account's history is out of reach.
   var FIRST_YEAR = 1999;
 
+  // The ranges of recent days offered ahead of the years, as TCGplayer's
+  // history offers them.
+  var RECENT = [30, 90, 120];
+
   var page = PAGES[location.pathname.replace(/\/+$/, "")];
   if (!page) {
     return;
@@ -48,8 +54,26 @@
   // rebuild is set once a kept file was handed out for the chosen year.
   var rebuild = false;
 
+  // chosen is the picker's choice: a year, null for every year, or a number
+  // of recent days.
   function chosen() {
-    return year.value === "all" ? null : Number(year.value);
+    var days = /^days:(\d+)$/.exec(year.value);
+    if (days) {
+      return { year: null, days: Number(days[1]) };
+    }
+    return { year: year.value === "all" ? null : Number(year.value), days: null };
+  }
+
+  // scope is what a choice covers, as the tooltip says it.
+  function scope(c) {
+    if (c.days) {
+      return " " + page.within + " the last " + c.days + " days";
+    }
+    return c.year === null ? "" : " " + page.within + " " + c.year;
+  }
+
+  function ymd(date) {
+    return date.year + "-" + String(date.month).padStart(2, "0") + "-" + String(date.day).padStart(2, "0");
   }
 
   function plural(n, one, many) {
@@ -57,12 +81,11 @@
   }
 
   function idle() {
-    var y = chosen();
     rebuild = false;
     go.textContent = "Download CSV";
     panel.word(page.kind);
     panel.clear();
-    panel.hint(page.every + (y === null ? "" : " " + page.within + " " + y) + ", as a CSV with one row per order");
+    panel.hint(page.every + scope(chosen()) + ", as a CSV with one row per order");
   }
 
   function pagesRead(walked) {
@@ -82,6 +105,9 @@
     if (picked.otherYears) {
       left.push(picked.otherYears + " from other years");
     }
+    if (picked.earlier) {
+      left.push(picked.earlier + " from before " + ymd(picked.since));
+    }
     return (
       "Saved " + name + ": " + plural(picked.rows.length, "order", "orders") + ", " + page.basis + ". " +
       "Read " + pagesRead(walked) + (left.length ? "; left out " + left.join(", ") : "") + "."
@@ -93,15 +119,29 @@
     return String(at.getHours()).padStart(2, "0") + ":" + String(at.getMinutes()).padStart(2, "0");
   }
 
-  function none(y) {
-    return page.none + (y === null ? "" : " in " + y);
+  function none(c) {
+    if (c.days) {
+      return page.none + " in the last " + c.days + " days";
+    }
+    return page.none + (c.year === null ? "" : " in " + c.year);
+  }
+
+  // fileName names a choice's file. A range of recent days carries the day
+  // it was read, since the same range holds other orders tomorrow.
+  function fileName(c, today) {
+    if (c.days) {
+      return "ck-" + page.kind + "-last-" + c.days + "-days-" + ymd(today) + ".csv";
+    }
+    return "ck-" + page.kind + "-" + (c.year === null ? "all" : c.year) + ".csv";
   }
 
   // finish saves the walk's file, when it found orders, and answers with
   // what is kept of it: a walk that found none is kept as that answer.
-  function finish(walked, y) {
-    var picked = CKB.pick(walked.rows, page.kind, y);
-    var name = "ck-" + page.kind + "-" + (y === null ? "all" : y) + ".csv";
+  function finish(walked, c, today, since) {
+    var y = c.year;
+    var picked = CKB.pick(walked.rows, page.kind, y, since);
+    picked.since = since;
+    var name = fileName(c, today);
     var file = { name: name, csv: "", count: picked.rows.length, read: pagesRead(walked) };
     if (picked.rows.length) {
       file.csv = CKB.toCSV(picked.rows);
@@ -111,10 +151,10 @@
       panel.recap(recap(name, picked, walked));
     } else {
       panel.word(page.kind);
-      panel.fail(none(y) + "; read " + pagesRead(walked) + ".");
+      panel.fail(none(c) + "; read " + pagesRead(walked) + ".");
     }
     // Every year's file keeps its rows too, so any one year can be cut from it.
-    if (y === null) {
+    if (y === null && !c.days) {
       file.rows = picked.rows.map(function (row) {
         return {
           orderID: row.orderID,
@@ -137,7 +177,7 @@
     go.textContent = "Rebuild";
     if (!file.count) {
       panel.word(page.kind);
-      panel.fail(none(y) + "," + since);
+      panel.fail(none({ year: y, days: null }) + "," + since);
       return;
     }
     CKB.download(file.csv, file.name);
@@ -156,7 +196,7 @@
     go.textContent = "Rebuild";
     if (!rows.length) {
       panel.word(page.kind);
-      panel.fail(none(y) + ", in " + built + ".");
+      panel.fail(none({ year: y, days: null }) + ", in " + built + ".");
       return;
     }
     var name = "ck-" + page.kind + "-" + y + ".csv";
@@ -181,7 +221,10 @@
     function stale() {
       return mine !== generation;
     }
-    var y = chosen();
+    var c = chosen();
+    var y = c.year;
+    var today = CKB.today();
+    var since = c.days ? CKB.daysBefore(today, c.days) : null;
     var key = CKB.fileKey(page.kind, y);
     var base = location.origin + location.pathname;
     var force = rebuild;
@@ -196,6 +239,23 @@
           return null;
         }
         signature = CKB.historySignature(first, page.kind);
+        function walk() {
+          return CKB.walkHistory(page.kind, base, {
+            year: y,
+            since: since,
+            first: first,
+            cancelled: stale,
+            progress: function (n) {
+              if (!stale()) {
+                panel.word("page " + n);
+              }
+            },
+          });
+        }
+        // A range of recent days has nothing kept to give.
+        if (since) {
+          return walk();
+        }
         return Promise.all([kept(key), y === null ? null : kept(CKB.fileKey(page.kind, null))])
           .then(function (found) {
             if (stale()) {
@@ -219,16 +279,7 @@
               served(own, y);
               return null;
             }
-            return CKB.walkHistory(page.kind, base, {
-              year: y,
-              first: first,
-              cancelled: stale,
-              progress: function (n) {
-                if (!stale()) {
-                  panel.word("page " + n);
-                }
-              },
-            });
+            return walk();
           });
       })
       .then(function (walked) {
@@ -238,8 +289,11 @@
         panel.busy(false);
         rebuild = false;
         go.textContent = "Download CSV";
+        var file = finish(walked, c, today, since);
+        if (since) {
+          return;
+        }
         // A whole walk replaces what is kept, even one that found nothing.
-        var file = finish(walked, y);
         file.v = CKB.FILE_VERSION;
         file.signature = signature;
         file.builtAt = Date.now();
@@ -268,9 +322,12 @@
 
     year = document.createElement("select");
     year.className = "ck-banner-year";
-    year.setAttribute("aria-label", "Year");
+    year.setAttribute("aria-label", "Range");
     var now = new Date().getFullYear();
-    var choices = [["all", "All years"]];
+    var choices = RECENT.map(function (days) {
+      return ["days:" + days, days + " days"];
+    });
+    choices.push(["all", "All years"]);
     for (var y = now; y >= FIRST_YEAR; y--) {
       choices.push([String(y), String(y)]);
     }

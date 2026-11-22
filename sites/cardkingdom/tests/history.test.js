@@ -266,3 +266,24 @@ describe("the kept file", () => {
     expect(CKB.usableFile(file({ builtAt: after }), signature(), 2025, NOW)).toBe(true);
   });
 });
+
+describe("picking the last days' rows", () => {
+  test("takes the rows filed on or after the day, and counts the earlier ones", () => {
+    // Purchases are filed by order date: 1000013 was ordered Jan 26.
+    const picked = CKB.pick(CKB.readHistory(purchases(), "purchases"), "purchases", null, { year: 2026, month: 1, day: 26 });
+    expect(picked.rows.map((row) => row.orderID).at(-1)).toBe("1000013");
+    expect(picked.rows.length).toBe(13);
+    expect(picked.earlier).toBe(12);
+    expect(picked.otherYears).toBe(0);
+  });
+
+  test("files a sale by the day it was received, not ordered", () => {
+    // 2000019 was ordered Jan 12 and received Jan 14; 2000025 ordered Jan 5,
+    // received Jan 16.
+    const picked = CKB.pick(CKB.readHistory(sales(), "sales"), "sales", null, { year: 2026, month: 1, day: 15 });
+    const ids = picked.rows.map((row) => row.orderID);
+    expect(ids).toContain("2000025");
+    expect(ids).not.toContain("2000019");
+    expect(picked.earlier).toBe(1);
+  });
+});

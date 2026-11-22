@@ -122,18 +122,29 @@ globalThis.CKB = globalThis.CKB || {};
     return row.status === KINDS[kind].done && row.paid === "Paid";
   };
 
-  // yearOf is the year a row is filed under: its order date's for a
-  // purchase, its Received date's for a sale, or null when it has none.
+  // filedOn is the date a row is filed under: its order date for a
+  // purchase, its Received date for a sale, or null when it has none.
+  CKB.filedOn = function (row, kind) {
+    return row[KINDS[kind].yearFrom] || null;
+  };
+
+  // yearOf is the year a row is filed under, or null.
   CKB.yearOf = function (row, kind) {
-    var when = row[KINDS[kind].yearFrom];
+    var when = CKB.filedOn(row, kind);
     return when ? when.year : null;
   };
 
-  // pick takes the rows the file holds for a year, null for every year, and
-  // counts what it left out: by status, unpaid, and from other years. A row
+  // dayOf orders dates by day, whatever their time.
+  function dayOf(when) {
+    return (when.year * 13 + when.month) * 32 + when.day;
+  }
+
+  // pick takes the rows the file holds for a year, null for every year, or,
+  // given since, for the days from that date on, and counts what it left
+  // out: by status, unpaid, from other years, and from before since. A row
   // that would be exported but has no date to file it under refuses the file.
-  CKB.pick = function (rows, kind, year) {
-    var picked = { rows: [], skipped: {}, unpaid: 0, otherYears: 0 };
+  CKB.pick = function (rows, kind, year, since) {
+    var picked = { rows: [], skipped: {}, unpaid: 0, otherYears: 0, earlier: 0 };
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       if (!CKB.exported(row, kind)) {
@@ -150,6 +161,10 @@ globalThis.CKB = globalThis.CKB || {};
       }
       if (year !== null && filed !== year) {
         picked.otherYears++;
+        continue;
+      }
+      if (since && dayOf(CKB.filedOn(row, kind)) < dayOf(since)) {
+        picked.earlier++;
         continue;
       }
       picked.rows.push(row);
@@ -245,8 +260,12 @@ globalThis.CKB = globalThis.CKB || {};
   // sale ordered or received in the year or later. If a page read shows the
   // list out of order, every page is read instead.
   //
-  // options: year, fetchPage, pace, cancelled(), progress(page, pages), and
-  // first, page 1 already in hand, which is then not asked for again.
+  // A range of recent days, since a date, is read from page 1 until a page
+  // is past that date by the same rules.
+  //
+  // options: year or since, fetchPage, pace, cancelled(), progress(page,
+  // pages), and first, page 1 already in hand, which is then not asked for
+  // again.
   CKB.walkHistory = function (kind, base, options) {
     var opts = options || {};
     var fetchPage = opts.fetchPage || CKB.fetchPage;
@@ -256,6 +275,7 @@ globalThis.CKB = globalThis.CKB || {};
     };
     var progress = opts.progress || function () {};
     var year = opts.year || null;
+    var since = opts.since || null;
 
     var walked = { rows: [], pages: 0, pageCount: 0, total: 0, stoppedEarly: false, cancelled: false };
     var read = {};
@@ -343,13 +363,19 @@ globalThis.CKB = globalThis.CKB || {};
       return rows[rows.length - 1].ordered.year;
     }
 
-    // past says whether a page is beyond the year, so none after it can hold
-    // a row filed in it.
+    // older says whether a date is before what is asked for: the year, or
+    // the day a range of recent days starts on.
+    function older(when) {
+      return since ? dayOf(when) < dayOf(since) : when.year < year;
+    }
+
+    // past says whether a page is beyond what is asked for, so none after it
+    // can hold a row filed in it.
     function past(rows) {
       return rows.some(function (row) {
-        return row.ordered.year < year;
+        return older(row.ordered);
       }) && (kind === "purchases" || rows.every(function (row) {
-        return row.ordered.year < year && (CKB.yearOf(row, kind) === null || CKB.yearOf(row, kind) < year);
+        return older(row.ordered) && (CKB.filedOn(row, kind) === null || older(CKB.filedOn(row, kind)));
       }));
     }
 
@@ -388,6 +414,16 @@ globalThis.CKB = globalThis.CKB || {};
 
     return page(1)
       .then(function (first) {
+        if (since) {
+          return through(1).then(function (to) {
+            if (!orderly()) {
+              since = null;
+              year = -Infinity;
+              return all();
+            }
+            return keep(1, to);
+          });
+        }
         if (year === null) {
           year = -Infinity;
           return all();
