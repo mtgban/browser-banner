@@ -1,0 +1,99 @@
+{
+  "manifest_version": 3,
+  "name": "BANner",
+  "version": "0.2.0",
+  "description": "Get a card store's lists to BAN: Cardmarket offers, Card Kingdom carts and history, TCGplayer orders.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "banner@mtgban.com",
+      "strict_min_version": "115.0"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.cardmarket.com/*/*/Users/*/Offers/*"
+      ],
+      "js": [
+        "sites/cardmarket/src/rates.js",
+        "sites/cardmarket/src/parse.js",
+        "sites/cardmarket/src/pages.js",
+        "sites/cardmarket/src/csv.js",
+        "sites/cardmarket/src/content.js"
+      ],
+      "css": [
+        "sites/cardmarket/src/content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.cardkingdom.com/myaccount/order_history*",
+        "https://www.cardkingdom.com/myaccount/selling_history*"
+      ],
+      "js": [
+        "sites/cardkingdom/src/net.js",
+        "sites/cardkingdom/src/money.js",
+        "sites/cardkingdom/src/csv.js",
+        "sites/cardkingdom/src/ui.js",
+        "sites/cardkingdom/src/store.js",
+        "sites/cardkingdom/src/history.js",
+        "sites/cardkingdom/src/historypage.js"
+      ],
+      "css": [
+        "sites/cardkingdom/src/panel.css",
+        "sites/cardkingdom/src/history.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.cardkingdom.com/sellcart*",
+        "https://www.cardkingdom.com/cart*"
+      ],
+      "js": [
+        "sites/cardkingdom/src/net.js",
+        "sites/cardkingdom/src/money.js",
+        "sites/cardkingdom/src/csv.js",
+        "sites/cardkingdom/src/ui.js",
+        "sites/cardkingdom/src/cart.js",
+        "sites/cardkingdom/src/prices.js",
+        "sites/cardkingdom/src/store.js",
+        "sites/cardkingdom/src/compare.js",
+        "sites/cardkingdom/src/update.js",
+        "sites/cardkingdom/src/cartpage.js"
+      ],
+      "css": [
+        "sites/cardkingdom/src/panel.css",
+        "sites/cardkingdom/src/cart.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://store.tcgplayer.com/*"
+      ],
+      "js": [
+        "sites/tcgplayer/src/money.js",
+        "sites/tcgplayer/src/csv.js",
+        "sites/tcgplayer/src/read.js",
+        "sites/tcgplayer/src/net.js",
+        "sites/tcgplayer/src/walk.js",
+        "sites/tcgplayer/src/handoff.js",
+        "sites/tcgplayer/src/ui.js",
+        "sites/tcgplayer/src/page.js"
+      ],
+      "css": [
+        "sites/tcgplayer/src/panel.css",
+        "sites/tcgplayer/src/orders.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

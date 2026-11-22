@@ -1,8 +1,8 @@
 {
   "name": "browser-banner",
   "private": true,
-  "version": "0.1.0",
-  "description": "Browser extensions that get a card store's lists to mtgban",
+  "version": "0.2.0",
+  "description": "A browser extension that gets a card store's lists to mtgban",
   "scripts": {
     "test": "bun test sites/ tests/",
     "mutate": "bun scripts/mutate.mjs"
