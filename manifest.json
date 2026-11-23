@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "BANner",
   "version": "0.2.0",
-  "description": "Get a card store's lists to BAN: Cardmarket offers, Card Kingdom carts and history, TCGplayer orders, ManaPool orders.",
+  "description": "Get a card store's lists to BAN: Cardmarket, Card Kingdom, TCGplayer, ManaPool and Star City Games.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -215,6 +215,30 @@
       "css": [
         "core/panel.css",
         "sites/manapool/src/cart.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://starcitygames.com/account.php*"
+      ],
+      "js": [
+        "core/net.js",
+        "core/csv.js",
+        "core/money.js",
+        "core/ranges.js",
+        "core/ui.js",
+        "sites/starcitygames/src/ui.js",
+        "sites/starcitygames/src/read.js",
+        "sites/starcitygames/src/money.js",
+        "sites/starcitygames/src/history.js",
+        "sites/starcitygames/src/order.js",
+        "core/handoff.js",
+        "sites/starcitygames/src/handoff.js",
+        "sites/starcitygames/src/page.js"
+      ],
+      "css": [
+        "core/panel.css"
       ],
       "run_at": "document_idle"
     }

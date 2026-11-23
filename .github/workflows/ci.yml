@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        site: [cardmarket, cardkingdom, tcgplayer, manapool]
+        site: [cardmarket, cardkingdom, tcgplayer, manapool, starcitygames]
     steps:
       - uses: actions/checkout@v7
 

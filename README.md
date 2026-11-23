@@ -11,6 +11,7 @@ on the stores' pages, each with its own panel.
 | Card Kingdom | [`sites/cardkingdom`](sites/cardkingdom) | the sell and buy carts, order and selling history |
 | TCGplayer | [`sites/tcgplayer`](sites/tcgplayer) | the order history, and an order to send |
 | ManaPool | [`sites/manapool`](sites/manapool) | the order history, an order to send, and the cart by seller |
+| Star City Games | [`sites/starcitygames`](sites/starcitygames) | the order history, and an order to send |
 
 Each store's own README says what it does there; its SPECIFICATIONS.md
 says what is known about the store's markup.
