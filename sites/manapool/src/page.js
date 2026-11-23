@@ -2,8 +2,8 @@
 //
 // ManaPool moves between its own pages without loading them, and a content
 // script runs only when a page loads. So this runs on every page and follows
-// the address: the order history gets its panel, and leaving it takes the
-// panel away and stops any read it started.
+// the address: the order history and the cart get their panels, and leaving
+// one takes its panel away and stops what it started.
 
 (function (MPB, BAN) {
   "use strict";
@@ -146,9 +146,218 @@
     };
   }
 
+  // cart is the cart's panel, and two buttons under each seller's name:
+  // Remove seller, and Only this seller, which sets every other seller's
+  // items aside for Put back.
+  function cart() {
+    var panel = MPB.panel();
+    var run = null;
+
+    var back = document.createElement("button");
+    back.type = "button";
+    back.className = "ban-go";
+    back.textContent = "Put back";
+    panel.actions.appendChild(back);
+
+    function stashed() {
+      return MPB.stash().items.length;
+    }
+
+    function idle() {
+      var n = stashed();
+      back.disabled = !n;
+      panel.word(n ? plural(n, "item", "items") + " set aside" : "");
+      panel.hint(n
+        ? "Put back the items Only this seller set aside, from the sellers they came from"
+        : "Under each seller: Remove seller, or Only this seller to set the others aside");
+    }
+
+    function stop() {
+      if (run) {
+        run = null;
+        panel.busy(false);
+      }
+    }
+
+    function going(token) {
+      return function () {
+        return run === token;
+      };
+    }
+
+    // take removes items one at a time, calling kept for each one taken.
+    function take(items, what, kept, done) {
+      if (run) {
+        return;
+      }
+      var token = {};
+      run = token;
+      panel.clear();
+      panel.word(what);
+      panel.busy(true);
+      var taken = 0;
+      MPB.removeAll(items, function (li, gone) {
+        taken++;
+        kept(li, gone);
+        panel.word(what + " " + taken + "/" + items.length);
+      }, going(token))
+        .then(function () {
+          if (run !== token) {
+            return;
+          }
+          stop();
+          idle();
+          panel.mark("done");
+          panel.recap(done(taken));
+        })
+        .catch(function (err) {
+          if (run !== token) {
+            return;
+          }
+          stop();
+          idle();
+          panel.fail((err && err.message ? err.message : String(err)) + "; " + plural(taken, "item", "items") + " taken out before it");
+        });
+    }
+
+    function removeSeller(seller) {
+      // The items as the page shows them now: ManaPool may have redrawn
+      // them since the button was.
+      var now = MPB.sellers(document).filter(function (s) {
+        return s.slug === seller.slug;
+      })[0];
+      take(now ? now.items : [], "removing", function () {}, function (n) {
+        return "Removed " + plural(n, "item", "items") + " from " + seller.name;
+      });
+    }
+
+    function onlySeller(seller) {
+      var others = MPB.sellers(document).filter(function (s) {
+        return s.slug !== seller.slug;
+      });
+      var items = [];
+      var owners = [];
+      others.forEach(function (s) {
+        s.items.forEach(function (li) {
+          items.push(li);
+          owners.push(s);
+        });
+      });
+      take(items, "setting aside", function (li, gone) {
+        var owner = owners[items.indexOf(li)];
+        var stash = MPB.stash();
+        stash.items.push({ entry: gone[0], seller: { slug: owner.slug, name: owner.name }, item: MPB.itemOf(li) });
+        MPB.keepStash(stash);
+      }, function (n) {
+        return "Set aside " + plural(n, "item", "items") + " from " + plural(others.length, "other seller", "other sellers") +
+          "; only " + seller.name + " is left to check out";
+      });
+    }
+
+    function putBack() {
+      if (run) {
+        return;
+      }
+      var stash = MPB.stash();
+      var added;
+      try {
+        added = MPB.putBack(stash.items);
+      } catch (err) {
+        panel.fail(err.message);
+        return;
+      }
+      var token = {};
+      run = token;
+      panel.clear();
+      panel.word("putting back");
+      panel.busy(true);
+      // ManaPool's sync has run once the stored cart no longer carries the
+      // changes written; whatever it then leaves out is no longer there to
+      // buy. The set-aside list is kept until that is known.
+      var written = stash.items.map(function (s) {
+        return s.entry.inventoryId;
+      });
+      MPB.waitFor(function () {
+        var cart = MPB.stored();
+        return cart && !cart.changes.some(function (c) {
+          return written.indexOf(c[0]) >= 0;
+        }) ? cart : null;
+      }, MPB.SYNC).then(function (cart) {
+        if (run !== token) {
+          return;
+        }
+        stop();
+        if (!cart) {
+          idle();
+          panel.fail("ManaPool has not synced the cart yet; keep its tab in front, then Put back again");
+          return;
+        }
+        var missing = stash.items.filter(function (s) {
+          return !cart.cart.entries.some(function (e) {
+            return e.inventoryId === s.entry.inventoryId;
+          });
+        });
+        MPB.keepStash({ items: [] });
+        idle();
+        panel.mark(missing.length ? "failed" : "done");
+        panel.recap("Put back " + plural(stash.items.length - missing.length, "item", "items") +
+          (missing.length ? "; no longer listed: " + missing.map(function (s) {
+            return s.item.name + " from " + s.seller.name;
+          }).join(", ") : ""));
+      });
+    }
+
+    back.addEventListener("click", putBack);
+    idle();
+
+    // buttons puts Remove seller and Only this seller under each seller's
+    // name, where ManaPool's redraw has not left them already.
+    function buttons() {
+      MPB.sellers(document).forEach(function (seller) {
+        if (seller.header.querySelector(".ban-seller")) {
+          return;
+        }
+        var row = document.createElement("div");
+        row.className = "ban-seller";
+        [["Remove seller", removeSeller], ["Only this seller", onlySeller]].forEach(function (b) {
+          var made = document.createElement("button");
+          made.type = "button";
+          made.textContent = b[0];
+          made.addEventListener("click", function () {
+            b[1](seller);
+          });
+          row.appendChild(made);
+        });
+        seller.header.appendChild(row);
+      });
+    }
+
+    return {
+      panel: panel,
+      refresh: buttons,
+      cancel: function () {
+        if (run) {
+          stop();
+          idle();
+          panel.clear();
+        }
+      },
+      leave: function () {
+        stop();
+        panel.root.remove();
+        Array.prototype.forEach.call(document.querySelectorAll(".ban-seller"), function (row) {
+          row.remove();
+        });
+      },
+    };
+  }
+
   // route is the panel a path gets, or null.
   function route(path) {
-    return /^\/settings\/orders\/?$/.test(path) ? history : null;
+    if (/^\/settings\/orders\/?$/.test(path)) {
+      return history;
+    }
+    return /^\/cart\/?$/.test(path) ? cart : null;
   }
 
   function follow() {
@@ -167,10 +376,13 @@
     if (shown && !shown.panel.root.isConnected) {
       document.body.appendChild(shown.panel.root);
     }
+    if (shown && shown.refresh) {
+      shown.refresh();
+    }
   }
 
   document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && shown) {
+    if (event.key === "Escape" && shown && !MPB.keying) {
       shown.cancel();
     }
   });

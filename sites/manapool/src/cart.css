@@ -1,0 +1,23 @@
+/* Remove seller and Only this seller, under a seller's name in the cart:
+   small, quiet, and ManaPool's own font. */
+.ban-seller {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.ban-seller button {
+  padding: 2px 8px;
+  border: 1px solid #1c2e4a;
+  border-radius: 4px;
+  background: #fff;
+  color: #1c2e4a;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ban-seller button:hover {
+  background: #1c2e4a;
+  color: #fff;
+}

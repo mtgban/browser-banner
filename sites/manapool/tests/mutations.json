@@ -93,8 +93,8 @@
   {
     "guard": "Escape stops the read",
     "file": "src/page.js",
-    "find": "if (event.key === \"Escape\" && shown) {\n      shown.cancel();",
-    "replace": "if (event.key === \"Escape\" && shown) {",
+    "find": "if (event.key === \"Escape\" && shown && !MPB.keying) {\n      shown.cancel();",
+    "replace": "if (event.key === \"Escape\" && shown && !MPB.keying) {",
     "expectFailing": "Escape stops the read, and nothing is saved"
   },
   {
@@ -107,8 +107,8 @@
   {
     "guard": "leaving mid-read saves nothing",
     "file": "src/page.js",
-    "find": "      leave: function () {\n        stop();",
-    "replace": "      leave: function () {",
+    "find": "      leave: function () {\n        stop();\n        panel.root.remove();\n      },",
+    "replace": "      leave: function () {\n        panel.root.remove();\n      },",
     "expectFailing": "leaving mid-read stops it, and nothing is saved"
   },
   {
@@ -124,5 +124,124 @@
     "find": "if (!sellers[i] || !cents(sellers[i].item_count) || typeof sellers[i].seller_username !== \"string\" || !sellers[i].seller_username) {",
     "replace": "if (false) {",
     "expectFailing": "is null for an order not whole"
+  },
+  {
+    "guard": "an item ManaPool does not take out stops the run",
+    "file": "src/cart.js",
+    "find": "throw new Error(\"ManaPool did not take out \" + MPB.itemOf(li).name);",
+    "replace": "return [];",
+    "expectFailing": "an item ManaPool does not take out stops the run and says which"
+  },
+  {
+    "guard": "a list with no remove is closed again",
+    "file": "src/cart.js",
+    "find": "key(box.ownerDocument.activeElement || box, \"Escape\");\n          throw",
+    "replace": "throw",
+    "expectFailing": "a list with no remove is closed again, and the run stops"
+  },
+  {
+    "guard": "put back leaves out what the cart holds",
+    "file": "src/cart.js",
+    "find": "var added = items.filter(function (s) {\n      return !cart.cart.entries.some(",
+    "replace": "var added = items.filter(function (s) {\n      return true || !cart.cart.entries.some(",
+    "expectFailing": "Put back leaves out a listing the cart already holds"
+  },
+  {
+    "guard": "put back announces its write",
+    "file": "src/cart.js",
+    "find": "window.dispatchEvent(new StorageEvent(\"storage\", { key: MPB.CART_KEY, oldValue: oldValue, newValue: newValue }));",
+    "replace": "",
+    "expectFailing": "Put back returns the set-aside listings to the cart, from their own sellers"
+  },
+  {
+    "guard": "put back queues each listing as a change",
+    "file": "src/cart.js",
+    "find": "changes: cart.changes.concat(added.map(",
+    "replace": "changes: cart.changes.concat([].map(",
+    "expectFailing": "Put back returns the set-aside listings to the cart, from their own sellers"
+  },
+  {
+    "guard": "the extension's own keys do not cancel its run",
+    "file": "src/page.js",
+    "find": "&& !MPB.keying) {",
+    "replace": ") {",
+    "expectFailing": "a list with no remove is closed again, and the run stops"
+  },
+  {
+    "guard": "Remove seller takes that seller's items alone",
+    "file": "src/page.js",
+    "find": "take(now ? now.items : [], \"removing\"",
+    "replace": "take(MPB.sellers(document).reduce(function (a, s) { return a.concat(s.items); }, []), \"removing\"",
+    "expectFailing": "Remove seller takes out that seller's items alone, through ManaPool's own list, and sets nothing aside"
+  },
+  {
+    "guard": "Only this seller sets aside the others alone",
+    "file": "src/page.js",
+    "find": "return s.slug !== seller.slug;",
+    "replace": "return true;",
+    "expectFailing": "Only this seller sets every other seller's items aside, each with its listing and seller"
+  },
+  {
+    "guard": "Only this seller keeps what it sets aside",
+    "file": "src/page.js",
+    "find": "stash.items.push({ entry: gone[0], seller: { slug: owner.slug, name: owner.name }, item: MPB.itemOf(li) });",
+    "replace": "",
+    "expectFailing": "Only this seller sets every other seller's items aside, each with its listing and seller"
+  },
+  {
+    "guard": "Put back names what sold out",
+    "file": "src/page.js",
+    "find": "panel.mark(missing.length ? \"failed\" : \"done\");",
+    "replace": "panel.mark(\"done\");",
+    "expectFailing": "Put back names a listing that sold out meanwhile, and its seller"
+  },
+  {
+    "guard": "Put back empties the stash",
+    "file": "src/page.js",
+    "find": "        MPB.keepStash({ items: [] });\n",
+    "replace": "",
+    "expectFailing": "Put back returns the set-aside listings to the cart, from their own sellers"
+  },
+  {
+    "guard": "the seller buttons are drawn once",
+    "file": "src/page.js",
+    "find": "if (seller.header.querySelector(\".ban-seller\")) {\n          return;\n        }",
+    "replace": "",
+    "expectFailing": "puts Remove seller and Only this seller under each seller's name, and back after a redraw"
+  },
+  {
+    "guard": "the seller buttons are drawn at all",
+    "file": "src/page.js",
+    "find": "if (shown && shown.refresh) {\n      shown.refresh();\n    }",
+    "replace": "",
+    "expectFailing": "puts Remove seller and Only this seller under each seller's name, and back after a redraw"
+  },
+  {
+    "guard": "leaving the cart takes the seller buttons",
+    "file": "src/page.js",
+    "find": "Array.prototype.forEach.call(document.querySelectorAll(\".ban-seller\"), function (row) {\n          row.remove();\n        });",
+    "replace": "",
+    "expectFailing": "leaving the cart takes the panel and the seller buttons away"
+  },
+  {
+    "guard": "Remove seller reads the items as they are now",
+    "file": "src/page.js",
+    "find": "      var now = MPB.sellers(document).filter(function (s) {\n        return s.slug === seller.slug;\n      })[0];\n      take(now ? now.items : []",
+    "replace": "      var now = null;\n      take(seller.items",
+    "expectFailing": "Remove seller takes the items ManaPool shows now, after a redraw of them"
+  },
+  {
+    "guard": "Put back waits for the sync before it reports",
+    "file": "src/page.js",
+    "find": "        return cart && !cart.changes.some(function (c) {\n          return written.indexOf(c[0]) >= 0;\n        }) ? cart : null;",
+    "replace": "        return cart;",
+    "expectFailing": "Put back waits for ManaPool to sync, and keeps what was set aside until it does"
+  },
+  {
+    "guard": "an unsynced Put back keeps the stash",
+    "file": "src/page.js",
+    "find": "        if (!cart) {\n          idle();\n          panel.fail(",
+    "replace": "        if (!cart) {\n          MPB.keepStash({ items: [] });\n          idle();\n          panel.fail(",
+    "expectFailing": "Put back waits for ManaPool to sync, and keeps what was set aside until it does"
   }
 ]
