@@ -1,0 +1,128 @@
+[
+  {
+    "guard": "an order not whole is null",
+    "file": "src/history.js",
+    "find": "!cents(o.subtotal_cents) || !cents(o.shipping_cents) || !cents(o.tax_cents) || !cents(o.total_cents)",
+    "replace": "false",
+    "expectFailing": "is null for an order not whole"
+  },
+  {
+    "guard": "an order's sellers are all named",
+    "file": "src/history.js",
+    "find": "return s.seller_username;\n      }).join(\"; \"),",
+    "replace": "return s.seller_username;\n      })[0],",
+    "expectFailing": "folds its sellers' suborders into one line, amounts as the API gives them"
+  },
+  {
+    "guard": "an order's items add up across its sellers",
+    "file": "src/history.js",
+    "find": "items += sellers[i].item_count;",
+    "replace": "items = sellers[i].item_count;",
+    "expectFailing": "folds its sellers' suborders into one line, amounts as the API gives them"
+  },
+  {
+    "guard": "a visitor not signed in is told to sign in",
+    "file": "src/api.js",
+    "find": "if (response.status === 401) {",
+    "replace": "if (false) {",
+    "expectFailing": "a visitor ManaPool has not signed in is told to sign in"
+  },
+  {
+    "guard": "an answer with no orders list is refused",
+    "file": "src/api.js",
+    "find": "throw new Error(\"ManaPool answered with no orders list\");",
+    "replace": "return orders;",
+    "expectFailing": "an answer with no orders list is refused, not read as none"
+  },
+  {
+    "guard": "the walk reads on until a short page",
+    "file": "src/api.js",
+    "find": "if (got.length < MPB.LIMIT) {",
+    "replace": "if (true) {",
+    "expectFailing": "All years reads every order, one page of the API at a time, newest first"
+  },
+  {
+    "guard": "the walk waits the pace",
+    "file": "src/api.js",
+    "find": "return net.after(MPB.PACE).then(function () {",
+    "replace": "return net.after(0).then(function () {",
+    "expectFailing": "waits the pace before each page after the first"
+  },
+  {
+    "guard": "a year keeps only its own orders",
+    "file": "src/page.js",
+    "find": "c.year === null || r.date.year === c.year",
+    "replace": "true",
+    "expectFailing": "a year asks from its first day and keeps only its own orders"
+  },
+  {
+    "guard": "recent days keep only their own orders",
+    "file": "src/page.js",
+    "find": "c.days ? day(r.date) >= day(since) :",
+    "replace": "c.days ? true :",
+    "expectFailing": "keeps only the range, even when the API sends more than was asked"
+  },
+  {
+    "guard": "the history runs newest first",
+    "file": "src/page.js",
+    "find": "return b.placed - a.placed;",
+    "replace": "return a.placed - b.placed;",
+    "expectFailing": "All years reads every order, one page of the API at a time, newest first"
+  },
+  {
+    "guard": "an order not whole is counted",
+    "file": "src/page.js",
+    "find": "              unreadable++;\n",
+    "replace": "",
+    "expectFailing": "an order not whole is left out and counted"
+  },
+  {
+    "guard": "a refused read says why",
+    "file": "src/page.js",
+    "find": "          panel.fail(err && err.message ? err.message : String(err));\n",
+    "replace": "",
+    "expectFailing": "a visitor ManaPool has not signed in is told to sign in"
+  },
+  {
+    "guard": "the history's file is named for its range",
+    "file": "src/page.js",
+    "find": "BAN.rangeFile(\"mp-orders\", c, today)",
+    "replace": "\"mp-orders.csv\"",
+    "expectFailing": "All years reads every order, one page of the API at a time, newest first"
+  },
+  {
+    "guard": "Escape stops the read",
+    "file": "src/page.js",
+    "find": "if (event.key === \"Escape\" && shown) {\n      shown.cancel();",
+    "replace": "if (event.key === \"Escape\" && shown) {",
+    "expectFailing": "Escape stops the read, and nothing is saved"
+  },
+  {
+    "guard": "leaving the history takes its panel",
+    "file": "src/page.js",
+    "find": "      shown.leave();\n",
+    "replace": "",
+    "expectFailing": "no panel off the order history, and one on arriving there with no load"
+  },
+  {
+    "guard": "leaving mid-read saves nothing",
+    "file": "src/page.js",
+    "find": "      leave: function () {\n        stop();",
+    "replace": "      leave: function () {",
+    "expectFailing": "leaving mid-read stops it, and nothing is saved"
+  },
+  {
+    "guard": "the panel comes back after a redraw",
+    "file": "src/page.js",
+    "find": "if (shown && !shown.panel.root.isConnected) {",
+    "replace": "if (false) {",
+    "expectFailing": "puts the panel back when ManaPool's redraw takes it"
+  },
+  {
+    "guard": "a suborder missing its count or seller leaves the order out",
+    "file": "src/history.js",
+    "find": "if (!sellers[i] || !cents(sellers[i].item_count) || typeof sellers[i].seller_username !== \"string\" || !sellers[i].seller_username) {",
+    "replace": "if (false) {",
+    "expectFailing": "is null for an order not whole"
+  }
+]

@@ -1,0 +1,169 @@
+{
+ "orders": [
+  {
+   "id": "8a119b9e-16bc-4732-8f7b-7676d015b0dc",
+   "created_at": "2024-12-30T23:10:05.123456+00:00",
+   "subtotal_cents": 198,
+   "tax_cents": 16,
+   "shipping_cents": 125,
+   "total_cents": 339,
+   "order_number": "1001",
+   "order_seller_details": [
+    {
+     "id": "f6fadfa7-e5c1-4b62-9362-da5cc13da58a",
+     "seller_id": "2c63888f-28f0-4481-be6d-dce7a7ace732",
+     "seller_username": "Seller A",
+     "order_number": "1001-2001",
+     "shipping_cents": 125,
+     "buyer_confirmed_at": null,
+     "item_count": 2
+    }
+   ]
+  },
+  {
+   "id": "a712755f-6cac-44d5-99d5-269512e74f7b",
+   "created_at": "2025-03-14T18:45:11.945361+00:00",
+   "subtotal_cents": 473,
+   "tax_cents": 39,
+   "shipping_cents": 125,
+   "total_cents": 637,
+   "order_number": "1002",
+   "order_seller_details": [
+    {
+     "id": "bc67ba94-637d-4efa-a09e-467ada679f81",
+     "seller_id": "fab36728-a78b-4b7e-8787-c0de2f960063",
+     "seller_username": "Seller B",
+     "order_number": "1002-2002",
+     "shipping_cents": 125,
+     "buyer_confirmed_at": null,
+     "item_count": 14
+    }
+   ]
+  },
+  {
+   "id": "dd2ee150-d284-4277-b89c-1af40ce8fcc9",
+   "created_at": "2025-11-02T09:01:44.5+00:00",
+   "subtotal_cents": 4251,
+   "tax_cents": 0,
+   "shipping_cents": 500,
+   "total_cents": 4751,
+   "order_number": "1003",
+   "order_seller_details": [
+    {
+     "id": "ac8efe12-1c59-49f1-ba2d-de83458bfed0",
+     "seller_id": "5796a670-482c-490e-8d97-82bfcdc83011",
+     "seller_username": "Seller C",
+     "order_number": "1003-2003",
+     "shipping_cents": 250,
+     "buyer_confirmed_at": null,
+     "item_count": 9
+    },
+    {
+     "id": "0b80a255-53a1-4945-a932-58ef7777682c",
+     "seller_id": "45ac16b9-c20d-4c21-8f8a-7abff2e91ac7",
+     "seller_username": "Seller D",
+     "order_number": "1003-2004",
+     "shipping_cents": 250,
+     "buyer_confirmed_at": null,
+     "item_count": 3
+    }
+   ]
+  },
+  {
+   "id": "bbeeb636-1d33-4c6d-96f0-da847a2a3b87",
+   "created_at": "2026-02-11T09:30:00+00:00",
+   "subtotal_cents": 616,
+   "tax_cents": 0,
+   "shipping_cents": 130,
+   "total_cents": 746,
+   "order_number": "1004",
+   "order_seller_details": [
+    {
+     "id": "3c3ae353-fb14-428e-90b4-01a6c1cc0aff",
+     "seller_id": "b9c8b9ff-e46e-4627-9419-c7723226db94",
+     "seller_username": "Seller A",
+     "order_number": "1004-2005",
+     "shipping_cents": 130,
+     "buyer_confirmed_at": null,
+     "item_count": 1
+    }
+   ]
+  },
+  {
+   "id": "03c472ca-4495-48b4-b8d8-89d2b47a5c1d",
+   "created_at": "2026-08-14T07:16:21.020304+00:00",
+   "subtotal_cents": 11341,
+   "tax_cents": 0,
+   "shipping_cents": 1485,
+   "total_cents": 12826,
+   "order_number": "1005",
+   "order_seller_details": [
+    {
+     "id": "68e58909-ccb2-4416-925a-56c9a30f4300",
+     "seller_id": "ff53a46f-5ead-403a-84c4-b877678537a3",
+     "seller_username": "Seller E",
+     "order_number": "1005-2006",
+     "shipping_cents": 400,
+     "buyer_confirmed_at": null,
+     "item_count": 40
+    },
+    {
+     "id": "e179f773-a6e0-43c0-9514-b7dde2ad0478",
+     "seller_id": "0c28cec1-b947-42af-a4b9-36976b4b76b0",
+     "seller_username": "Seller F",
+     "order_number": "1005-2007",
+     "shipping_cents": 405,
+     "buyer_confirmed_at": null,
+     "item_count": 30
+    },
+    {
+     "id": "a398d022-d435-4df4-8322-905089933837",
+     "seller_id": "4c8b1eb4-4f1e-4ccf-8372-a2a784a67245",
+     "seller_username": "Seller G",
+     "order_number": "1005-2008",
+     "shipping_cents": 310,
+     "buyer_confirmed_at": null,
+     "item_count": 20
+    },
+    {
+     "id": "ac9130f4-547c-47d3-8e3a-655f20731ab2",
+     "seller_id": "ca3ab343-ac33-4b68-be9b-f77c6519a9d5",
+     "seller_username": "Seller H",
+     "order_number": "1005-2009",
+     "shipping_cents": 370,
+     "buyer_confirmed_at": null,
+     "item_count": 11
+    }
+   ]
+  },
+  {
+   "id": "8f39aaa5-729a-453c-b891-da33e83a9d40",
+   "created_at": "2026-11-21T08:00:04.589106+00:00",
+   "subtotal_cents": 4857,
+   "tax_cents": 0,
+   "shipping_cents": 540,
+   "total_cents": 5397,
+   "order_number": "1006",
+   "order_seller_details": [
+    {
+     "id": "77dde229-df88-4e4d-ac23-86e5cc86ba64",
+     "seller_id": "c3dd75f6-8085-48e6-ac92-5f09a227f039",
+     "seller_username": "Seller I",
+     "order_number": "1006-2010",
+     "shipping_cents": 405,
+     "buyer_confirmed_at": null,
+     "item_count": 32
+    },
+    {
+     "id": "bb262a93-4ce1-4c61-aa03-36d98b8c82f1",
+     "seller_id": "b183256e-a16e-4121-b07a-6fc42fd7b23a",
+     "seller_username": "Seller J",
+     "order_number": "1006-2011",
+     "shipping_cents": 135,
+     "buyer_confirmed_at": null,
+     "item_count": 13
+    }
+   ]
+  }
+ ]
+}
