@@ -243,5 +243,124 @@
     "find": "        if (!cart) {\n          idle();\n          panel.fail(",
     "replace": "        if (!cart) {\n          MPB.keepStash({ items: [] });\n          idle();\n          panel.fail(",
     "expectFailing": "Put back waits for ManaPool to sync, and keeps what was set aside until it does"
+  },
+  {
+    "guard": "a refunded line comes off its item",
+    "file": "src/order.js",
+    "find": "var refunded = Math.min(it.quantity, refundOf[it.order_item_id] || 0);",
+    "replace": "var refunded = 0;",
+    "expectFailing": "are one line per card received, every seller's, and what was left out is counted"
+  },
+  {
+    "guard": "a seller ManaPool refunded sent nothing",
+    "file": "src/order.js",
+    "find": "if (shipped && shipped.status === \"refunded\") {",
+    "replace": "if (false) {",
+    "expectFailing": "are one line per card received, every seller's, and what was left out is counted"
+  },
+  {
+    "guard": "a replacement shipped on its own is its own order's",
+    "file": "src/order.js",
+    "find": "if (swapped && !swap.same_package) {",
+    "replace": "if (false) {",
+    "expectFailing": "are one line per card received, every seller's, and what was left out is counted"
+  },
+  {
+    "guard": "a replacement ManaPool does not name is left out",
+    "file": "src/order.js",
+    "find": "} else if (swapped && !swap.product) {",
+    "replace": "} else if (false) {",
+    "expectFailing": "are one line per card received, every seller's, and what was left out is counted"
+  },
+  {
+    "guard": "a replacement that names its card is that card",
+    "file": "src/order.js",
+    "find": "other = card(swap.product.single, swapped, it.price_cents);",
+    "replace": "other = null;",
+    "expectFailing": "are one line per card received, every seller's, and what was left out is counted"
+  },
+  {
+    "guard": "a sealed product is counted",
+    "file": "src/order.js",
+    "find": "          left.sealed += q;\n",
+    "replace": "          left.sealed++;\n",
+    "expectFailing": "counts a sealed product by its copies, as every other card left out is"
+  },
+  {
+    "guard": "a card without a Scryfall id does not read",
+    "file": "src/order.js",
+    "find": "if (!single || !UUID.test(single.scryfall_id || \"\") ||",
+    "replace": "if (!single ||",
+    "expectFailing": "count a line whose card does not read whole, and keep the rest"
+  },
+  {
+    "guard": "a finish is written in the upload's words",
+    "file": "src/order.js",
+    "find": "var FINISHES = { NF: \"Nonfoil\", FO: \"Foil\", EF: \"Etched Foil\" };",
+    "replace": "var FINISHES = { NF: \"NF\", FO: \"FO\", EF: \"EF\" };",
+    "expectFailing": "are one line per card received, every seller's, and what was left out is counted"
+  },
+  {
+    "guard": "an answer with no order is refused",
+    "file": "src/order.js",
+    "find": "throw new Error(\"ManaPool answered with no order\");",
+    "replace": "return { lines: [], left: {} };",
+    "expectFailing": "refuse an answer with no order"
+  },
+  {
+    "guard": "an order is read once",
+    "file": "src/page.js",
+    "find": "got = got || MPB.getOrder(id)",
+    "replace": "got = MPB.getOrder(id)",
+    "expectFailing": "CSV reads the order once and saves its cards, named for its number"
+  },
+  {
+    "guard": "an order's file is named for its number",
+    "file": "src/page.js",
+    "find": "\"mp-order-\" + r.number + \".csv\"",
+    "replace": "\"mp-order.csv\"",
+    "expectFailing": "CSV reads the order once and saves its cards, named for its number"
+  },
+  {
+    "guard": "Send to BAN sends what CSV saves",
+    "file": "src/page.js",
+    "find": "return got.lines.lines.length ? { csv: MPB.orderCSV(got.lines.lines), rows: got.lines.lines.length } : null;",
+    "replace": "return { csv: \"\", rows: got.lines.lines.length };",
+    "expectFailing": "Send to BAN opens mtgban's upload on the click and hands it the CSV's rows"
+  },
+  {
+    "guard": "an order with nothing to send sends nothing",
+    "file": "src/page.js",
+    "find": "return got.lines.lines.length ? {",
+    "replace": "return true ? {",
+    "expectFailing": "an order with no cards to send closes the tab and says so"
+  },
+  {
+    "guard": "what an order left out is said",
+    "file": "src/page.js",
+    "find": "out.push(plural(l.away, \"card\", \"cards\") + \" replaced by another order\");",
+    "replace": "",
+    "expectFailing": "CSV reads the order once and saves its cards, named for its number"
+  },
+  {
+    "guard": "an order's panel needs an order's id",
+    "file": "src/page.js",
+    "find": "var id = /^\\/settings\\/orders\\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\\/?$/.exec(path);",
+    "replace": "var id = /^\\/settings\\/orders\\/([^/]+)\\/?$/.exec(path);",
+    "expectFailing": "gets no panel on a suborder's page, or an address that is not an order"
+  },
+  {
+    "guard": "an order's failed read says why",
+    "file": "src/page.js",
+    "find": "      return function (err) {\n        if (run !== token) {\n          return;\n        }\n        run = null;\n        panel.busy(false);\n        panel.fail(err && err.message ? err.message : String(err));",
+    "replace": "      return function (err) {\n        if (run !== token) {\n          return;\n        }\n        run = null;\n        panel.busy(false);",
+    "expectFailing": "a visitor not signed in is told to sign in"
+  },
+  {
+    "guard": "a failed read closes the tab Send to BAN opened",
+    "file": "src/page.js",
+    "find": "      }, function (err) {\n        failed(token)(err);\n        return null;\n      });",
+    "replace": "      });\n      rows.catch(failed(token));",
+    "expectFailing": "Send to BAN that cannot read the order says why and closes the tab it opened"
   }
 ]

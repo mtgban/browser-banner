@@ -161,7 +161,13 @@ describe("following ManaPool's own navigation", () => {
     it.visit("/settings/orders");
     await it.settle(600);
     expect(it.shown()).toBe(true);
+    expect(it.window.document.querySelector(".ban-year") === null).toBe(false);
+    // An order's own page swaps the history's panel for the order's.
     it.visit("/settings/orders/3e28cf57-6020-47e1-89ca-f4ee167de083");
+    await it.settle(600);
+    expect(it.window.document.querySelector(".ban-year") === null).toBe(true);
+    expect(it.window.document.querySelector(".ban-send") === null).toBe(false);
+    it.visit("/cards");
     await it.settle(600);
     expect(it.shown()).toBe(false);
   });

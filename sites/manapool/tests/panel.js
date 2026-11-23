@@ -33,7 +33,7 @@ export function ordersAged(ages) {
 
 // mount opens path with orders behind the API, served oldest first in
 // pages of the asked limit. answer(url), when given, answers instead.
-export function mount({ path = "/settings/orders", orders = ordersAged(), answer, limit } = {}) {
+export function mount({ path = "/settings/orders", orders = ordersAged(), order, answer, limit, blockPopups } = {}) {
   const window = new Window({ url: SITE + path });
   window.document.body.innerHTML = "<main><h1>Orders</h1></main>";
   const asked = [];
@@ -41,6 +41,11 @@ export function mount({ path = "/settings/orders", orders = ordersAged(), answer
     asked.push(String(url));
     if (answer) return answer(String(url));
     const u = new URL(String(url), SITE);
+    const one = /^\/api\/v1\/buyer\/orders\/([0-9a-f-]{36})$/.exec(u.pathname);
+    if (one) {
+      const body = order || JSON.parse(text("order.json"));
+      return Promise.resolve({ ok: true, status: 200, headers: { get: () => null }, json: () => Promise.resolve(body) });
+    }
     const since = u.searchParams.get("since");
     const from = Number(u.searchParams.get("offset") || 0);
     const size = Number(u.searchParams.get("limit") || 100);
@@ -65,6 +70,14 @@ export function mount({ path = "/settings/orders", orders = ordersAged(), answer
     }
     return element;
   };
+  // mtgban's handoff tab: what was opened, and what was posted to it.
+  const tabs = [];
+  window.open = (url) => {
+    if (blockPopups) return null;
+    const tab = { url, closed: false, posted: [], postMessage: (data, origin) => tab.posted.push({ data, origin }), close: () => (tab.closed = true) };
+    tabs.push(tab);
+    return tab;
+  };
   for (const entry of siteManifest("manapool").content_scripts) {
     for (const script of entry.js) {
       window.eval(source(script));
@@ -78,6 +91,11 @@ export function mount({ path = "/settings/orders", orders = ordersAged(), answer
     window,
     asked,
     saved,
+    tabs,
+    ready: (i = 0) =>
+      window.dispatchEvent(new window.MessageEvent("message", { data: { type: "mtgban-handoff-ready" }, origin: "https://mtgban.com", source: tabs[i] })),
+    send: () => at(".ban-send").click(),
+    csv: () => at(".ban-csv").click(),
     shown: () => panel() !== null,
     heading: () => [...at(".ban-label").childNodes].filter((n) => !n.hidden).map((n) => n.textContent).join(""),
     tip: () => at(".ban-tip").textContent,

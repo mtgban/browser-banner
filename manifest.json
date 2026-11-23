@@ -206,6 +206,9 @@
         "sites/manapool/src/ui.js",
         "sites/manapool/src/api.js",
         "sites/manapool/src/history.js",
+        "sites/manapool/src/order.js",
+        "core/handoff.js",
+        "sites/manapool/src/handoff.js",
         "sites/manapool/src/cart.js",
         "sites/manapool/src/page.js"
       ],
