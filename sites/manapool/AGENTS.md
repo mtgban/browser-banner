@@ -2,8 +2,10 @@
 
 Guidance for AI coding agents working on ManaPool's part of **BANner**, the
 browser extension: it saves a ManaPool buyer's order history as CSV, one
-line per order. Read `SPECIFICATIONS.md` for what it does and what is known
-about ManaPool; this file is about how to work on it without breaking it.
+line per order, and in the cart removes a seller's items or sets the other
+sellers' aside and puts them back. Read `SPECIFICATIONS.md` for what it does
+and what is known about ManaPool; this file is about how to work on it
+without breaking it.
 
 ## The one rule that matters
 
@@ -29,8 +31,11 @@ number not in 1000 to 1999.
 src/ui.js        core/ui.js's panel and download, the panel headed MP
 src/api.js       the buyer API: one answer, and every order, PACE apart
 src/history.js   an order to its line, its sellers' suborders folded in
-src/page.js      content script: follows the address, the history's panel
+src/cart.js      the cart: sellers, an item taken out, listings put back
+src/cart.css     the seller buttons, in ManaPool's own page
+src/page.js      content script: follows the address, each page's panel
 tests/panel.js   stands the script up in a window; the API from the fixture
+tests/cart.js    the cart page, and ManaPool's own cart behaviour faked
 tests/mutations.json  each guard, the text that breaks it, the test that fails
 tests/           bun + happy-dom, no browser
 ```
@@ -52,6 +57,10 @@ bun run mutate sites/manapool
   path, and leaving the path takes it away and stops what it started.
 - **One request at a time, PACE apart.** The API answers 100 orders at once,
   so a whole history is a request or two; it is still never fanned out.
+- **The cart is ManaPool's.** Items go out through ManaPool's own quantity
+  list, and listings come back as changes in its own stored cart, which it
+  syncs. Nothing here posts to ManaPool's server; `tests/cart.js` fakes the
+  page's side, so a change there is checked in a real cart first.
 - **Amounts are the API's own.** ManaPool's page adds its service fee to
   an order's total; the API does not give it, and it is not computed here.
 

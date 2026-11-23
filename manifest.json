@@ -206,10 +206,12 @@
         "sites/manapool/src/ui.js",
         "sites/manapool/src/api.js",
         "sites/manapool/src/history.js",
+        "sites/manapool/src/cart.js",
         "sites/manapool/src/page.js"
       ],
       "css": [
-        "core/panel.css"
+        "core/panel.css",
+        "sites/manapool/src/cart.css"
       ],
       "run_at": "document_idle"
     }
