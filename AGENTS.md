@@ -15,9 +15,9 @@ What holds for the whole repository:
 - **Never answer a Cloudflare challenge in code**, and never fan out
   requests: one page at a time, with a wait before each.
 - **`core/` holds what every store shares**, as factories on `globalThis.BAN`
-  that each store binds onto its own global (`MKM`, `CKB`, `TCGB`). Nothing
-  in `core/` keeps state, names a store or touches a store's global; a root
-  test holds it to that.
+  that each store binds onto its own global (`MKM`, `CKB`, `TCGB`, `MPB`).
+  Nothing in `core/` keeps state, names a store or touches a store's global;
+  a root test holds it to that.
 - **Do not guess at a price, an id or a card.** A row that cannot be
   resolved carries an empty column and the panel says how many.
 - **Do not write an em dash**, anywhere: `tests/repo.test.js` checks the

@@ -24,6 +24,7 @@ const HOSTS = {
   cardmarket: "www.cardmarket.com",
   cardkingdom: "www.cardkingdom.com",
   tcgplayer: "store.tcgplayer.com",
+  manapool: "manapool.com",
 };
 
 describe("the manifest", () => {
@@ -73,7 +74,7 @@ describe("the manifest", () => {
 });
 
 describe("the sites", () => {
-  test("are the three stores, each with its own rules and specification", () => {
+  test("are the stores, each with its own rules and specification", () => {
     expect([...sites].sort()).toEqual(Object.keys(HOSTS).sort());
     const missing = sites.flatMap((site) =>
       ["AGENTS.md", "SPECIFICATIONS.md"].map((name) => "sites/" + site + "/" + name).filter((path) => !existsSync(new URL(path, root))),
@@ -99,7 +100,7 @@ describe("the sites", () => {
   });
 
   test("core names no store", () => {
-    const names = [...Object.values(HOSTS).map((host) => host.replace(/^(www|store)\./, "")), "Cardmarket", "Card Kingdom", "TCGplayer"];
+    const names = [...Object.values(HOSTS).map((host) => host.replace(/^(www|store)\./, "")), "Cardmarket", "Card Kingdom", "TCGplayer", "ManaPool", "Mana Pool"];
     const naming = files("core").flatMap((path) => names.filter((name) => read(path).includes(name)).map((name) => path + " names " + name));
     expect(naming).toEqual([]);
   });
