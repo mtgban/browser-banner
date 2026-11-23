@@ -25,6 +25,7 @@ const HOSTS = {
   cardkingdom: "www.cardkingdom.com",
   tcgplayer: "store.tcgplayer.com",
   manapool: "manapool.com",
+  starcitygames: "starcitygames.com",
 };
 
 describe("the manifest", () => {
@@ -45,7 +46,7 @@ describe("the manifest", () => {
     }
   });
 
-  test("runs on the three stores' hosts and nowhere else", () => {
+  test("runs on the stores' hosts and nowhere else", () => {
     const hosts = new Set(manifest.content_scripts.flatMap((cs) => cs.matches).map((match) => new URL(match.replace(/\*/g, "x")).host));
     expect([...hosts].sort()).toEqual(Object.values(HOSTS).sort());
   });
@@ -91,16 +92,16 @@ describe("the sites", () => {
 
   test("core binds nothing of a store's, and keeps to BAN", () => {
     // A factory every store binds onto its own global: core touching
-    // MKM, CKB or TCGB would be state one store's tests could leave behind
+    // a store's global would be state one store's tests could leave behind
     // for another's.
     const touching = files("core")
       .filter((path) => path.endsWith(".js"))
-      .filter((path) => /\b(MKM|CKB|TCGB)\b/.test(read(path)) || /globalThis\.(?!BAN\b)\w+/.test(read(path)));
+      .filter((path) => /\b(MKM|CKB|TCGB|MPB|SCGB)\b/.test(read(path)) || /globalThis\.(?!BAN\b)\w+/.test(read(path)));
     expect(touching).toEqual([]);
   });
 
   test("core names no store", () => {
-    const names = [...Object.values(HOSTS).map((host) => host.replace(/^(www|store)\./, "")), "Cardmarket", "Card Kingdom", "TCGplayer", "ManaPool", "Mana Pool"];
+    const names = [...Object.values(HOSTS).map((host) => host.replace(/^(www|store)\./, "")), "Cardmarket", "Card Kingdom", "TCGplayer", "ManaPool", "Mana Pool", "Star City Games"];
     const naming = files("core").flatMap((path) => names.filter((name) => read(path).includes(name)).map((name) => path + " names " + name));
     expect(naming).toEqual([]);
   });

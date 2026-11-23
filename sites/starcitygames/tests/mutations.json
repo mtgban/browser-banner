@@ -1,0 +1,387 @@
+[
+  {
+    "guard": "a date is one of a month's days",
+    "file": "src/read.js",
+    "find": "return date.day >= 1 && date.day <= BAN.daysIn(date.year, month) ? date : null;",
+    "replace": "return date;",
+    "expectFailing": "a date is a day of a month, or none"
+  },
+  {
+    "guard": "a page with no list is refused",
+    "file": "src/read.js",
+    "find": "if (!doc.querySelector(\".orders-list\")) {",
+    "replace": "if (false) {",
+    "expectFailing": "a page with no list, or an order's with no order, says to sign in and saves nothing"
+  },
+  {
+    "guard": "an order with no number or date is counted",
+    "file": "src/read.js",
+    "find": "read.unreadable++;",
+    "replace": "",
+    "expectFailing": "counts an order with no number or no date"
+  },
+  {
+    "guard": "the list's last page ends the walk",
+    "file": "src/read.js",
+    "find": "if (!link) {\n      return \"\";",
+    "replace": "if (!link) {\n      throw new Error(\"no next page\");",
+    "expectFailing": "every year reads the list to its last page"
+  },
+  {
+    "guard": "a read starts from the first page",
+    "file": "src/read.js",
+    "find": "if (!page || page === \"1\") {",
+    "replace": "if (true) {",
+    "expectFailing": "a read started on a later page starts from the first"
+  },
+  {
+    "guard": "an order's page is the order asked for",
+    "file": "src/read.js",
+    "find": "if (order && String(order.id) === String(id)) {",
+    "replace": "if (order) {",
+    "expectFailing": "is refused when there is none, it does not read, or it is another"
+  },
+  {
+    "guard": "JSON that does not read is refused",
+    "file": "src/read.js",
+    "find": "      } catch (err) {\n        break;",
+    "replace": "      } catch (err) {\n        return {};",
+    "expectFailing": "is refused when there is none, it does not read, or it is another"
+  },
+  {
+    "guard": "a price is whole cents",
+    "file": "src/money.js",
+    "find": "return Math.abs(value * 100 - c) < 1e-6 ? c : null;",
+    "replace": "return c;",
+    "expectFailing": "a price is whole cents or none"
+  },
+  {
+    "guard": "a price is a number",
+    "file": "src/money.js",
+    "find": "if (typeof value !== \"number\" || !isFinite(value)) {",
+    "replace": "if (false) {",
+    "expectFailing": "a price is whole cents or none"
+  },
+  {
+    "guard": "a count is a count",
+    "file": "src/money.js",
+    "find": " || q < 1 || r < 0 || r > q) {",
+    "replace": ") {",
+    "expectFailing": "copies refuses a count that is not one"
+  },
+  {
+    "guard": "an item marked refunded is refunded whole",
+    "file": "src/money.js",
+    "find": "refunded: item.refunded === true ? q : r };",
+    "replace": "refunded: r };",
+    "expectFailing": "an item marked refunded is refunded whole, whatever its count says"
+  },
+  {
+    "guard": "a label not known leaves the amounts empty",
+    "file": "src/money.js",
+    "find": "if (!kind || value === null) {",
+    "replace": "if (value === null) {",
+    "expectFailing": "a line of its totals that is not one of the known ones"
+  },
+  {
+    "guard": "a line with no value leaves the amounts empty",
+    "file": "src/money.js",
+    "find": "if (!kind || value === null) {",
+    "replace": "if (!kind) {",
+    "expectFailing": "an item or a line with no price"
+  },
+  {
+    "guard": "a refund under an unclear discount is not known",
+    "file": "src/money.js",
+    "find": "if (t.percent === null) {",
+    "replace": "if (false) {",
+    "expectFailing": "a refund under a discount that is not a whole percent"
+  },
+  {
+    "guard": "a refund on a taxed order is not known",
+    "file": "src/money.js",
+    "find": "if (t.tax) {",
+    "replace": "if (false) {",
+    "expectFailing": "a refund on a taxed order: its share of the tax is not known"
+  },
+  {
+    "guard": "an unreadable order is null",
+    "file": "src/history.js",
+    "find": "|| !Array.isArray(order.items) || !order.items.length) {",
+    "replace": ") {",
+    "expectFailing": "is null for an order with no items, no status, or an unreadable count"
+  },
+  {
+    "guard": "amounts not known are empty",
+    "file": "src/history.js",
+    "find": "return r.cost.why ? \"\" : BAN.decimal(r.cost[name]);",
+    "replace": "return BAN.decimal(r.cost[name] || 0);",
+    "expectFailing": "leaves the amounts empty when they are not known"
+  },
+  {
+    "guard": "a refunded order has no cards",
+    "file": "src/order.js",
+    "find": "SCGB.keptNothing(order) ? 0 : ",
+    "replace": "",
+    "expectFailing": "are none of a refunded order's"
+  },
+  {
+    "guard": "another game's card is left out",
+    "file": "src/order.js",
+    "find": "if (sku && sku[1] !== \"MTG\") {",
+    "replace": "if (false) {",
+    "expectFailing": "leave out another game's, and what is not a single"
+  },
+  {
+    "guard": "what is not a single is left out as that",
+    "file": "src/order.js",
+    "find": "left.sealed += q;",
+    "replace": "left.unreadable++;",
+    "expectFailing": "leave out another game's, and what is not a single"
+  },
+  {
+    "guard": "a finish not known is unreadable",
+    "file": "src/order.js",
+    "find": "!FINISHES[sku[5]] || ",
+    "replace": "",
+    "expectFailing": "count a line whose SKU, finish, condition, name, count or price does not read"
+  },
+  {
+    "guard": "a condition not known is unreadable",
+    "file": "src/order.js",
+    "find": "!condition || ",
+    "replace": "",
+    "expectFailing": "count a line whose SKU, finish, condition, name, count or price does not read"
+  },
+  {
+    "guard": "a line with no name is unreadable",
+    "file": "src/order.js",
+    "find": "if (!sku || !name || ",
+    "replace": "if (!sku || ",
+    "expectFailing": "count a line whose SKU, finish, condition, name, count or price does not read"
+  },
+  {
+    "guard": "a line with no price of its own is unreadable",
+    "file": "src/order.js",
+    "find": " || price === null) {\n        left",
+    "replace": ") {\n        left",
+    "expectFailing": "count a line whose SKU, finish, condition, name, count or price does not read"
+  },
+  {
+    "guard": "only the promos known are unpacked",
+    "file": "src/order.js",
+    "find": "parts && PROMOS.hasOwnProperty(parts[1]) ? PROMOS[parts[1]] : null;",
+    "replace": "parts ? PROMOS[parts[1]] || \"\" : null;",
+    "expectFailing": "a promo's SKU names its own set and number only where mtgban reads them so"
+  },
+  {
+    "guard": "a price under an unclear discount is empty",
+    "file": "src/order.js",
+    "find": "var percent = t.why ? null : t.percent;",
+    "replace": "var percent = t.why ? null : t.percent || 0;",
+    "expectFailing": "have no price under a discount that is not a whole percent, or totals not known"
+  },
+  {
+    "guard": "a price under totals not known is empty",
+    "file": "src/order.js",
+    "find": "var percent = t.why ? null : t.percent;",
+    "replace": "var percent = t.why ? 0 : t.percent;",
+    "expectFailing": "have no price under a discount that is not a whole percent, or totals not known"
+  },
+  {
+    "guard": "an older order ends the walk",
+    "file": "src/page.js",
+    "find": "past = true;",
+    "replace": "past = false;",
+    "expectFailing": "the walk ends at the first order older than the range"
+  },
+  {
+    "guard": "a page already read ends the walk",
+    "file": "src/page.js",
+    "find": "if (!next || visited[next]) {",
+    "replace": "if (!next) {",
+    "expectFailing": "a next link back to a page already read ends the walk"
+  },
+  {
+    "guard": "requests are PACE apart",
+    "file": "src/page.js",
+    "find": "(asked++ ? SCGB.after(SCGB.PACE) : Promise.resolve())",
+    "replace": "Promise.resolve()",
+    "expectFailing": "waits PACE before each request after the first"
+  },
+  {
+    "guard": "a stopped run asks nothing more",
+    "file": "src/page.js",
+    "find": "return run === token ? SCGB.fetchPage(url) : null;",
+    "replace": "return SCGB.fetchPage(url);",
+    "expectFailing": "Escape during the wait asks nothing more"
+  },
+  {
+    "guard": "a stopped run saves nothing",
+    "file": "src/page.js",
+    "find": "        if (run !== token) {\n          return null;\n        }\n        if (i === orders.length) {",
+    "replace": "        if (i === orders.length) {",
+    "expectFailing": "Escape on the last order saves nothing"
+  },
+  {
+    "guard": "an order's number is a number",
+    "file": "src/page.js",
+    "find": "&& /^\\d+$/.test(query.get(\"order_id\") || \"\")",
+    "replace": "",
+    "expectFailing": "no panel on the account's other pages"
+  },
+  {
+    "guard": "the items come to the subtotal",
+    "file": "src/money.js",
+    "find": "listed === sums.subtotal &&",
+    "replace": "true &&",
+    "expectFailing": "a refund, on items that do not come to the subtotal, or totals to the grand total"
+  },
+  {
+    "guard": "the totals come to the grand total",
+    "file": "src/money.js",
+    "find": "sums.subtotal - discount + sums.shipping + sums.tax + sums.credit === sums.grand;",
+    "replace": "true;",
+    "expectFailing": "a refund, on items that do not come to the subtotal, or totals to the grand total"
+  },
+  {
+    "guard": "a refund on lines that do not add up is not known",
+    "file": "src/money.js",
+    "find": "if (!t.adds) {",
+    "replace": "if (false) {",
+    "expectFailing": "a refund, on items that do not come to the subtotal, or totals to the grand total"
+  },
+  {
+    "guard": "a refund takes its share of the discount",
+    "file": "src/money.js",
+    "find": "var discount = off(kept, t.percent);",
+    "replace": "var discount = t.discount;",
+    "expectFailing": "leaves a refund's share of the discount out with it"
+  },
+  {
+    "guard": "a discount is rounded line by line",
+    "file": "src/money.js",
+    "find": "if (off(lines, p) === discount) {",
+    "replace": "if (Math.round((lines.reduce(function (n, l) { return n + l; }, 0) * p) / 100) === discount) {",
+    "expectFailing": "takes a discount off line by line, each rounded on its own"
+  },
+  {
+    "guard": "store credit is part of what was paid",
+    "file": "src/money.js",
+    "find": "paid: sums.grand - sums.credit,",
+    "replace": "paid: sums.grand,",
+    "expectFailing": "is what it came to before store credit, with nothing refunded"
+  },
+  {
+    "guard": "with nothing refunded a cost is what was paid",
+    "file": "src/money.js",
+    "find": "if (!refunded) {",
+    "replace": "if (false) {",
+    "expectFailing": "is what was paid with nothing refunded, though its lines are a cent off it"
+  },
+  {
+    "guard": "a refunded, cancelled or declined order came to nothing",
+    "file": "src/money.js",
+    "find": "if (SCGB.keptNothing(order) || (refunded && !kept.length)) {",
+    "replace": "if (refunded && !kept.length) {",
+    "expectFailing": "is nothing for an order refunded, cancelled or declined by its status"
+  },
+  {
+    "guard": "an order refunded whole came to nothing",
+    "file": "src/money.js",
+    "find": "if (SCGB.keptNothing(order) || (refunded && !kept.length)) {",
+    "replace": "if (SCGB.keptNothing(order)) {",
+    "expectFailing": "is nothing for an order refunded whole, shipping included"
+  },
+  {
+    "guard": "an order with nothing refunded did not come to nothing",
+    "file": "src/money.js",
+    "find": "(refunded && !kept.length)",
+    "replace": "!kept.length",
+    "expectFailing": "an order of that free line alone came to what was paid for it"
+  },
+  {
+    "guard": "the free line for shipping back is no item",
+    "file": "src/money.js",
+    "find": "return !item || item.sku !== \"BUYER-RETURN\";",
+    "replace": "return true;",
+    "expectFailing": "does not count the free line for shipping a buyer's cards back"
+  },
+  {
+    "guard": "totals without a grand total do not read",
+    "file": "src/money.js",
+    "find": "!seen.subtotal || !seen.grand || ",
+    "replace": "",
+    "expectFailing": "totals with no grand total"
+  },
+  {
+    "guard": "a discount takes off",
+    "file": "src/money.js",
+    "find": " || sums.discount > 0",
+    "replace": "",
+    "expectFailing": "a discount that adds"
+  },
+  {
+    "guard": "a discount that could be two percents is neither",
+    "file": "src/money.js",
+    "find": "if (found !== null) {\n          return null;\n        }",
+    "replace": "",
+    "expectFailing": "a discount that could be more than one percent is none of them"
+  },
+  {
+    "guard": "a refunded copy is not charged",
+    "file": "src/money.js",
+    "find": "kept.push((c.quantity - c.refunded) * SCGB.cents(item.price));",
+    "replace": "kept.push(c.quantity * SCGB.cents(item.price));",
+    "expectFailing": "is the copies kept, at what each was bought for, and the shipping"
+  },
+  {
+    "guard": "an order's unreadable count is null",
+    "file": "src/history.js",
+    "find": "      if (!c) {\n        return null;",
+    "replace": "      if (!c) {\n        continue;",
+    "expectFailing": "is null for an order with no items, no status, or an unreadable count"
+  },
+  {
+    "guard": "a refunded order's copies are all refunded",
+    "file": "src/history.js",
+    "find": "var gone = SCGB.keptNothing(order) ? c.quantity : c.refunded;",
+    "replace": "var gone = c.refunded;",
+    "expectFailing": "is zeros for an order refunded whole"
+  },
+  {
+    "guard": "refunded copies are left out of a line",
+    "file": "src/order.js",
+    "find": "c.quantity - c.refunded;",
+    "replace": "c.quantity;",
+    "expectFailing": "leave out the copies refunded, and keep the rest of the line"
+  },
+  {
+    "guard": "a price has the discount taken off",
+    "file": "src/order.js",
+    "find": "Math.round((price * (100 - percent)) / 100),",
+    "replace": "price,",
+    "expectFailing": "are one line per card kept, at what each copy was paid, as the page prints it"
+  },
+  {
+    "guard": "a price the page prints is what was paid",
+    "file": "src/order.js",
+    "find": "paid !== undefined ? paid : ",
+    "replace": "",
+    "expectFailing": "are at the price the page prints as paid, where it prints one"
+  },
+  {
+    "guard": "a printed sum that is no price is not one",
+    "file": "src/order.js",
+    "find": "if (paid !== null) {",
+    "replace": "if (true) {",
+    "expectFailing": "are at the price the page prints as paid, where it prints one"
+  },
+  {
+    "guard": "an order's panel uses the printed prices",
+    "file": "src/page.js",
+    "find": ", SCGB.printed(document));",
+    "replace": ");",
+    "expectFailing": "saves the prices the page has printed"
+  }
+]
