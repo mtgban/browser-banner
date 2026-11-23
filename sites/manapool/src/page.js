@@ -2,8 +2,8 @@
 //
 // ManaPool moves between its own pages without loading them, and a content
 // script runs only when a page loads. So this runs on every page and follows
-// the address: the order history and the cart get their panels, and leaving
-// one takes its panel away and stops what it started.
+// the address: the order history, an order and the cart get their panels,
+// and leaving one takes its panel away and stops what it started.
 
 (function (MPB, BAN) {
   "use strict";
@@ -352,10 +352,169 @@
     };
   }
 
+  // order is one order's panel: Send to BAN and CSV, its cards read from
+  // the API on the click.
+  function order(id) {
+    var panel = MPB.panel();
+    var run = null;
+    var got = null;
+
+    // read answers with the order and its lines, asking the API once.
+    function read() {
+      got = got || MPB.getOrder(id).then(function (o) {
+        return { number: o && o.order_number, lines: MPB.orderLines(o) };
+      });
+      got.catch(function () {
+        got = null;
+      });
+      return got;
+    }
+
+    function left(read) {
+      var l = read.lines.left;
+      var out = [];
+      if (l.refunded) {
+        out.push(plural(l.refunded, "refunded card", "refunded cards"));
+      }
+      if (l.away) {
+        out.push(plural(l.away, "card", "cards") + " replaced by another order");
+      }
+      if (l.unnamed) {
+        out.push(plural(l.unnamed, "card", "cards") + " replaced with one ManaPool does not name");
+      }
+      if (l.sealed) {
+        out.push(plural(l.sealed, "sealed product", "sealed products"));
+      }
+      if (l.unreadable) {
+        out.push(plural(l.unreadable, "unreadable line", "unreadable lines"));
+      }
+      return out.length ? "; left out: " + out.join(", ") : "";
+    }
+
+    function cards(read) {
+      return read.lines.lines.reduce(function (n, l) {
+        return n + l.quantity;
+      }, 0);
+    }
+
+    function failed(token) {
+      return function (err) {
+        if (run !== token) {
+          return;
+        }
+        run = null;
+        panel.busy(false);
+        panel.fail(err && err.message ? err.message : String(err));
+      };
+    }
+
+    function save() {
+      if (run) {
+        return;
+      }
+      var token = {};
+      run = token;
+      panel.clear();
+      panel.busy(true);
+      read()
+        .then(function (r) {
+          if (run !== token) {
+            return;
+          }
+          run = null;
+          panel.busy(false);
+          panel.word(plural(cards(r), "card", "cards"));
+          if (!r.lines.lines.length) {
+            panel.fail("No cards to save" + left(r));
+            return;
+          }
+          var name = "mp-order-" + r.number + ".csv";
+          MPB.download(MPB.orderCSV(r.lines.lines), name);
+          panel.mark("done");
+          panel.recap("Saved " + name + left(r));
+        })
+        .catch(failed(token));
+    }
+
+    // send opens mtgban's page on the click itself, as it must, and hands it
+    // the rows once they are read.
+    function send() {
+      if (run) {
+        return;
+      }
+      var token = {};
+      run = token;
+      var r = null;
+      panel.clear();
+      panel.recap("Waiting for mtgban's upload page to take the order");
+      // A read that fails is said here and handed over as nothing to send,
+      // which closes the tab the click opened.
+      var rows = read().then(function (got) {
+        r = got;
+        return got.lines.lines.length ? { csv: MPB.orderCSV(got.lines.lines), rows: got.lines.lines.length } : null;
+      }, function (err) {
+        failed(token)(err);
+        return null;
+      });
+      MPB.handOff(rows, function (said) {
+        if (run !== token) {
+          return;
+        }
+        run = null;
+        if (said === MPB.REPLACED) {
+          return;
+        }
+        if (said === null) {
+          panel.fail("No cards to send" + (r ? left(r) : ""));
+          return;
+        }
+        if (said) {
+          panel.fail(said);
+          return;
+        }
+        panel.word(plural(cards(r), "card", "cards"));
+        panel.mark("done");
+        panel.recap("Sent " + plural(cards(r), "card", "cards") + " to BAN" + left(r));
+      });
+    }
+
+    [["ban-go ban-send", "Send to BAN", send], ["ban-go ban-csv", "CSV", save]].forEach(function (b) {
+      var made = document.createElement("button");
+      made.type = "button";
+      made.className = b[0];
+      made.textContent = b[1];
+      made.addEventListener("click", b[2]);
+      panel.actions.appendChild(made);
+    });
+    panel.hint("Send this order's cards to BAN, or save them as CSV");
+
+    return {
+      panel: panel,
+      cancel: function () {
+        if (run) {
+          run = null;
+          panel.busy(false);
+          panel.clear();
+        }
+      },
+      leave: function () {
+        run = null;
+        panel.busy(false);
+        panel.root.remove();
+      },
+    };
+  }
+
   // route is the panel a path gets, or null.
   function route(path) {
     if (/^\/settings\/orders\/?$/.test(path)) {
       return history;
+    }
+    var id = /^\/settings\/orders\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/.exec(path);
+    if (id) {
+      return function () {
+        return order(id[1]);
+      };
     }
     return /^\/cart\/?$/.test(path) ? cart : null;
   }

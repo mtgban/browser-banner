@@ -1,0 +1,383 @@
+{
+ "order": {
+  "id": "3e28cf57-6020-47e1-89ca-f4ee167de083",
+  "created_at": "2026-11-21T08:00:04.589106+00:00",
+  "order_number": "1006",
+  "subtotal_cents": 0,
+  "tax_cents": 0,
+  "shipping_cents": 405,
+  "total_cents": 0,
+  "order_seller_details": [
+   {
+    "id": "7c77833f-338f-4aab-b1c8-046a3c6dd345",
+    "seller_id": "e4631b55-3fde-45b4-a886-904732dce811",
+    "seller_username": "Seller I",
+    "order_number": "1006-2010",
+    "shipping_cents": 135,
+    "buyer_confirmed_at": null,
+    "fulfillments": [
+     {
+      "status": "shipped",
+      "tracking_company": null,
+      "tracking_number": null,
+      "tracking_url": null,
+      "in_transit_at": null
+     }
+    ],
+    "items": [
+     {
+      "order_item_id": "bc67ba94-637d-4efa-a09e-467ada679f81",
+      "price_cents": 19,
+      "product": {
+       "product_id": "2c63888f-28f0-4481-be6d-dce7a7ace732",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "NM",
+        "finish_id": "NF",
+        "language_id": "EN",
+        "mtgjson_id": "8a119b9e-16bc-4732-8f7b-7676d015b0dc",
+        "name": "Arboreal Grazer",
+        "number": "343",
+        "scryfall_id": "f6fadfa7-e5c1-4b62-9362-da5cc13da58a",
+        "scryfall_ids": [
+         "f6fadfa7-e5c1-4b62-9362-da5cc13da58a"
+        ],
+        "set": "RVR"
+       }
+      },
+      "quantity": 1,
+      "shipped_quantity": 1,
+      "replacement": null
+     },
+     {
+      "order_item_id": "5796a670-482c-490e-8d97-82bfcdc83011",
+      "price_cents": 27,
+      "product": {
+       "product_id": "a712755f-6cac-44d5-99d5-269512e74f7b",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "NM",
+        "finish_id": "FO",
+        "language_id": "EN",
+        "mtgjson_id": "ac8efe12-1c59-49f1-ba2d-de83458bfed0",
+        "name": "Vanquish the Horde",
+        "number": "333",
+        "scryfall_id": "fab36728-a78b-4b7e-8787-c0de2f960063",
+        "scryfall_ids": [
+         "fab36728-a78b-4b7e-8787-c0de2f960063"
+        ],
+        "set": "MID"
+       }
+      },
+      "quantity": 2,
+      "shipped_quantity": 2,
+      "replacement": null
+     },
+     {
+      "order_item_id": "3c3ae353-fb14-428e-90b4-01a6c1cc0aff",
+      "price_cents": 8,
+      "product": {
+       "product_id": "45ac16b9-c20d-4c21-8f8a-7abff2e91ac7",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "LP",
+        "finish_id": "EF",
+        "language_id": "EN",
+        "mtgjson_id": "dd2ee150-d284-4277-b89c-1af40ce8fcc9",
+        "name": "Valentin, Dean of the Vein // Lisette, Dean of the Root",
+        "number": "161",
+        "scryfall_id": "0b80a255-53a1-4945-a932-58ef7777682c",
+        "scryfall_ids": [
+         "0b80a255-53a1-4945-a932-58ef7777682c"
+        ],
+        "set": "STX"
+       }
+      },
+      "quantity": 1,
+      "shipped_quantity": 1,
+      "replacement": null
+     },
+     {
+      "order_item_id": "ff53a46f-5ead-403a-84c4-b877678537a3",
+      "price_cents": 15,
+      "product": {
+       "product_id": "bbeeb636-1d33-4c6d-96f0-da847a2a3b87",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "MP",
+        "finish_id": "NF",
+        "language_id": "EN",
+        "mtgjson_id": "68e58909-ccb2-4416-925a-56c9a30f4300",
+        "name": "Corpsejack Menace",
+        "number": "197",
+        "scryfall_id": "b9c8b9ff-e46e-4627-9419-c7723226db94",
+        "scryfall_ids": [
+         "b9c8b9ff-e46e-4627-9419-c7723226db94"
+        ],
+        "set": "MB1"
+       }
+      },
+      "quantity": 3,
+      "shipped_quantity": 3,
+      "replacement": null
+     }
+    ],
+    "refunded_items": [
+     {
+      "order_item_id": "ff53a46f-5ead-403a-84c4-b877678537a3",
+      "price_cents": 15,
+      "product": {
+       "product_id": "bbeeb636-1d33-4c6d-96f0-da847a2a3b87",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "MP",
+        "finish_id": "NF",
+        "language_id": "EN",
+        "mtgjson_id": "68e58909-ccb2-4416-925a-56c9a30f4300",
+        "name": "Corpsejack Menace",
+        "number": "197",
+        "scryfall_id": "b9c8b9ff-e46e-4627-9419-c7723226db94",
+        "scryfall_ids": [
+         "b9c8b9ff-e46e-4627-9419-c7723226db94"
+        ],
+        "set": "MB1"
+       }
+      },
+      "quantity": 1,
+      "refunded_cents": null
+     }
+    ]
+   },
+   {
+    "id": "c86308a3-429b-4def-959c-11d466f6d437",
+    "seller_id": "05c8d825-4589-4289-8e69-2bf19b26be74",
+    "seller_username": "Seller J",
+    "order_number": "1006-2011",
+    "shipping_cents": 135,
+    "buyer_confirmed_at": null,
+    "fulfillments": [
+     {
+      "status": "shipped",
+      "tracking_company": null,
+      "tracking_number": null,
+      "tracking_url": null,
+      "in_transit_at": null
+     }
+    ],
+    "items": [
+     {
+      "order_item_id": "4c8b1eb4-4f1e-4ccf-8372-a2a784a67245",
+      "price_cents": 72,
+      "product": {
+       "product_id": "0c28cec1-b947-42af-a4b9-36976b4b76b0",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "LP",
+        "finish_id": "FO",
+        "language_id": "EN",
+        "mtgjson_id": "a398d022-d435-4df4-8322-905089933837",
+        "name": "Verdurous Gearhulk",
+        "number": "172s",
+        "scryfall_id": "e179f773-a6e0-43c0-9514-b7dde2ad0478",
+        "scryfall_ids": [
+         "e179f773-a6e0-43c0-9514-b7dde2ad0478"
+        ],
+        "set": "PKLD"
+       }
+      },
+      "quantity": 1,
+      "shipped_quantity": 1,
+      "replacement": {
+       "product": null,
+       "quantity": 1,
+       "refunded_cents": null,
+       "same_package": false,
+       "separate_shipment": {
+        "order_number": "1999-9001",
+        "seller_username": "Seller Z",
+        "status": null
+       },
+       "separate_shipments": []
+      }
+     },
+     {
+      "order_item_id": "77dde229-df88-4e4d-ac23-86e5cc86ba64",
+      "price_cents": 30,
+      "product": {
+       "product_id": "ca3ab343-ac33-4b68-be9b-f77c6519a9d5",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "HP",
+        "finish_id": "NF",
+        "language_id": "EN",
+        "mtgjson_id": "03c472ca-4495-48b4-b8d8-89d2b47a5c1d",
+        "name": "Remote Isle",
+        "number": "324",
+        "scryfall_id": "ac9130f4-547c-47d3-8e3a-655f20731ab2",
+        "scryfall_ids": [
+         "ac9130f4-547c-47d3-8e3a-655f20731ab2"
+        ],
+        "set": "USG"
+       }
+      },
+      "quantity": 2,
+      "shipped_quantity": 2,
+      "replacement": {
+       "product": null,
+       "quantity": 1,
+       "refunded_cents": null,
+       "same_package": true,
+       "separate_shipment": null,
+       "separate_shipments": []
+      }
+     },
+     {
+      "order_item_id": "d00f7b11-205f-42f7-88c1-d781b972e776",
+      "price_cents": 25,
+      "product": {
+       "product_id": "bb262a93-4ce1-4c61-aa03-36d98b8c82f1",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "NM",
+        "finish_id": "NF",
+        "language_id": "EN",
+        "mtgjson_id": "b183256e-a16e-4121-b07a-6fc42fd7b23a",
+        "name": "Flashfires",
+        "number": "187",
+        "scryfall_id": "c3dd75f6-8085-48e6-ac92-5f09a227f039",
+        "scryfall_ids": [
+         "c3dd75f6-8085-48e6-ac92-5f09a227f039"
+        ],
+        "set": "4ED"
+       }
+      },
+      "quantity": 1,
+      "shipped_quantity": 1,
+      "replacement": {
+       "product": {
+        "product_id": "e5a9f6b1-a297-49bf-adf4-38f7b27c1c74",
+        "product_type": "mtg_single",
+        "sealed": null,
+        "single": {
+         "condition_id": "NM",
+         "finish_id": "NF",
+         "language_id": "EN",
+         "mtgjson_id": "f1a38d32-6834-4c65-927c-b2382bedda16",
+         "name": "Flashfires",
+         "number": "226",
+         "scryfall_id": "8f39aaa5-729a-453c-b891-da33e83a9d40",
+         "scryfall_ids": [
+          "8f39aaa5-729a-453c-b891-da33e83a9d40"
+         ],
+         "set": "5ED"
+        }
+       },
+       "quantity": 1,
+       "refunded_cents": null,
+       "same_package": true,
+       "separate_shipment": null,
+       "separate_shipments": []
+      }
+     },
+     {
+      "order_item_id": "b338afd6-b776-4568-a9ca-4bb956e78ec7",
+      "price_cents": 499,
+      "product": {
+       "product_id": "b21b1c2e-1f61-41bc-acb7-0dd842762334",
+       "product_type": "mtg_sealed",
+       "single": null,
+       "sealed": {
+        "mtgjson_id": "3ceb0831-8744-4e92-ad93-36c0f9c4b930",
+        "name": "Foundations Play Booster",
+        "set": "FDN",
+        "language_id": "EN"
+       }
+      },
+      "quantity": 1,
+      "shipped_quantity": 1,
+      "replacement": null
+     },
+     {
+      "order_item_id": "adff32f5-35dd-4954-a7f8-022a4eedef2a",
+      "price_cents": 10,
+      "product": {
+       "product_id": "670c1cd3-5555-4e31-84be-37c1dfe6c55b",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "NM",
+        "finish_id": "ZZ",
+        "language_id": "EN",
+        "mtgjson_id": "6f877ca9-8a42-427f-b0d3-79d72f8cbeb2",
+        "name": "Broken Card",
+        "number": "1",
+        "scryfall_id": "ea44bd0d-405e-4311-8b68-dba7a2bb831d",
+        "scryfall_ids": [
+         "ea44bd0d-405e-4311-8b68-dba7a2bb831d"
+        ],
+        "set": "XXX"
+       }
+      },
+      "quantity": 1,
+      "shipped_quantity": 1,
+      "replacement": null
+     }
+    ],
+    "refunded_items": []
+   },
+   {
+    "id": "cf6f4db3-5497-4bda-913b-7c4fd711cad0",
+    "seller_id": "52c78612-cc65-4109-b6ec-730b5ab4e22f",
+    "seller_username": "Seller K",
+    "order_number": "1006-2012",
+    "shipping_cents": 135,
+    "buyer_confirmed_at": null,
+    "fulfillments": [
+     {
+      "status": "refunded",
+      "tracking_company": null,
+      "tracking_number": null,
+      "tracking_url": null,
+      "in_transit_at": null
+     }
+    ],
+    "items": [
+     {
+      "order_item_id": "76dca866-649b-4809-8780-b8cf55034265",
+      "price_cents": 13550,
+      "product": {
+       "product_id": "7f11ee19-d49d-4a71-a615-dc020b7ef25e",
+       "product_type": "mtg_single",
+       "sealed": null,
+       "single": {
+        "condition_id": "LP",
+        "finish_id": "NF",
+        "language_id": "EN",
+        "mtgjson_id": "0f66fa84-1834-49be-b913-63081216b6dc",
+        "name": "Juggernaut",
+        "number": "268",
+        "scryfall_id": "396dfa33-6763-4f9c-8484-f9d69de18a44",
+        "scryfall_ids": [
+         "396dfa33-6763-4f9c-8484-f9d69de18a44"
+        ],
+        "set": "LEA"
+       }
+      },
+      "quantity": 1,
+      "shipped_quantity": 1,
+      "replacement": null
+     }
+    ],
+    "refunded_items": []
+   }
+  ]
+ }
+}

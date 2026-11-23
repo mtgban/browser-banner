@@ -9,9 +9,10 @@ Every fact about ManaPool here was read off a signed-in buyer's account on
 A content script on `https://manapool.com/*`, with the panel every store
 shares (the "MP BANner" heading, a mark, a drawn tooltip, one row of
 controls). On the order history, `/settings/orders`, it saves the orders
-as CSV, one line per order. In the cart, `/cart`, each seller gets Remove
-seller and Only this seller, and the panel puts back what Only this seller
-set aside (section 5).
+as CSV, one line per order. On an order, `/settings/orders/<id>`, it sends
+the order's cards to BAN or saves them as CSV (section 6). In the cart,
+`/cart`, each seller gets Remove seller and Only this seller, and the panel
+puts back what Only this seller set aside (section 5).
 
 ## 2. The buyer API
 
@@ -109,9 +110,44 @@ taken out through its list was its listing gone from the stored cart, and
 put back it returned under the same seller at the same price, the cart
 whole again after the page synced.
 
-## 6. Not yet
+## 6. An order's cards
 
-- An order's cards, `/settings/orders/<id>`: CSV and Send to BAN, each
-  card with its Scryfall id from the API's order detail.
-- Send to BAN needs `https://manapool.com` in mtgban-website's
-  `handoff_origins`.
+`GET /api/v1/buyer/orders/<id>` answers with the order, every seller's
+suborder in `order_seller_details`: its `fulfillments` (the last one's
+`status`, "shipped" or "refunded"), its `items` and its `refunded_items`.
+An item has an `order_item_id`, `quantity`, `price_cents` each, a
+`product` (`mtg_single` with a `single`: `scryfall_id`, `name`, `set`,
+`number`, `finish_id` NF, FO or EF, `condition_id` NM, LP, MP, HP or DMG,
+`language_id`), and maybe a `replacement`: `quantity`, `same_package`,
+and a `product` that is null when it does not name the card.
+
+One line per card received, seller by seller: Scryfall ID, Name, Set,
+Number, Finish (Nonfoil, Foil, Etched Foil), Condition, Language, Quantity
+and Price each in dollars, headed so mtgban's upload reads every column it
+can; nothing else is headed with "number", which it reads as the collector
+number. Left out, and counted on the panel:
+
+- **Refunded cards.** A refunded line names the item it refunds by
+  `order_item_id`, and its quantity comes off that item; it is not a line
+  of its own. A seller whose last fulfillment says "refunded" sent nothing,
+  whatever its items say.
+- **Replacements shipped on their own** (`same_package` false): they come
+  as an order of their own, with their own page.
+- **Replacements in the same package that do not name their card.** One
+  that names its card is that card, for the quantity it replaced.
+- **Sealed products**, which carry no Scryfall id, and any line that does
+  not read whole.
+
+ManaPool's own count of an order's items agrees with this on 8 of 10 real
+orders, among them refunds, a seller refunded whole, and replacements of
+each kind. On the other two, Gathered orders, it counts 5 unnamed
+replacements as received; it does not on two other orders, so no rule
+covers both, and those cards are left out and said.
+
+The panel offers Send to BAN and CSV, and asks the API on the first click,
+once. Send to BAN opens mtgban's upload on the click itself and hands it
+the CSV's rows once read; with no card to send, or an order it could not
+read, the tab closes again. CSV
+saves `mp-order-<number>.csv`. A suborder's page,
+`/settings/orders/suborder/<id>`, gets no panel. Send to BAN needs
+`https://manapool.com` in mtgban-website's `handoff_origins`.
