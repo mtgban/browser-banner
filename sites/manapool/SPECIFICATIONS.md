@@ -88,8 +88,12 @@ Where they do not fit beside the name they wrap under it.
 
 - **Remove seller** takes each of that seller's items out in turn, through
   its own quantity list as a person would by keyboard: focus, ArrowDown
-  (the list opens with "remove" highlighted), Enter. The next waits until
-  the stored cart has lost exactly one listing.
+  (the list opens with "remove" highlighted), Enter. The next goes as soon
+  as the stored cart has lost exactly one listing, a few milliseconds on.
+  The item and its list stay on the page some 0.3 s more, so each item's
+  list is found by its own button's `aria-controls`, and the run ends once
+  the items are off the page. Taken out this quickly, ManaPool asks for one
+  new checkout preview for the lot; a second apart, for one each.
 - **Only this seller** takes every other seller's items out the same way,
   and keeps each listing the stored cart lost, with its quantity, seller,
   name, set and tags, in localStorage beside it, `banner-manapool-stash`.
@@ -114,6 +118,17 @@ Run in a signed-in account's cart of 7 listings from 6 sellers: an item
 taken out through its list was its listing gone from the stored cart, and
 put back it returned under the same seller at the same price, the cart
 whole again after the page synced.
+
+Run in a signed-out cart of 26 listings from 3 sellers: one seller's 24 were
+out of the stored cart in 0.29 s and off the page in 0.39 s, the other 2
+untouched, with one checkout preview asked for. Not timed signed in.
+
+Signed in, ManaPool's own script (read 2026-11-24) syncs at most every 3
+seconds, one sync at a time under a lock: it sends the changes queued so
+far, and takes the answer as the server's cart with the changes queued since
+added again. So a sync answered during a run, or after it, does not bring
+back an item taken out meanwhile; one that fails puts its changes back in
+the queue and leaves the stored cart as it is.
 
 ## 6. An order's cards
 

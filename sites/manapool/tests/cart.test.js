@@ -153,11 +153,26 @@ describe("the cart", () => {
     expect(it.names()).toEqual(ALL);
   });
 
-  test("Escape stops between items", async () => {
-    const it = mountCart();
-    it.window.MPB.STEP = 300;
+  test("takes the next item as soon as the last is out of the stored cart, its list still on the page", async () => {
+    const it = mountCart({ linger: 400 });
+    const before = it.doc.querySelectorAll("li").length;
     it.press("Seller A", "Remove seller");
+    const until = Date.now() + 1000;
+    while (it.stored().length > 2 && Date.now() < until) await it.settle(1);
+    expect(it.stored()).toEqual(["inv-3", "inv-4"]);
+    // Neither item has left the page yet, so nothing waited for that.
+    expect(it.doc.querySelectorAll("li").length).toBe(before);
+    // Nor does the run end before they have.
     await it.settle(100);
+    expect(it.tip()).not.toBe("Removed 2 items from Seller A");
+    await it.settle(600);
+    expect(it.tip()).toBe("Removed 2 items from Seller A");
+  });
+
+  test("Escape stops between items", async () => {
+    const it = mountCart({ answer: 100 });
+    it.press("Seller A", "Remove seller");
+    await it.settle(50);
     it.escape();
     await it.settle(500);
     expect(it.names()).toEqual(["Pinnacle Monk // Mystic Peak", "Alloy Myr", "Pyrrhic Revival"]);

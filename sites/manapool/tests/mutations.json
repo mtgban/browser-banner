@@ -135,9 +135,30 @@
   {
     "guard": "a list with no remove is closed again",
     "file": "src/cart.js",
-    "find": "key(box.ownerDocument.activeElement || box, \"Escape\");\n          throw",
+    "find": "key(box, \"Escape\");\n          throw",
     "replace": "throw",
     "expectFailing": "a list with no remove is closed again, and the run stops"
+  },
+  {
+    "guard": "an item is taken out through its own list, not the last one's",
+    "file": "src/cart.js",
+    "find": "box.ownerDocument.getElementById(box.getAttribute(\"aria-controls\") || \"\")",
+    "replace": "box.ownerDocument.querySelector('[role=\"listbox\"]')",
+    "expectFailing": "takes the next item as soon as the last is out of the stored cart, its list still on the page"
+  },
+  {
+    "guard": "removals follow each other without a pause",
+    "file": "src/cart.js",
+    "find": "        took(li, gone);\n        return next();",
+    "replace": "        took(li, gone);\n        return waitFor(function () {}, 400).then(next);",
+    "expectFailing": "takes the next item as soon as the last is out of the stored cart, its list still on the page"
+  },
+  {
+    "guard": "a run ends once its items are off the page",
+    "file": "src/cart.js",
+    "find": "            return li.isConnected;",
+    "replace": "            return false;",
+    "expectFailing": "takes the next item as soon as the last is out of the stored cart, its list still on the page"
   },
   {
     "guard": "put back leaves out what the cart holds",
