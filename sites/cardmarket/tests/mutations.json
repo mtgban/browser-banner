@@ -672,6 +672,20 @@
     "expectFailing": "an older range with none says so"
   },
   {
+    "guard": "orders that cannot be read are not said to be none",
+    "file": "src/historypage.js",
+    "find": "if (!done.read && done.unreadable) {",
+    "replace": "if (false) {",
+    "expectFailing": "a list with no order it can read fails, and does not say it has none"
+  },
+  {
+    "guard": "an unreadable order alone does not fail an empty range",
+    "file": "src/historypage.js",
+    "find": "if (!done.read && done.unreadable) {",
+    "replace": "if (!done.orders.length && done.unreadable) {",
+    "expectFailing": "an order it cannot read outside an empty range is said, not a failure"
+  },
+  {
     "guard": "a history file is named for its list and range",
     "file": "src/historypage.js",
     "find": "BAN.rangeFile(\"cm-purchases-\" + tab.toLowerCase(), c, today)",

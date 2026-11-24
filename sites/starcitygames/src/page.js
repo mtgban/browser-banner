@@ -107,7 +107,7 @@
         var past = take(doc);
         var next = past ? "" : SCGB.nextPage(doc, href);
         if (!next || visited[next]) {
-          return { orders: orders, unreadable: unreadable };
+          return { orders: orders, unreadable: unreadable, read: Object.keys(seen).length };
         }
         panel.word("page " + (pages + 1));
         return get(next).then(function (fetched) {
@@ -181,6 +181,7 @@
       var since = c.days ? BAN.daysBefore(today, c.days) : null;
       var get = reader(token);
       var listed = 0;
+      var read = 0;
       panel.clear();
       panel.word("reading");
       panel.busy(true);
@@ -190,6 +191,7 @@
             return null;
           }
           listed = found.unreadable;
+          read = found.read;
           return open(found.orders, get, token);
         })
         .then(function (done) {
@@ -201,6 +203,12 @@
           panel.mark("done");
           var n = listed + done.unreadable;
           var left = n ? "; " + plural(n, "order", "orders") + " unreadable, left out" : "";
+          // An order the list read is in range; one it did not has no date.
+          if (!done.rows.length && (done.unreadable || (n && !read))) {
+            panel.word(n + " unreadable");
+            panel.fail("Nothing saved: " + plural(n, "order", "orders") + " could not be read");
+            return;
+          }
           if (!done.rows.length) {
             panel.word("no orders");
             panel.recap("No orders in that range" + left);

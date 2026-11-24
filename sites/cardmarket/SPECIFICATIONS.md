@@ -951,9 +951,10 @@ with a decimal point, and Currency. The amount is not converted: today's
 rate is not the one the order was paid at. An order is written once: one
 that arrives during the walk pushes the rest down, and the order it pushes
 onto the next page is read again. A row that cannot be read whole is left
-out and counted. A refused page saves nothing and says why, and Escape stops
-the walk with nothing saved. The file is `cm-purchases-<tab>-<range>.csv`,
-named as the other stores' are.
+out and counted. When no order could be read at all, the panel fails and
+says how many, rather than that there are none. A refused page saves nothing
+and says why, and Escape stops the walk with nothing saved. The file is
+`cm-purchases-<tab>-<range>.csv`, named as the other stores' are.
 
 Two saved list pages, 60 orders from 2021 to 2026, read whole, their totals
 matching the page's to the cent and every order id once. A British account's

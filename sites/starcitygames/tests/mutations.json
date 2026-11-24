@@ -383,5 +383,26 @@
     "find": ", SCGB.printed(document));",
     "replace": ");",
     "expectFailing": "saves the prices the page has printed"
+  },
+  {
+    "guard": "orders that cannot be read are not said to be none",
+    "file": "src/page.js",
+    "find": "if (!done.rows.length && (done.unreadable || (n && !read))) {",
+    "replace": "if (false) {",
+    "expectFailing": "a range with no order it can read fails, and does not say it has none"
+  },
+  {
+    "guard": "an unreadable order alone does not fail an empty range",
+    "file": "src/page.js",
+    "find": "if (!done.rows.length && (done.unreadable || (n && !read))) {",
+    "replace": "if (!done.rows.length && n) {",
+    "expectFailing": "an order it cannot read outside an empty range is said, not a failure"
+  },
+  {
+    "guard": "a range whose orders' own pages do not read is not said to be empty",
+    "file": "src/page.js",
+    "find": "if (!done.rows.length && (done.unreadable || (n && !read))) {",
+    "replace": "if (!done.rows.length && n && !read) {",
+    "expectFailing": "a range whose orders' own pages do not read fails"
   }
 ]

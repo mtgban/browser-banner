@@ -101,6 +101,29 @@ describe("the order history's panel", () => {
     expect(it.tip()).toBe("Saved mp-orders-all.csv: 5 orders; 1 order unreadable, left out");
   });
 
+  test("a history with no order it can read fails, and does not say it has none", async () => {
+    const orders = ordersAged().map((o) => ({ ...o, total_cents: null }));
+    const it = mount({ orders });
+    it.choose("all");
+    it.go();
+    await it.settle();
+    expect(it.heading()).toMatch(/^MP BANner - 6 unreadable/);
+    expect(it.failed()).toBe(true);
+    expect(it.tip()).toBe("Nothing saved: 6 orders could not be read");
+    expect(it.saved).toEqual([]);
+  });
+
+  test("an order it cannot read outside an empty range is said, not a failure", async () => {
+    const orders = ordersAged([400, 200, 100, 90, 80, 70]);
+    orders[0].total_cents = null;
+    const it = mount({ answer: () => Promise.resolve({ ok: true, status: 200, headers: { get: () => null }, json: () => Promise.resolve({ orders }) }) });
+    it.choose("days:30");
+    it.go();
+    await it.settle();
+    expect(it.heading()).toBe("MP BANner - no orders✓");
+    expect(it.tip()).toBe("No orders in that range; 1 order unreadable, left out");
+  });
+
   test("a range with none says so, and saves nothing", async () => {
     // The fixture's one 2024 order is left out.
     const none = mount({ orders: ordersAged().slice(1) });

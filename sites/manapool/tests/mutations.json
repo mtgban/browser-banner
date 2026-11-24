@@ -362,5 +362,19 @@
     "find": "      }, function (err) {\n        failed(token)(err);\n        return null;\n      });",
     "replace": "      });\n      rows.catch(failed(token));",
     "expectFailing": "Send to BAN that cannot read the order says why and closes the tab it opened"
+  },
+  {
+    "guard": "orders that cannot be read are not said to be none",
+    "file": "src/page.js",
+    "find": "if (unreadable && unreadable === orders.length) {",
+    "replace": "if (false) {",
+    "expectFailing": "a history with no order it can read fails, and does not say it has none"
+  },
+  {
+    "guard": "an unreadable order alone does not fail an empty range",
+    "file": "src/page.js",
+    "find": "if (unreadable && unreadable === orders.length) {",
+    "replace": "if (!rows.length && unreadable) {",
+    "expectFailing": "an order it cannot read outside an empty range is said, not a failure"
   }
 ]

@@ -57,7 +57,9 @@ The list is read from its first page until it ends or an order is older than
 the range; then each order in range is opened, `PACE` between one request
 and the next. The file is `scg-orders-<range>.csv`. A refused page, or one
 with no list or no order on it, saves nothing and says why. Escape stops the
-read. An order whose line does not read is left out and counted.
+read. An order whose line does not read is left out and counted. When the
+list read no order at all, or every order in range has a page that does not
+read, the panel fails and says how many, rather than that there are none.
 
 What an order came to is added up from its lines, never read off its total:
 

@@ -102,6 +102,11 @@
           });
           var left = unreadable ? "; " + plural(unreadable, "order", "orders") + " unreadable, left out" : "";
           panel.mark("done");
+          if (unreadable && unreadable === orders.length) {
+            panel.word(unreadable + " unreadable");
+            panel.fail("Nothing saved: " + plural(unreadable, "order", "orders") + " could not be read");
+            return;
+          }
           if (!rows.length) {
             panel.word("no orders");
             panel.recap("No orders in that range" + left);
