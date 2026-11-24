@@ -34,6 +34,23 @@ describe("naming the currency", () => {
     expect(MKM.currencyOf("$3.00")).toBe("usd");
   });
 
+  test("an amount is read whichever side its symbol is on", () => {
+    const read = (s) => { const a = MKM.readAmount(s); return a && [a.amount, a.currency]; };
+    expect(read("0,05 €")).toEqual(["0.05", "eur"]);
+    expect(read("1.204,50 €")).toEqual(["1204.50", "eur"]);
+    expect(read("1250,00 £")).toEqual(["1250.00", "gbp"]);
+    expect(read("£180.05")).toEqual(["180.05", "gbp"]);
+    expect(read("£1,250.00")).toEqual(["1250.00", "gbp"]);
+    expect(read("£1,234,250.00")).toEqual(["1234250.00", "gbp"]);
+    expect(read("$3.00")).toEqual(["3.00", "usd"]);
+  });
+
+  test("an amount that is neither form is not read", () => {
+    const not = ["", "180.05", "180.05 €", "£180,05", "£1.204,50", "1,204.50 €", "£1,20.00", "12.04,50 €",
+      "£5", "5 €", "£1.2", "£6.50 )", "1 £6.50", "£6.50 €"];
+    expect(not.filter((s) => MKM.readAmount(s))).toEqual([]);
+  });
+
   test("text with no symbol names no currency", () => {
     expect(MKM.currencyOf("1.20")).toBe("");
     expect(MKM.currencyOf("")).toBe("");

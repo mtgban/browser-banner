@@ -65,16 +65,44 @@
   {
     "guard": "a price is read from an element's own text",
     "file": "src/parse.js",
-    "find": "PRICE_RE.exec(ownText(elements[i]))",
-    "replace": "PRICE_RE.exec((elements[i].textContent || \"\").trim())",
+    "find": "MKM.readAmount(ownText(elements[i]))",
+    "replace": "MKM.readAmount((elements[i].textContent || \"\").trim())",
     "expectFailing": "an element wrapping the quantity and the price is not the price"
   },
   {
     "guard": "a full stop groups thousands",
-    "file": "src/parse.js",
-    "find": "return written.replace(/\\./g, \"\").replace(\",\", \".\");",
-    "replace": "return written.replace(\",\", \".\");",
+    "file": "src/rates.js",
+    "find": "last[1].replace(/\\./g, \"\")",
+    "replace": "last[1]",
     "expectFailing": "a grouped thousand is not read as a decimal"
+  },
+  {
+    "guard": "a comma groups thousands after a leading symbol",
+    "file": "src/rates.js",
+    "find": "first[2].replace(/,/g, \"\")",
+    "replace": "first[2]",
+    "expectFailing": "an amount is read whichever side its symbol is on"
+  },
+  {
+    "guard": "an amount with its symbol first is read",
+    "file": "src/rates.js",
+    "find": "    if (first) {",
+    "replace": "    if (false) {",
+    "expectFailing": "reads a British account's totals, the pound sign first"
+  },
+  {
+    "guard": "an amount with its symbol last takes a decimal comma alone",
+    "file": "src/rates.js",
+    "find": "|\\d+),(\\d{2})\\s*",
+    "replace": "|\\d+)[.,](\\d{2})\\s*",
+    "expectFailing": "an amount that is neither form is not read"
+  },
+  {
+    "guard": "an amount with its symbol first takes a decimal point alone",
+    "file": "src/rates.js",
+    "find": "|\\d+)\\.(\\d{2})$/",
+    "replace": "|\\d+)[.,](\\d{2})$/",
+    "expectFailing": "an amount that is neither form is not read"
   },
   {
     "guard": "a row repeated on one page is kept once",
@@ -581,11 +609,11 @@
     "expectFailing": "reads every order, the day and time apart, an amount grouped by a full stop"
   },
   {
-    "guard": "an order's amount drops its grouping full stop",
+    "guard": "an order's amount is read with its currency",
     "file": "src/history.js",
-    "find": "price[1].replace(/\\./g, \"\").replace(\",\", \".\")",
-    "replace": "price[1].replace(\",\", \".\")",
-    "expectFailing": "reads every order, the day and time apart, an amount grouped by a full stop"
+    "find": "price.currency.toUpperCase()",
+    "replace": "\"EUR\"",
+    "expectFailing": "reads a British account's totals, the pound sign first"
   },
   {
     "guard": "an order not read whole is counted",

@@ -9,7 +9,6 @@ globalThis.MKM = globalThis.MKM || {};
 
   var ORDER = /\/Orders\/(\d+)$/;
   var DATE = /^(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{2}:\d{2}))?$/;
-  var AMOUNT = /^(\d[\d.]*,\d{2})\s*(€|£|\$)$/;
 
   function text(node) {
     return node ? node.textContent.replace(/\s+/g, " ").trim() : "";
@@ -29,7 +28,7 @@ globalThis.MKM = globalThis.MKM || {};
       var id = ORDER.exec(row.getAttribute("data-url") || "");
       var seller = text(row.querySelector(".seller-name > span:not(.icon):not(.text-nowrap)"));
       var quantity = text(row.querySelector(".col-smallNumber.d-lg-flex"));
-      var price = AMOUNT.exec(text(row.querySelector(".col-price")));
+      var price = MKM.readAmount(text(row.querySelector(".col-price")));
       // The day and the time are two spans with nothing between them.
       var parts = row.querySelectorAll(".col-datetime span");
       var dateText = Array.prototype.map.call(parts, text).join(" ");
@@ -42,8 +41,8 @@ globalThis.MKM = globalThis.MKM || {};
         id: id[1],
         seller: seller,
         quantity: quantity,
-        amount: price[1].replace(/\./g, "").replace(",", "."),
-        currency: MKM.currencyOf(price[2]).toUpperCase(),
+        amount: price.amount,
+        currency: price.currency.toUpperCase(),
         dateText: dateText,
         date: { year: Number(date[3]), month: Number(date[2]), day: Number(date[1]) },
       });
