@@ -40,9 +40,10 @@ One line per order, its suborders folded in: Order Number, Order Date (the
 browser's own time, as ManaPool's page shows it, "2026-11-21 03:00"),
 Sellers (each seller's name, joined by "; "), Packages (the suborders),
 Items (their item counts added up), and Subtotal, Shipping, Tax and Total in
-dollars, as the API gives them. Newest first. An order missing any of
-those, or with a suborder missing its seller's name or its item count, is
-left out and counted.
+dollars, as the API gives them. Newest first. An order missing any of those,
+or with a suborder missing its seller's name or its item count, is left out
+and counted. When no order could be read at all, the panel fails and says
+how many, rather than that there are none.
 
 The range is the other stores': the last 30, 90 or 120 days, every year, or
 one year back to 2024, when ManaPool's first orders were placed. The API

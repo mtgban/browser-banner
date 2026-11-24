@@ -199,6 +199,40 @@ describe("the history's panel", () => {
     expect(it.tip()).toBe("Saved scg-orders-2026.csv: 4 orders; 2 orders unreadable, left out");
   });
 
+  test("a range with no order it can read fails, and does not say it has none", async () => {
+    const pages = listPages().map((p) => p.replace(/[A-Z][a-z]{2} \d{1,2}(?:st|nd|rd|th) \d{4}/g, "soon"));
+    const it = mount({ pages });
+    it.choose("2022");
+    it.go();
+    await it.done();
+    expect(it.heading()).toMatch(/^SCG BANner - 10 unreadable/);
+    expect(it.failed()).toBe(true);
+    expect(it.tip()).toBe("Nothing saved: 10 orders could not be read");
+    expect(it.saved).toEqual([]);
+  });
+
+  test("an order it cannot read outside an empty range is said, not a failure", async () => {
+    const pages = listPages();
+    pages[0] = pages[0].replace("Nov 19th 2026", "soon");
+    const it = mount({ pages });
+    it.choose("2022");
+    it.go();
+    await it.done();
+    expect(it.heading()).toBe("SCG BANner - no orders✓");
+    expect(it.tip()).toBe("No orders in that range; 1 order unreadable, left out");
+  });
+
+  test("a range whose orders' own pages do not read fails", async () => {
+    const o = orderOf("1000002");
+    o.items = [];
+    const it = mount({ pages: listPages(10, [5, 200, 210, 220, 230, 240, 250, 260, 270, 280]), orders: { 1000001: orderPage({ ...o, id: 1000001 }) } });
+    it.choose("days:30");
+    it.go();
+    await it.done();
+    expect(it.failed()).toBe(true);
+    expect(it.tip()).toBe("Nothing saved: 1 order could not be read");
+  });
+
   test("a range with no orders saves nothing", async () => {
     const it = mount();
     it.choose("2022");

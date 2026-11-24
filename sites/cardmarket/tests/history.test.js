@@ -257,6 +257,28 @@ describe("the purchase list's panel", () => {
     expect(it.saved).toEqual([]);
   });
 
+  test("a list with no order it can read fails, and does not say it has none", async () => {
+    const it = mount();
+    for (const cell of it.window.document.querySelectorAll("#StatusTable .table-body .col-price")) cell.textContent = "a lot";
+    it.window.document.querySelector('[aria-label="Next page"]').removeAttribute("href");
+    it.go();
+    await it.settle();
+    expect(it.heading()).toMatch(/^CM BANner - 5 unreadable/);
+    expect(it.failed()).toBe(true);
+    expect(it.tip()).toBe("Nothing saved: 5 orders could not be read");
+    expect(it.saved).toEqual([]);
+  });
+
+  test("an order it cannot read outside an empty range is said, not a failure", async () => {
+    const it = mount();
+    it.window.document.querySelector("#StatusTable .table-body .col-price").textContent = "a lot";
+    it.choose(String(dated(1200).getFullYear() - 2));
+    it.go();
+    await it.settle(120);
+    expect(it.heading()).toBe("CM BANner - no orders✓");
+    expect(it.tip()).toBe("No orders in that range. Read 3 pages; 1 order unreadable, left out");
+  });
+
   test("an older range with none says so", async () => {
     const it = mount({ fetchPage: (href) => Promise.resolve({ ok: true, status: 200, headers: { get: () => null }, text: () => Promise.resolve(page(Number(/site=(\d+)/.exec(href)[1]))) }) });
     it.choose(String(dated(1200).getFullYear() - 2));

@@ -83,7 +83,7 @@
       var past = take(doc);
       var next = MKM.nextPageURL(doc, href);
       if (past || !next) {
-        return { orders: orders, pages: pages, unreadable: unreadable };
+        return { orders: orders, pages: pages, unreadable: unreadable, read: Object.keys(seen).length };
       }
       panel.word("page " + (pages + 1));
       return after(MKM.PACE)
@@ -124,6 +124,13 @@
         run = null;
         panel.busy(false);
         var left = done.unreadable ? "; " + plural(done.unreadable, "order", "orders") + " unreadable, left out" : "";
+        // An order that does not read has no date, so it says nothing of the
+        // range unless none read.
+        if (!done.read && done.unreadable) {
+          panel.word(done.unreadable + " unreadable");
+          panel.fail("Nothing saved: " + plural(done.unreadable, "order", "orders") + " could not be read");
+          return;
+        }
         if (!done.orders.length) {
           panel.word("no orders");
           panel.mark("done");
