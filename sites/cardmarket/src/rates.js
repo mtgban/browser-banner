@@ -32,6 +32,25 @@ globalThis.MKM = globalThis.MKM || {};
     return "";
   };
 
+  // The two ways Cardmarket writes an amount. The symbol's side says which
+  // mark is the decimal one: "1.250,00 €" and "£1,250.00".
+  var SYMBOL_LAST = /^(\d{1,3}(?:\.\d{3})+|\d+),(\d{2})\s*([€£$])$/;
+  var SYMBOL_FIRST = /^([€£$])\s*(\d{1,3}(?:,\d{3})+|\d+)\.(\d{2})$/;
+
+  // readAmount reads a text that is one amount and nothing else into
+  // { amount, currency }, amount with a decimal point, or null.
+  MKM.readAmount = function (text) {
+    var last = SYMBOL_LAST.exec(text);
+    if (last) {
+      return { amount: last[1].replace(/\./g, "") + "." + last[2], currency: CURRENCIES[last[3]] };
+    }
+    var first = SYMBOL_FIRST.exec(text);
+    if (first) {
+      return { amount: first[2].replace(/,/g, "") + "." + first[3], currency: CURRENCIES[first[1]] };
+    }
+    return null;
+  };
+
   // toRates reads the feed into the multipliers a caller wants: the feed
   // quotes what one dollar buys, and a price is going the other way.
   //

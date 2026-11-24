@@ -58,12 +58,6 @@ globalThis.MKM = globalThis.MKM || {};
     11: "Traditional Chinese",
   };
   var QTY_RE = /^\s*(\d+)/;
-  // Cardmarket writes a decimal comma, and the symbol says which currency
-  // the shelf quotes in. The price has to be the whole of what its element
-  // says: read off the row's flattened text instead, a quantity sitting
-  // beside the price is glued to the front of it, and "1" before "0,05 EUR"
-  // reads as ten euros and five cents.
-  var PRICE_RE = /^(\d[\d.,]*)\s*(\u20ac|\u00a3|\$)$/;
   // The product id is the image's own file name:
   // ".../1/ULG/10601/10601.jpg" is product 10601. Reading the last path
   // element rather than a fixed position in the path keeps it working
@@ -113,24 +107,20 @@ globalThis.MKM = globalThis.MKM || {};
     return text.trim();
   }
 
-  // priceOf finds the element whose whole text is a price. The row shows the
-  // unit price before any line total, so the first one found is the asking
-  // price.
+  // priceOf finds the element whose whole text is a price. Read off the
+  // row's flattened text instead, a quantity sitting beside the price is
+  // glued to the front of it, and "1" before "0,05 EUR" reads as ten euros
+  // and five cents. The row shows the unit price before any line total, so
+  // the first one found is the asking price.
   function priceOf(row) {
     var elements = row.querySelectorAll("*");
     for (var i = 0; i < elements.length; i++) {
-      var found = PRICE_RE.exec(ownText(elements[i]));
+      var found = MKM.readAmount(ownText(elements[i]));
       if (found) {
         return found;
       }
     }
     return null;
-  }
-
-  // normalizeAmount reads the number Cardmarket writes: a decimal comma,
-  // and a full stop grouping the thousands above it.
-  function normalizeAmount(written) {
-    return written.replace(/\./g, "").replace(",", ".");
   }
 
   // slugToName turns a product slug back into the card's name. It is the
@@ -283,8 +273,8 @@ globalThis.MKM = globalThis.MKM || {};
       // what it is taking rather than quietly given less.
       language: language,
       languageName: MKM.languageName(language, languages),
-      price: priced ? normalizeAmount(priced[1]) : "",
-      currency: priced ? MKM.currencyOf(priced[2]) : "",
+      price: priced ? priced.amount : "",
+      currency: priced ? priced.currency : "",
     };
   }
 

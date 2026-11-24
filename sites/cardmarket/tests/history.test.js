@@ -115,6 +115,15 @@ describe("reading a purchase list", () => {
     expect(orders[0].date).toEqual({ year: 2026, month: 10, day: 14 });
   });
 
+  test("reads a British account's totals, the pound sign first", () => {
+    const { MKM: mkm } = MKM();
+    const w = new Window({ url: LIST });
+    w.document.body.innerHTML = text("purchases.html").replace("4,05 €", "£180.05").replace("1.204,50 €", "£1,204.50");
+    const { orders, unreadable } = mkm.readOrders(w.document);
+    expect(unreadable).toBe(0);
+    expect(orders.slice(1, 3).map((o) => [o.amount, o.currency])).toEqual([["180.05", "GBP"], ["1204.50", "GBP"]]);
+  });
+
   test("counts a row it cannot read whole", () => {
     const { MKM: mkm } = MKM();
     const w = new Window({ url: LIST });

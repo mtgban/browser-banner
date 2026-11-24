@@ -205,8 +205,12 @@ The price is `0,05 €`. The `10,05 €` is an illusion - a neighbouring `1`
 glued to the front of it by concatenation. The first run against a saved
 page priced a common at $11.53 because of exactly this.
 
-Cardmarket writes a decimal comma and groups thousands with a full stop
-(`1.250,00 £`). Currencies seen: `€`, `£`.
+Cardmarket writes an amount in one of two forms, and the symbol's side says
+which: symbol last, a decimal comma and thousands grouped by a full stop
+(`1.204,50 €`), or symbol first, a decimal point and thousands grouped by a
+comma (`£530.67`, a British account's purchase list). Any other form is not
+read. Currencies seen: `€`, `£`. The symbol-first form has been seen on a
+purchase list and not yet on an offers page or an order.
 
 A row may show two prices - the item and the item plus shipping. The unit
 price comes first in DOM order.
@@ -926,14 +930,15 @@ read, the amounts added up to the count in the table's heading (5, 40 and
 
 ## 9. The purchase history
 
-`/<language>/<Game>/Orders/Purchases/<Tab>` is one of the visitor's
-purchase lists, a tab per status: Unpaid, Paid, Sent, Arrived, NotArrived,
-Cancelled. Each lists its orders newest first, 30 to a page, numbered by a
-`site` parameter left off the first, under the same pager the offers use
-(section 6.1), with the count beside it. A row is `[data-url]` in
-`#StatusTable .table-body`: the order id in its address, the seller's name,
-the article count, the total ("1.204,50 €") and the tab's date, its day and
-time in two spans with nothing between them ("11.11.2026" and "22:12").
+`/<language>/<Game>/Orders/Purchases/<Tab>` is one of the visitor's purchase
+lists, a tab per status: Unpaid, Paid, Sent, Arrived, NotArrived, Cancelled.
+Each lists its orders newest first, 30 to a page, numbered by a `site`
+parameter left off the first, under the same pager the offers use (section
+6.1), with the count beside it. A row is `[data-url]` in `#StatusTable
+.table-body`: the order id in its address, the seller's name, the article
+count, the total ("1.204,50 €", or "£530.67" on a British account; section
+3.6) and the tab's date, its day and time in two spans with nothing between
+them ("11.11.2026" and "22:12").
 
 The panel offers a range, as Card Kingdom's and TCGplayer's histories do
 (the last 30, 90 or 120 days, every year, or one year back to 2007), and
@@ -951,5 +956,6 @@ the walk with nothing saved. The file is `cm-purchases-<tab>-<range>.csv`,
 named as the other stores' are.
 
 Two saved list pages, 60 orders from 2021 to 2026, read whole, their totals
-matching the page's to the cent and every order id once.
+matching the page's to the cent and every order id once. A British account's
+saved list, two orders in pounds, read whole.
 

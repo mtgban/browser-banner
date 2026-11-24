@@ -165,6 +165,13 @@ describe("the price as the page wrote it", () => {
     expect(byArticle["2060000002"].currency).toBe("gbp");
   });
 
+  test("a price with its symbol first is read", () => {
+    const window = new Window();
+    window.document.body.innerHTML = text("offers.html").replace("1.250,00 £", "£1,250.00");
+    const offer = MKM.parseOffers(window.document).find((o) => o.articleID === "2060000002");
+    expect([offer.price, offer.currency]).toEqual(["1250.00", "gbp"]);
+  });
+
   test("a quantity beside the price is not part of it", () => {
     // The row reads "1" then "0,05 EUR"; flattened that is "10,05 EUR".
     expect(byArticle["2060000003"].price).toBe("0.05");
