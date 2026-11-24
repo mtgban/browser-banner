@@ -99,7 +99,7 @@ export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut 
   const at = (s) => panel() && panel().querySelector(s);
   const sellerRow = (name) => {
     const h3 = [...doc.querySelectorAll("h3")].find((h) => h.textContent.trim() === name);
-    return h3 && h3.parentElement.querySelector(".ban-seller");
+    return h3 && h3.closest(".justify-between").querySelector(".ban-seller");
   };
   return {
     window,

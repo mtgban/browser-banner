@@ -58,8 +58,15 @@ globalThis.MPB = globalThis.MPB || {};
     }
   };
 
+  // headerOf is the row across a seller's section, the name at its left and
+  // its right empty, or the name's own box where the page draws no such row.
+  function headerOf(section, named) {
+    var row = named.closest(".justify-between");
+    return row && section.contains(row) ? row : named.closest("h3").parentElement;
+  }
+
   // sellers reads the cart page's sections: { slug, name, header, items }
-  // for each list of items under one seller's links, header being the box
+  // for each list of items under one seller's links, header being the row
   // that holds the seller's name.
   MPB.sellers = function (doc) {
     var found = [];
@@ -97,8 +104,7 @@ globalThis.MPB = globalThis.MPB || {};
       found.push({
         slug: hrefs[0].replace(/^.*\/shop\//, "").replace(/[/?#].*$/, ""),
         name: text(named),
-        // The row goes beside the name, not in its heading.
-        header: named.closest("h3").parentElement,
+        header: headerOf(section, named),
         items: items,
       });
     }

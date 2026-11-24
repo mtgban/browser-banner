@@ -1,5 +1,5 @@
-// The cart: Remove seller and Only this seller under each seller's name,
-// and Put back on the panel.
+// The cart: Remove seller and Only this seller at the right of each
+// seller's row, and Put back on the panel.
 
 import { test, expect, describe } from "bun:test";
 import { mountCart } from "./cart.js";
@@ -7,15 +7,29 @@ import { mountCart } from "./cart.js";
 const ALL = ["Grim Guardian", "Pinnacle Monk // Mystic Peak", "Alloy Myr", "Pyrrhic Revival"];
 
 describe("the cart", () => {
-  test("puts Remove seller and Only this seller under each seller's name, and back after a redraw", async () => {
+  test("puts Remove seller and Only this seller at the right of each seller's row, and back after a redraw", async () => {
     const it = mountCart();
     expect(it.rows()).toBe(3);
     expect([...it.doc.querySelector(".ban-seller").querySelectorAll("button")].map((b) => b.textContent)).toEqual(["Remove seller", "Only this seller"]);
+    for (const row of it.doc.querySelectorAll(".ban-seller")) {
+      expect(row.parentElement.className).toContain("justify-between");
+      expect(row.parentElement.lastElementChild === row).toBe(true);
+    }
+    expect([...it.doc.querySelector(".ban-seller").children].map((b) => b.className)).toEqual(["ban-remove", "ban-only"]);
     it.doc.querySelector(".ban-seller").remove();
     await it.settle(600);
     expect(it.rows()).toBe(3);
     expect(it.back().disabled).toBe(true);
-    expect(it.tip()).toBe("Under each seller: Remove seller, or Only this seller to set the others aside");
+    expect(it.tip()).toBe("Beside each seller: Remove seller, or Only this seller to set the others aside");
+  });
+
+  test("goes in the name's box where the page draws no row across", () => {
+    const it = mountCart();
+    const row = it.doc.querySelector(".justify-between");
+    row.className = "";
+    it.doc.querySelector("main").className = "justify-between";
+    it.doc.querySelectorAll(".ban-seller").forEach((r) => r.remove());
+    expect(it.window.MPB.sellers(it.doc)[0].header === it.doc.querySelector("h3").parentElement).toBe(true);
   });
 
   test("Remove seller takes out that seller's items alone, through ManaPool's own list, and sets nothing aside", async () => {

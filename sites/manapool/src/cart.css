@@ -1,23 +1,45 @@
-/* Remove seller and Only this seller, under a seller's name in the cart:
-   small, quiet, and ManaPool's own font. */
+/* Remove seller and Only this seller, at the right of a seller's row in the
+   cart, in ManaPool's own font. The row pulls itself 16px up and left, and
+   gives its children that much back; so does this. Where the two do not fit
+   beside the name, they wrap under it, still at the right. */
 .ban-seller {
   display: flex;
-  gap: 6px;
-  margin-top: 4px;
+  flex: none;
+  gap: 8px;
+  margin: 16px 0 0 auto;
+  padding-left: 16px;
 }
 
 .ban-seller button {
-  padding: 2px 8px;
-  border: 1px solid #1c2e4a;
-  border-radius: 4px;
-  background: #fff;
-  color: #1c2e4a;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.ban-seller button:hover {
-  background: #1c2e4a;
-  color: #fff;
+.ban-seller .ban-remove {
+  background: #c62828;
+}
+
+.ban-seller .ban-remove:hover {
+  background: #a31f1f;
+}
+
+.ban-seller .ban-only {
+  background: #2d67c4;
+}
+
+.ban-seller .ban-only:hover {
+  background: #23529d;
+}
+
+.ban-seller button:focus-visible {
+  outline: 2px solid #8ab4f8;
+  outline-offset: 2px;
 }
