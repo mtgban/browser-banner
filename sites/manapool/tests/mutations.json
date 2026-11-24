@@ -203,18 +203,32 @@
     "expectFailing": "Put back returns the set-aside listings to the cart, from their own sellers"
   },
   {
+    "guard": "the seller buttons sit in the seller's row, not under the name",
+    "file": "src/cart.js",
+    "find": "header: headerOf(section, named),",
+    "replace": "header: named.closest(\"h3\").parentElement,",
+    "expectFailing": "puts Remove seller and Only this seller at the right of each seller's row, and back after a redraw"
+  },
+  {
+    "guard": "the seller's row is within the seller's section",
+    "file": "src/cart.js",
+    "find": "row && section.contains(row) ?",
+    "replace": "row ?",
+    "expectFailing": "goes in the name's box where the page draws no row across"
+  },
+  {
     "guard": "the seller buttons are drawn once",
     "file": "src/page.js",
     "find": "if (seller.header.querySelector(\".ban-seller\")) {\n          return;\n        }",
     "replace": "",
-    "expectFailing": "puts Remove seller and Only this seller under each seller's name, and back after a redraw"
+    "expectFailing": "puts Remove seller and Only this seller at the right of each seller's row, and back after a redraw"
   },
   {
     "guard": "the seller buttons are drawn at all",
     "file": "src/page.js",
     "find": "if (shown && shown.refresh) {\n      shown.refresh();\n    }",
     "replace": "",
-    "expectFailing": "puts Remove seller and Only this seller under each seller's name, and back after a redraw"
+    "expectFailing": "puts Remove seller and Only this seller at the right of each seller's row, and back after a redraw"
   },
   {
     "guard": "leaving the cart takes the seller buttons",

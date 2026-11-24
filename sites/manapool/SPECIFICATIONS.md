@@ -82,6 +82,10 @@ seller's links, the seller named in an `h3`. An item shows its name, set,
 finish and condition, and a quantity list (`aria-label="Update Quantity"`)
 whose first option is "remove", value 0. No listing's id is on the page.
 
+The buttons are drawn at the right of the row across a seller's section,
+its name at the left: Remove seller red, Only this seller the panel's blue.
+Where they do not fit beside the name they wrap under it.
+
 - **Remove seller** takes each of that seller's items out in turn, through
   its own quantity list as a person would by keyboard: focus, ArrowDown
   (the list opens with "remove" highlighted), Enter. The next waits until

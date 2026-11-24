@@ -151,7 +151,7 @@
     };
   }
 
-  // cart is the cart's panel, and two buttons under each seller's name:
+  // cart is the cart's panel, and two buttons in each seller's row:
   // Remove seller, and Only this seller, which sets every other seller's
   // items aside for Put back.
   function cart() {
@@ -174,7 +174,7 @@
       panel.word(n ? plural(n, "item", "items") + " set aside" : "");
       panel.hint(n
         ? "Put back the items Only this seller set aside, from the sellers they came from"
-        : "Under each seller: Remove seller, or Only this seller to set the others aside");
+        : "Beside each seller: Remove seller, or Only this seller to set the others aside");
     }
 
     function stop() {
@@ -315,8 +315,8 @@
     back.addEventListener("click", putBack);
     idle();
 
-    // buttons puts Remove seller and Only this seller under each seller's
-    // name, where ManaPool's redraw has not left them already.
+    // buttons puts Remove seller and Only this seller at the right of each
+    // seller's row, where ManaPool's redraw has not left them already.
     function buttons() {
       MPB.sellers(document).forEach(function (seller) {
         if (seller.header.querySelector(".ban-seller")) {
@@ -324,12 +324,13 @@
         }
         var row = document.createElement("div");
         row.className = "ban-seller";
-        [["Remove seller", removeSeller], ["Only this seller", onlySeller]].forEach(function (b) {
+        [["ban-remove", "Remove seller", removeSeller], ["ban-only", "Only this seller", onlySeller]].forEach(function (b) {
           var made = document.createElement("button");
           made.type = "button";
-          made.textContent = b[0];
+          made.className = b[0];
+          made.textContent = b[1];
           made.addEventListener("click", function () {
-            b[1](seller);
+            b[2](seller);
           });
           row.appendChild(made);
         });
