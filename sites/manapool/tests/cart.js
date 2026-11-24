@@ -2,8 +2,9 @@
 // fixture, the stored cart in localStorage, and ManaPool's own behaviour
 // around them, which the extension drives and does not own:
 //
-// - a quantity list opens on ArrowDown with "remove" highlighted, and Enter
-//   takes the item out of the page and the stored cart;
+// - a quantity list opens soon after ArrowDown, "remove" highlighted, named
+//   by its button's aria-controls, and Enter takes the item out of the stored
+//   cart at once and off the page, its list with it, a moment later;
 // - a write to the stored cart announced by a storage event is synced: new
 //   listings come back under their seller, unless marked sold out.
 
@@ -14,7 +15,7 @@ import { text } from "./panel.js";
 
 const SITE = "https://manapool.com";
 
-export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut = [], stash, noSync = false } = {}) {
+export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut = [], stash, noSync = false, answer = 2, linger = 80 } = {}) {
   const window = new Window({ url: SITE + path });
   window.document.body.innerHTML = text("cart.html");
   const doc = window.document;
@@ -27,14 +28,16 @@ export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut 
 
   const read = () => JSON.parse(window.localStorage.getItem("manapool-cart"));
   const write = (s) => window.localStorage.setItem("manapool-cart", JSON.stringify(s));
-  let open = null;
+  let lists = 0;
   doc.addEventListener("keydown", (event) => {
     const box = event.target.closest && event.target.closest('[aria-label="Update Quantity"]');
     if (!box) return;
     const listing = listings.find((l) => l.li === box.closest("li"));
+    const open = doc.getElementById(box.getAttribute("aria-controls") || "");
     if (event.key === "ArrowDown" && !open) {
-      open = doc.createElement("div");
-      open.setAttribute("role", "listbox");
+      const list = doc.createElement("div");
+      list.setAttribute("role", "listbox");
+      list.id = "list-" + ++lists;
       const values = noRemove.includes(listing.name) ? ["1", "2"] : ["0", "1", "2"];
       values.forEach((v, i) => {
         const o = doc.createElement("div");
@@ -42,21 +45,26 @@ export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut 
         o.setAttribute("data-value", v);
         o.textContent = v === "0" ? "remove" : v;
         if (i === 0) o.setAttribute("data-highlighted", "");
-        open.appendChild(o);
+        list.appendChild(o);
       });
-      doc.body.appendChild(open);
+      setTimeout(() => {
+        box.setAttribute("aria-controls", list.id);
+        doc.body.appendChild(list);
+      }, 3);
     } else if (event.key === "Escape" && open) {
       open.remove();
-      open = null;
+      box.removeAttribute("aria-controls");
     } else if (event.key === "Enter" && open) {
       const highlighted = open.querySelector("[data-highlighted]");
-      open.remove();
-      open = null;
+      box.removeAttribute("aria-controls");
+      setTimeout(() => open.remove(), linger);
       if (highlighted.getAttribute("data-value") === "0" && !refuse.includes(listing.name)) {
-        listing.li.remove();
-        const s = read();
-        s.cart.entries = s.cart.entries.filter((e) => e.inventoryId !== listing.id);
-        write(s);
+        setTimeout(() => listing.li.remove(), linger);
+        setTimeout(() => {
+          const s = read();
+          s.cart.entries = s.cart.entries.filter((e) => e.inventoryId !== listing.id);
+          write(s);
+        }, answer);
       }
     }
   });
@@ -91,7 +99,6 @@ export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut 
       window.eval(readFileSync(new URL("../" + script, import.meta.url), "utf8"));
     }
   }
-  window.MPB.STEP = 0;
   window.MPB.OPEN = 100;
   window.MPB.WAIT = 200;
   window.MPB.SYNC = 300;

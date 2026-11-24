@@ -14,11 +14,14 @@ globalThis.MPB = globalThis.MPB || {};
 
   MPB.CART_KEY = "manapool-cart";
   MPB.STASH_KEY = "banner-manapool-stash";
-  // STEP is the pause between items, OPEN how long a quantity list gets
-  // to open, and WAIT how long ManaPool gets to answer each change.
-  MPB.STEP = 400;
+  // TICK is how often a removal looks for ManaPool's answer, which takes a
+  // few milliseconds; OPEN is how long a quantity list gets to open, WAIT how
+  // long ManaPool gets to answer each change, and LEAVE how long it gets to
+  // draw the items taken out off the page.
+  MPB.TICK = 5;
   MPB.OPEN = 1000;
   MPB.WAIT = 3000;
+  MPB.LEAVE = 1000;
   // SYNC is how long Put back waits for ManaPool to sync what it wrote.
   MPB.SYNC = 15000;
 
@@ -26,15 +29,9 @@ globalThis.MPB = globalThis.MPB || {};
     return node ? node.textContent.replace(/\s+/g, " ").trim() : "";
   }
 
-  function pause(ms) {
-    return new Promise(function (resume) {
-      setTimeout(resume, ms);
-    });
-  }
-
   // waitFor polls test until it answers something, or ms run out.
   MPB.waitFor = waitFor;
-  function waitFor(test, ms) {
+  function waitFor(test, ms, every) {
     var until = Date.now() + ms;
     return new Promise(function (done) {
       (function poll() {
@@ -43,7 +40,7 @@ globalThis.MPB = globalThis.MPB || {};
           done(got || null);
           return;
         }
-        setTimeout(poll, 50);
+        setTimeout(poll, every || 50);
       })();
     });
   }
@@ -146,14 +143,17 @@ globalThis.MPB = globalThis.MPB || {};
     box.focus();
     key(box, "ArrowDown");
     return waitFor(function () {
-      return box.ownerDocument.querySelector('[role="listbox"] [role="option"][data-value="0"]');
-    }, MPB.OPEN)
+      // This box's own list: an item just taken out leaves its list on the
+      // page for a moment, open beside this one.
+      var list = box.ownerDocument.getElementById(box.getAttribute("aria-controls") || "");
+      return list && list.querySelector('[role="option"][data-value="0"][data-highlighted]');
+    }, MPB.OPEN, MPB.TICK)
       .then(function (remove) {
-        if (!remove || remove.getAttribute("data-highlighted") === null) {
-          key(box.ownerDocument.activeElement || box, "Escape");
+        if (!remove) {
+          key(box, "Escape");
           throw new Error("ManaPool offered no remove for " + MPB.itemOf(li).name);
         }
-        key(box.ownerDocument.activeElement || box, "Enter");
+        key(box, "Enter");
         return waitFor(function () {
           var after = MPB.stored();
           var gone = after ? before.cart.entries.filter(function (e) {
@@ -162,7 +162,7 @@ globalThis.MPB = globalThis.MPB || {};
             });
           }) : [];
           return gone.length ? gone : null;
-        }, MPB.WAIT);
+        }, MPB.WAIT, MPB.TICK);
       })
       .then(function (gone) {
         if (!gone || gone.length !== 1) {
@@ -172,18 +172,23 @@ globalThis.MPB = globalThis.MPB || {};
       });
   };
 
-  // removeAll takes items out one at a time, STEP apart, calling took(li,
-  // gone) after each; going() answers false to stop.
+  // removeAll takes items out one at a time, each as soon as ManaPool has
+  // answered the last, calling took(li, gone) after each; going() answers
+  // false to stop. It ends once the page has drawn them off.
   MPB.removeAll = function (items, took, going) {
     var i = 0;
     function next() {
       if (i >= items.length || !going()) {
-        return Promise.resolve(i);
+        return waitFor(function () {
+          return !items.slice(0, i).some(function (li) {
+            return li.isConnected;
+          });
+        }, MPB.LEAVE);
       }
       var li = items[i++];
       return MPB.removeItem(li).then(function (gone) {
         took(li, gone);
-        return pause(MPB.STEP).then(next);
+        return next();
       });
     }
     return next();
