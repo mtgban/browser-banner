@@ -7,13 +7,14 @@ cards to mtgban's uploader or saves them as CSV. Read `SPECIFICATIONS.md`
 for what it does and what is known about Star City Games' pages; this file
 is about how to work on it without breaking it.
 
+The root's `AGENTS.md` holds here too: how to run the tests, the rules, the
+traps and the commits. This file says only what is this store's own.
+
 ## The one rule that matters
 
 **Verify against a saved Star City Games page, not against a fixture.**
 
-A fixture is a reconstruction, and a reconstruction drifts toward whatever
-the code already does. When you change how a page is read, ask for saved
-pages (`Cmd-S`, complete) and run against them:
+Run the reader against saved pages:
 
 ```
 SCG_SAVED="<list.html>:<order.html>:<order.html>" bun test sites/starcitygames
@@ -25,9 +26,8 @@ variable it skips.
 
 **Saved pages are not committable as they are.** One carries the account's
 name, email, phone, postal addresses and a storefront token, all in the JSON
-the page boots with. Work on them outside the repository and delete them
-after. The fixtures are cut by `scripts/cut-fixtures.mjs`, never by editing
-a saved page down; `tests/repo.test.js` scans every fixture for what a cut
+the page boots with. The fixtures are cut by `scripts/cut-fixtures.mjs`,
+never by editing a saved page down; `tests/repo.test.js` scans every fixture for what a cut
 must never keep.
 
 ## Layout
@@ -46,16 +46,6 @@ tests/mutations.json  each guard, the text that breaks it, the test that fails
 tests/           bun + happy-dom, no browser
 ```
 
-## Verifying
-
-From the repository's root:
-
-```
-bun install
-bun run test
-bun run mutate sites/starcitygames
-```
-
 ## Rules
 
 - **Read the JSON the page boots with.** What an order's page prints beside
@@ -67,8 +57,3 @@ bun run mutate sites/starcitygames
   before refunds. A cost is added up from the order's lines, and only when
   they come to the order's own totals; a line not known leaves it empty.
 - **One page at a time, PACE apart.** A history opens every order in range.
-
-## Commits
-
-One topic per commit, wrapped at 80 columns, with the reasoning in the body
-rather than the diff. No `Co-Authored-By` lines.

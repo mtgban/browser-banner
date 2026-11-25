@@ -4,9 +4,12 @@ Guidance for AI coding agents working on ManaPool's part of **BANner**, the
 browser extension: it saves a ManaPool buyer's order history as CSV, one
 line per order, sends an order's or a package's cards to mtgban's uploader
 or saves them as CSV, and in the cart removes a seller's items or sets the
-other sellers' aside and puts them back. Read `SPECIFICATIONS.md` for what it does
-and what is known about ManaPool; this file is about how to work on it
-without breaking it.
+other sellers' aside and puts them back. Read `SPECIFICATIONS.md` for what
+it does and what is known about ManaPool; this file is about how to work on
+it without breaking it.
+
+The root's `AGENTS.md` holds here too: how to run the tests, the rules, the
+traps and the commits. This file says only what is this store's own.
 
 ## The one rule that matters
 
@@ -43,16 +46,6 @@ tests/mutations.json  each guard, the text that breaks it, the test that fails
 tests/           bun + happy-dom, no browser
 ```
 
-## Verifying
-
-From the repository's root:
-
-```
-bun install
-bun run test
-bun run mutate sites/manapool
-```
-
 ## Rules
 
 - **ManaPool moves between pages without loading them.** The script runs on
@@ -66,8 +59,3 @@ bun run mutate sites/manapool
   page's side, so a change there is checked in a real cart first.
 - **Amounts are the API's own.** ManaPool's page adds its service fee to
   an order's total; the API does not give it, and it is not computed here.
-
-## Commits
-
-One topic per commit, wrapped at 80 columns, with the reasoning in the body
-rather than the diff. No `Co-Authored-By` lines.

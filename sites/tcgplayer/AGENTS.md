@@ -2,20 +2,19 @@
 
 Guidance for AI coding agents working on TCGplayer's part of **BANner**, the
 browser extension: it handles a TCGplayer buyer's order history: a year,
-every year or the last days saved as CSV, every order number made a search for that order, and an order's cards
-sent to mtgban's uploader. Read `SPECIFICATIONS.md` for what it does and what
-is known about TCGplayer's page; this file is about how to work on it without
-breaking it.
+every year or the last days saved as CSV, every order number made a search
+for that order, and an order's cards sent to mtgban's uploader. Read
+`SPECIFICATIONS.md` for what it does and what is known about TCGplayer's
+page; this file is about how to work on it without breaking it.
+
+The root's `AGENTS.md` holds here too: how to run the tests, the rules, the
+traps and the commits. This file says only what is this store's own.
 
 ## The one rule that matters
 
 **Verify against a saved TCGplayer page, not against the fixture.**
 
-A fixture is a reconstruction, and a reconstruction drifts toward whatever the
-code already does. The sibling extensions learned this more than once: a
-parser and its fixture agreed with each other and were both wrong, until a
-real page showed it. When you change the parser, ask for a saved page
-(`Cmd-S`, complete) and run against it:
+Run the reader against a saved page:
 
 ```
 TCG_SAVED_ORDERS="<saved order history.html>" bun test tests/
@@ -28,9 +27,8 @@ the variable it skips.
 **Saved pages are not committable as they are.** One carries the account's
 email (the welcome line), name, two postal addresses, tracking numbers, the
 filter form's `__RequestVerificationToken`, and every seller it bought from.
-Work on them outside the repository and delete them after. The fixture is cut
-by `scripts/cut-fixtures.mjs`, never by editing a saved page down;
-`tests/repo.test.js` scans every fixture for what a cut must never keep.
+The fixture is cut by `scripts/cut-fixtures.mjs`, never by editing a saved
+page down; `tests/repo.test.js` scans every fixture for what a cut must never keep.
 
 ## Layout
 
@@ -54,27 +52,6 @@ The scripts share one global, `globalThis.TCGB`, the way the browser runs
 them; `tests/helpers.js` runs them the same way and stands in for TCGplayer's
 session (a range, a search, and pages of a list cut from the fixture).
 
-## Verifying
-
-From the repository's root:
-
-```
-bun install
-bun run test
-bun run mutate sites/tcgplayer
-```
-
-CI runs the same on every push; `bun test tests/` here runs this site's tests
-alone, without the repository's own. There is no build step: the scripts are
-plain ES5-ish so they can be `content_scripts` entries as they are; keep them
-that way.
-
-A guard (a refusal, a strict shape, a check that keeps the walk honest) lands
-with an entry in `tests/mutations.json`: the text that breaks it and the name
-of the test that must then fail. The repository's `scripts/mutate.mjs` fails
-if that test does not fail, if no test file names it, or if an entry's text
-no longer appears exactly once.
-
 ## Traps
 
 **The date range is session state.** TCGplayer keeps the range, and a search,
@@ -85,61 +62,22 @@ for, and why it puts the visitor's range and search back, verified, whatever
 happens. A search is scoped by the range: an order outside the range is "No
 orders match your search criteria."
 
-**A saved page in happy-dom can reach TCGplayer.** Given a
-`store.tcgplayer.com` URL, the window resolves the page's own stylesheets,
-scripts and images against it and fetches them. Strip `<script>`, `<link>`,
-`src` and `url()` first, give the window no URL, and turn its file loading
-off.
-
-**Reloading the extension is not enough.** A content script already injected
-into an open tab keeps running the old code, so the TCGplayer tab needs
-reloading too.
-
-**Never hand `expect` an object holding a DOM node.** An order keeps its
-wrapper and its number's text node; a failing `toEqual` on one prints the
-whole happy-dom window. Compare the plain fields.
-
 **The order number is a bare text node** after the label's `<br>`. Replacing
 it is what makes it a button; reading a whole span's text would take the
 label with it.
 
 ## Things not to do
 
-- **Do not add a permission**, or declare a file web-accessible. Every request
-  is the page's own origin, and the handoff is a tab the visitor opens.
 - **Do not drive TCGplayer's search by key events.** The box carries jQuery
   autocomplete; setting `.value` and submitting the page's own form with its
   own button is all a search needs.
-- **Do not write a short export.** A walk that missed a page, saw the list
-  move, or met an order it could not read whole writes nothing.
-- **Do not guess** a condition, a language, an id or a game. A line that
+- **Do not guess** a condition, a language or a game either. A line that
   cannot be read whole carries what was read and says why; it is not sent to
-  BAN.
-- **Do not fan out the walk.** One request at a time, with a pause before
-  each. A challenge or a 429 stops it; never answer one in code.
-- **Do not resize the panel, or write anything under its buttons.** Status is
-  a mark beside the heading and a drawn tooltip.
-- **Do not write an em dash.** Use a plain dash, a comma or a new sentence; a
-  test fails on one.
+  BAN. A history with an order that cannot be read whole writes nothing.
+- **A 429 stops the walk too**, as a challenge does.
 
 ## Working with the other repositories
 
-The cards CSV is a contract with **mtgban-website**: every column name is
-chosen for how `internal/docparse`'s `ParseHeader` reads it (SPECIFICATIONS.md
-section 6). A header holding "number" becomes the card's variant, and one of
-exactly "TCGplayer Id" is a SKU that wipes the product id. Check that file
-before adding or renaming a column.
-
-The handoff protocol is the one Cardmarket's side speaks; mtgban-website's
-`/upload/handoff` must list `https://store.tcgplayer.com` in its
-`handoff_origins` (infrastructure config, not code) or the page never
-answers. When a change here needs one there, land the site side first.
-
-What the stores share is in `core/`; share nothing else with another store's
-side but its conventions.
-
-## Commits
-
-One topic per commit; a plain imperative subject with no `area:` prefix,
-wrapped at 80 columns; the reason and what was measured in the body. No
-`Co-Authored-By` lines. Pull requests off `master`, merged by rebase.
+The cards CSV's columns and how the upload reads them are SPECIFICATIONS.md
+section 6. A header of exactly "TCGplayer Id" is a SKU that wipes the product
+id.
