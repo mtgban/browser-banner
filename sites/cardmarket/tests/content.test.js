@@ -233,6 +233,13 @@ describe("the mark", () => {
   });
 });
 
+describe("a history's row", () => {
+  test("the button beside the range fills the row", () => {
+    const rule = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find((r) => r[1].includes("#ban-panel .ban-year + .ban-save"));
+    expect(rule && rule[2]).toContain("flex: 1");
+  });
+});
+
 describe("the armed pulse", () => {
   test("the ring is measured against the button and not the panel", () => {
     // It is absolutely positioned, so without a containing block on the

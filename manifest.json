@@ -104,8 +104,7 @@
       ],
       "css": [
         "core/panel.css",
-        "sites/cardkingdom/src/panel.css",
-        "sites/cardkingdom/src/history.css"
+        "sites/cardkingdom/src/panel.css"
       ],
       "run_at": "document_idle"
     },

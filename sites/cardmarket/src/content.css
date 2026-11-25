@@ -106,9 +106,11 @@
   background: #3f5f92;
 }
 
-/* Alone on the row, it takes the room the send button was using. The panel
-   is a fixed width and the button carries a longer word to suit. */
-#ban-panel .ban-send[hidden] + .ban-save {
+/* Alone on the row, or beside a history's range, it takes the room the send
+   button was using. The panel is a fixed width and the button carries a
+   longer word to suit. */
+#ban-panel .ban-send[hidden] + .ban-save,
+#ban-panel .ban-year + .ban-save {
   flex: 1;
 }
 

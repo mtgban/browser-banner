@@ -149,6 +149,52 @@
   gap: 6px;
 }
 
+/* A history's range, beside its Download CSV (core/ranges.js). One width, so
+   the button never moves as the range changes: 92px holds "120 days" and
+   its arrow, and leaves the button 122px, which takes 117px at its roomiest.
+   What a store's own form styles set is set here too, and the arrow is
+   drawn, since a store may take the browser's away. */
+#ban-panel .ban-year {
+  appearance: none;
+  flex: none;
+  box-sizing: border-box;
+  width: 92px;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 6px 20px 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+
+  background: #33507d url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E") right 7px center / 10px 6px no-repeat;
+  color: #fff;
+  font: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  cursor: pointer;
+}
+
+/* The open list, which Firefox draws in these colors. */
+#ban-panel .ban-year option {
+  background: #33507d;
+  color: #fff;
+}
+
+#ban-panel .ban-year:not([disabled]):hover {
+  background-color: #3f5f92;
+}
+
+#ban-panel .ban-year:focus-visible {
+  outline: 2px solid #8ab4f8;
+  outline-offset: 2px;
+}
+
+#ban-panel .ban-year[disabled] {
+  cursor: default;
+  opacity: 0.55;
+}
+
 #ban-panel .ban-go {
   flex: 1;
   margin: 0;
