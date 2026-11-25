@@ -188,6 +188,21 @@ globalThis.BAN = globalThis.BAN || {};
       }
     }
 
-    return { handOff: handOff, handoffURL: handoffURL };
+    // linkURL is the game's handoff page with the rows in its fragment, for a
+    // store whose Cross-Origin-Opener-Policy cuts its pages off from the
+    // windows they open. mtgban's page takes them when the referrer is the
+    // store's, so the link must send one. "" for a game the store may not
+    // send.
+    function linkURL(game, got) {
+      var page = handoffURL(game);
+      if (!page) {
+        return "";
+      }
+      var here = location.href;
+      var list = { csv: got.csv, rows: got.rows, source: here };
+      return page + "#" + ROWS + "=" + encodeURIComponent(JSON.stringify(list));
+    }
+
+    return { handOff: handOff, handoffURL: handoffURL, linkURL: linkURL };
   };
 })(globalThis.BAN);
