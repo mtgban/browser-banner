@@ -4,7 +4,8 @@ Guidance for AI coding agents working on Card Kingdom's part of **BANner**,
 the browser extension: it compares a Card Kingdom sell or buy cart with Card
 Kingdom's price list, exports order and selling history as CSV, and saves or
 sends a cart's or an invoice's cards. Read `SPECIFICATIONS.md` for what it
-does and what is known about Card Kingdom's pages; this file is about how to work on it without breaking it.
+does and what is known about Card Kingdom's pages; this file is about how to
+work on it without breaking it.
 
 The root's `AGENTS.md` holds here too: how to run the tests, the rules, the
 traps and the commits. This file says only what is this store's own.
@@ -16,11 +17,11 @@ traps and the commits. This file says only what is this store's own.
 **Saved pages are not committable as they are.** A saved cart carries the
 signed-in session in every form's `_token`; a saved history page carries the
 account's name, email, mailing and shipping addresses, and tracking numbers.
-Fixtures are cut by allowlist, never by editing a saved page down: see `SPECIFICATIONS.md`,
-"Fixtures". `tests/repo.test.js` scans every fixture for what a cut must never
-keep. A cart fixture holds none of the account's items: the cutter keeps CK's
-markup and refills every line with an item drawn from a price list, so it
-needs one (`--prices`, the `pricelist.json` CK publishes).
+Fixtures are cut by allowlist, never by editing a saved page down: see
+`SPECIFICATIONS.md`, "Fixtures". `tests/repo.test.js` scans every fixture for
+what a cut must never keep. A cart fixture holds none of the account's items:
+the cutter keeps CK's markup and refills every line with an item drawn from a
+price list, so it needs one (`--prices`, the `pricelist.json` CK publishes).
 
 `tests/panel.js` runs a content script the way a tab does: the scripts the
 manifest names, in its order, in one happy-dom window at a Card Kingdom
@@ -93,6 +94,5 @@ the selling history the status cell's attribute is misspelled `id-=`.
 The sell cart's add endpoint, its JSON body and the `CartResponse` it returns
 are go-mtgban's (`cardkingdom/utils.go`). What the endpoint does to a product
 already in the cart is not known; `SPECIFICATIONS.md`, "Update price", says
-how the extension copes with either answer. The price
-list is the one go-mtgban's CK scraper reads, at the URL go-cardkingdom
-publishes.
+how the extension copes with either answer. The price list is the one
+go-mtgban's CK scraper reads, at the URL go-cardkingdom publishes.

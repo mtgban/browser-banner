@@ -124,10 +124,11 @@ the name, set and number a SKU gives, mtgban's matcher found 145,006 of
 rest not at all or as one of several; 3,361 of those not found are tokens.
 Every card on the saved orders is found exactly.
 
-Left out and counted: refunded copies of anything, another game's cards, products that
-are not singles (a SKU not starting `SGL-`), and lines that do not read.
-Send to BAN opens mtgban's `/upload/handoff` and hands it the CSV; mtgban
-takes it because `https://starcitygames.com` is one of its `handoff_origins`.
+Left out and counted: refunded copies of anything, another game's cards,
+products that are not singles (a SKU not starting `SGL-`), and lines that do
+not read. Send to BAN opens mtgban's `/upload/handoff` and hands it the CSV;
+mtgban takes it because `https://starcitygames.com` is one of its
+`handoff_origins`.
 
 ## 5. The panel
 

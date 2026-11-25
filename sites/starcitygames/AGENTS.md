@@ -26,9 +26,9 @@ variable it skips.
 
 **Saved pages are not committable as they are.** One carries the account's
 name, email, phone, postal addresses and a storefront token, all in the JSON
-the page boots with. The fixtures are cut by `scripts/cut-fixtures.mjs`,
-never by editing a saved page down; `tests/repo.test.js` scans every fixture for what a cut
-must never keep.
+the page boots with. The fixtures are cut by `scripts/cut-fixtures.mjs`, never
+by editing a saved page down; `tests/repo.test.js` scans every fixture for
+what a cut must never keep.
 
 ## Layout
 

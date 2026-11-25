@@ -777,11 +777,11 @@ That takes three things, and each is a way the panel used to change size:
 The heading also carries the BAN stroopwafel at 12px, which the line has
 room for: of the 220px inside the panel's padding, the widest heading,
 `CM BANner - 2000 / 2000` with the tick beside it, measured 183px with the
-stroopwafel at 14px. It is base64 in the
-stylesheet rather than a relative `url()`, because that url resolves to
-the extension's own origin and serving it to somebody else's page wants a
-`web_accessible_resources` entry - which is a file exposed to every page
-this runs on, for the sake of three kilobytes.
+stroopwafel at 14px. It is base64 in the stylesheet rather than a relative
+`url()`, because that url resolves to the extension's own origin and serving
+it to somebody else's page wants a `web_accessible_resources` entry - which
+is a file exposed to every page this runs on, for the sake of three
+kilobytes.
 
 Nothing is written under the buttons. What went wrong - a read Cloudflare
 refused, a walk that came back short, a pop-up the browser blocked, an
