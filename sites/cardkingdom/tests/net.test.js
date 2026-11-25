@@ -77,7 +77,7 @@ describe("the deadline", () => {
   test("aborts once its time is up", async () => {
     const signal = CKB.deadline(20);
     expect(signal.aborted).toBe(false);
-    await CKB.after(60);
+    await new Promise((done) => signal.addEventListener("abort", done));
     expect(signal.aborted).toBe(true);
     expect(signal.reason.name).toBe("TimeoutError");
   });

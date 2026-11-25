@@ -350,19 +350,19 @@ describe("stopping and failing", () => {
 
   test("Refresh is greyed out while the list is fresh, and comes back as it ages", async () => {
     // Kept, and fresh, until a moment after the page marked the cart.
-    const it = await mountCart({ kept: CKB.reducePrices(moved(), Date.now() - CKB.LIST_TTL + 150) });
+    const it = await mountCart({ kept: CKB.reducePrices(moved(), Date.now() - CKB.LIST_TTL + 60000) });
     expect(it.button().textContent).toBe("Refresh");
     expect(it.button().disabled).toBe(true);
-    await it.settle(250);
+    await it.settle(60000);
     expect(it.button().disabled).toBe(false);
   });
 
   test("a refused refresh keeps the marks it had", async () => {
     const it = await mountCart({
-      kept: CKB.reducePrices(moved(), Date.now() - CKB.LIST_TTL + 150),
+      kept: CKB.reducePrices(moved(), Date.now() - CKB.LIST_TTL + 60000),
       respond: (resolve) => resolve({ ok: false, status: 503, json: () => Promise.resolve({}) }),
     });
-    await it.settle(250);
+    await it.settle(60000);
     it.button().click();
     await it.idle();
     expect(it.failed()).toBe(true);
@@ -567,9 +567,9 @@ describe("Update price", () => {
 
   test("a list that went stale since it was read sends nothing", async () => {
     // Kept, and fresh, until a moment after the page marked the cart.
-    const it = await mountCart({ kept: CKB.reducePrices(moved(), Date.now() - CKB.LIST_TTL + 150) });
+    const it = await mountCart({ kept: CKB.reducePrices(moved(), Date.now() - CKB.LIST_TTL + 60000) });
     expect(it.update(206649)).not.toBeNull();
-    await it.settle(250);
+    await it.settle(60000);
     it.update(206649).click();
     await it.idle();
     expect(it.written).toEqual([]);
@@ -776,8 +776,8 @@ describe("Update all", () => {
 
   test("sends nothing once the list has gone stale", async () => {
     // Kept, and fresh, until a moment after the page marked the cart.
-    const it = await mountCart({ kept: CKB.reducePrices(two(), Date.now() - CKB.LIST_TTL + 150), writes: ck() });
-    await it.settle(250);
+    const it = await mountCart({ kept: CKB.reducePrices(two(), Date.now() - CKB.LIST_TTL + 60000), writes: ck() });
+    await it.settle(60000);
     it.all().querySelector("button").click();
     await it.settle();
     expect(it.written).toEqual([]);

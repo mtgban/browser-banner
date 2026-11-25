@@ -11,6 +11,7 @@
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
 import { site } from "./helpers.js";
+import { clock } from "../../../tests/clock.js";
 import { siteManifest } from "../../../tests/manifest.js";
 
 const URL_ = "https://store.tcgplayer.com/myaccount/orderhistory";
@@ -28,6 +29,7 @@ export function mount(options = {}) {
     url: options.url ?? URL_,
     settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true, disableIframePageLoading: true },
   });
+  const time = clock(window);
   const document = window.document;
   document.body.innerHTML = options.body ?? session.html(1);
 
@@ -131,13 +133,7 @@ export function mount(options = {}) {
     ready: (i = 0, origin = "https://mtgban.com") =>
       window.dispatchEvent(new window.MessageEvent("message", { data: { type: "mtgban-handoff-ready" }, origin, source: tabs[i] })),
     // idle waits for the work a click started to finish.
-    idle: async () => {
-      const until = Date.now() + 5000;
-      while (Date.now() < until) {
-        await new Promise((done) => setTimeout(done, 10));
-        if (!panel.classList.contains("ban-busy")) return;
-      }
-      throw new Error("still busy");
-    },
+    idle: () => time.until(() => !panel.classList.contains("ban-busy")),
+    settle: (ms = 20) => time.settle(ms),
   };
 }

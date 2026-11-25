@@ -157,8 +157,7 @@ describe("the cart", () => {
     const it = mountCart({ linger: 400 });
     const before = it.doc.querySelectorAll("li").length;
     it.press("Seller A", "Remove seller");
-    const until = Date.now() + 1000;
-    while (it.stored().length > 2 && Date.now() < until) await it.settle(1);
+    await it.until(() => it.stored().length <= 2);
     expect(it.stored()).toEqual(["inv-3", "inv-4"]);
     // Neither item has left the page yet, so nothing waited for that.
     expect(it.doc.querySelectorAll("li").length).toBe(before);

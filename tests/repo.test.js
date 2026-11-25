@@ -181,6 +181,23 @@ test("CI runs the guards of every site that has them, and no others", () => {
   expect(ran).toEqual(guarded);
 });
 
+// A wait by the real clock ends early on a slow machine, and the check after
+// it passes or fails for nothing. tests/clock.js is the clock a page gets.
+// The files listed set a real timer to check what comes before it, or to fail
+// a request later, and wait for none.
+test("no site's tests sleep", () => {
+  const timed = ["sites/cardkingdom/tests/net.test.js", "sites/cardkingdom/tests/store.test.js", "sites/cardkingdom/tests/walk.test.js", "sites/cardmarket/tests/pages.test.js"];
+  const bare = /(?<![.\w])(setTimeout|setInterval)\(|\bBun\.sleep|\btimers\/promises\b|\b(globalThis|global)\.set(Timeout|Interval)\(/;
+  const found = sites.flatMap((site) =>
+    files("sites/" + site + "/tests")
+      .filter((path) => path.endsWith(".js"))
+      .filter((path) => bare.test(read(path))),
+  );
+  expect(found.sort()).toEqual(timed);
+  const sleeping = timed.filter((path) => /await [^;]*(setTimeout|setInterval|Bun\.sleep(Sync)?)\(/.test(read(path)));
+  expect(sleeping).toEqual([]);
+});
+
 // Every site's tests run in one process, and happy-dom shares element
 // prototypes across windows: a stub set on one outlives the test and reaches
 // the next site's, depending on the order bun happens to list the files in.

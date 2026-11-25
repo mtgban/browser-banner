@@ -218,14 +218,20 @@ describe("pace and cancelling", () => {
     const shop = purchases(60);
     const at = [];
     const started = Date.now();
+    // Without a timer of its own, the first is asked for before any timer
+    // set first.
+    let timed = false;
+    let waited = null;
+    setTimeout(() => (timed = true), 0);
     await walk("purchases", shop, {
       pace: 40,
       fetchPage: (url) => {
+        if (waited === null) waited = timed;
         at.push(Date.now() - started);
         return shop.fetchPage(url);
       },
     });
-    expect(at[0]).toBeLessThan(30);
+    expect(waited).toBe(false);
     expect(at[1] - at[0]).toBeGreaterThanOrEqual(35);
     expect(at[2] - at[1]).toBeGreaterThanOrEqual(35);
   });

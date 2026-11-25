@@ -96,6 +96,11 @@ give the window no URL, and turn its file loading off.
 `toEqual` or `toBe` makes bun print the whole happy-dom window; the run climbs
 past 10 GB and never ends. Compare the plain fields, or `a === b` with `true`.
 
+**Never sleep in a test.** A wait by the real clock ends early on a slow
+machine. A panel's harness takes `tests/clock.js`'s clock, and `settle(ms)`
+moves it: what is under way runs, and what falls due in that time fires. A
+test that waits for something to happen uses `until`, or the harness's own.
+
 ## Working with the other repositories
 
 A CSV that can be sent is a contract with **mtgban-website**: every column is

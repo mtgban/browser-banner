@@ -413,9 +413,7 @@ describe("a walk that ended before the pages did", () => {
     it.window.fetch = emptyPage;
 
     it.save().click();
-    // The walk waits PACE before asking for page two, which is the one
-    // place in the suite where that wait is not worth mocking away: what
-    // is being tested is what comes back from it.
+    // Past the walk's wait before asking for page two.
     await it.settle(1500);
 
     // One page of fourteen against the 1093 the page itself advertises.

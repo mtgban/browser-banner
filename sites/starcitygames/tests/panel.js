@@ -5,6 +5,7 @@
 
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
+import { clock } from "../../../tests/clock.js";
 import { siteManifest } from "../../../tests/manifest.js";
 
 const SITE = "https://starcitygames.com";
@@ -64,6 +65,7 @@ export function listPages(size = 10, ages) {
 // when given, answers instead where it answers at all.
 export function mount({ path = LIST, pages = listPages(), orders = {}, answer, blockPopups } = {}) {
   const window = new Window({ url: SITE + path });
+  const time = clock(window);
   const asked = [];
   function page(url) {
     const u = new URL(url, SITE);
@@ -133,12 +135,8 @@ export function mount({ path = LIST, pages = listPages(), orders = {}, answer, b
     failed: () => !at(".ban-mark").hidden && at(".ban-mark").classList.contains("ban-failed"),
     escape: () => window.document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" })),
     file: async () => ({ name: saved[0].name, text: await saved[0].blob.text() }),
-    // done waits for a run to end, as long as a long one takes.
-    done: async () => {
-      for (let i = 0; i < 100 && panel().classList.contains("ban-busy"); i++) {
-        await new Promise((resume) => setTimeout(resume, 10));
-      }
-    },
-    settle: (ms = 40) => new Promise((resume) => setTimeout(resume, ms)),
+    // done waits for a run to end.
+    done: () => time.until(() => !panel().classList.contains("ban-busy")),
+    settle: (ms = 40) => time.settle(ms),
   };
 }

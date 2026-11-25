@@ -10,6 +10,7 @@ import { Window } from "happy-dom";
 import { IDBFactory } from "fake-indexeddb";
 import { readFileSync } from "fs";
 import { CKB, pageHTML, text } from "./helpers.js";
+import { clock } from "../../../tests/clock.js";
 import { siteManifest } from "../../../tests/manifest.js";
 
 const SITE = "https://www.cardkingdom.com";
@@ -18,6 +19,10 @@ const manifest = siteManifest("cardkingdom");
 function source(name) {
   return readFileSync(new URL("../" + name, import.meta.url), "utf8");
 }
+
+// The clock of the last page opened on each IndexedDB, so that the next one
+// opens after it and not before what it kept.
+const clocks = new WeakMap();
 
 // scriptsFor is the manifest's list of scripts for a path, in its order.
 function scriptsFor(path) {
@@ -40,6 +45,8 @@ export function mountHistory({ kind = "purchases", total = 210, change = {}, bod
     url: SITE + path,
     settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true, disableIframePageLoading: true },
   });
+  const time = clock(window, clocks.get(idb));
+  clocks.set(idb, time);
   window.document.body.innerHTML = body ?? pageHTML(name, { n: 1, total });
   window.indexedDB = idb;
 
@@ -123,23 +130,16 @@ export function mountHistory({ kind = "purchases", total = 210, change = {}, bod
     },
     escape: () => window.document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" })),
     file: async (i = 0) => ({ name: saved[i].name, text: await saved[i].blob.text() }),
-    settle: (ms = 30) => new Promise((done) => setTimeout(done, ms)),
-    // idle is settle, then as long again as the work a click started runs on
-    // a loaded machine, up to a few seconds.
+    settle: (ms = 30) => time.settle(ms),
+    // idle waits for the work a click started to finish.
     idle: async () => {
-      const until = Date.now() + 5000;
-      await new Promise((done) => setTimeout(done, 30));
-      while (panel.classList.contains("ban-busy") && Date.now() < until) {
-        await new Promise((done) => setTimeout(done, 10));
-      }
+      await time.settle(30);
+      await time.until(() => !panel.classList.contains("ban-busy"));
+      // What it keeps, it writes after.
+      await time.settle();
     },
-    // askedFor waits until n pages have been asked for, up to a few seconds.
-    askedFor: async (n) => {
-      const until = Date.now() + 5000;
-      while (asked.length < n && Date.now() < until) {
-        await new Promise((done) => setTimeout(done, 10));
-      }
-    },
+    // askedFor waits until n pages have been asked for.
+    askedFor: (n) => time.until(() => asked.length >= n),
   };
 }
 
@@ -173,6 +173,8 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
     url: SITE + at,
     settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true, disableIframePageLoading: true },
   });
+  const time = clock(window, clocks.get(idb));
+  clocks.set(idb, time);
   window.document.body.innerHTML = body ?? text(side === "sell" ? "sell-cart.html" : "buy-cart.html");
   window.indexedDB = idb;
 
@@ -246,7 +248,7 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
   const doc = window.document;
   const panel = doc.getElementById("ban-panel");
   const at$ = (selector) => panel && panel.querySelector(selector);
-  const settle = (ms = 40) => new Promise((done) => setTimeout(done, ms));
+  const settle = (ms = 40) => time.settle(ms);
   await settle();
 
   const marks = () =>
@@ -322,18 +324,16 @@ export async function mountCart({ side = "sell", path, body, prices = pricelist(
       window.dispatchEvent(event);
       return event.defaultPrevented;
     },
-    kept: async () => CKB.keptList(await CKB.openStore(idb), Date.now()),
+    kept: async () => CKB.keptList(await CKB.openStore(idb), window.Date.now()),
     settle,
-    // idle is settle, then as long again as the work a click started runs on
-    // a loaded machine, up to a few seconds; a reload the work asks for ends
-    // it too.
+    // idle waits for the work a click started to finish; a reload the work
+    // asks for ends it too.
     idle: async () => {
-      const until = Date.now() + 5000;
       const reloaded = reloads.length;
       await settle();
-      while (panel.classList.contains("ban-busy") && reloads.length === reloaded && Date.now() < until) {
-        await settle(10);
-      }
+      await time.until(() => !panel.classList.contains("ban-busy") || reloads.length !== reloaded);
+      // What it keeps, it writes after.
+      await time.settle();
     },
   };
 }

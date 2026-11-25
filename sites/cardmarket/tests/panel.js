@@ -10,6 +10,7 @@
 
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
+import { clock } from "../../../tests/clock.js";
 import { siteManifest } from "../../../tests/manifest.js";
 
 const OFFERS = "https://www.cardmarket.com/en/Magic/Users/Seller/Offers/Singles";
@@ -29,6 +30,7 @@ export function mount({
   loggedOut = false,
 } = {}) {
   const window = new Window({ url });
+  const time = clock(window);
   // Cardmarket puts a login form on every page it serves to somebody it
   // has not signed in. The rest of the page is the same.
   window.document.body.innerHTML =
@@ -138,7 +140,7 @@ export function mount({
       ),
     // What reached the tab: everything posted to it.
     posted: () => opened.filter((entry) => entry && entry.data),
-    settle: (ms = 50) => new Promise((done) => setTimeout(done, ms)),
+    settle: (ms = 50) => time.settle(ms),
   };
 }
 

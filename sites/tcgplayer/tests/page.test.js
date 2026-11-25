@@ -230,7 +230,7 @@ describe("All years", () => {
     const p = mount({ totals: only({ 2025: 12 }), change: (html, n, state) => (state.range === "2025" && n === 2 ? held.then(() => html) : html) });
     p.choose("All years");
     p.button("Download CSV").click();
-    await new Promise((done) => setTimeout(done, 20));
+    await p.settle();
     expect(p.word()).toBe("2025: page 2 of 2");
     release();
     await p.idle();
@@ -494,7 +494,7 @@ describe("Send to BAN", () => {
     p.document.querySelector("button.ban-send").click();
     p.choose("2025");
     p.button("Download CSV").click();
-    await new Promise((done) => setTimeout(done, 20));
+    await p.settle();
     const during = p.word();
     expect(during).toBe("page 2 of 3");
     p.ready();
