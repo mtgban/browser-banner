@@ -37,10 +37,10 @@ Requests go to the store's own origin, with the session the page has, but for
 two public files read without it: Card Kingdom's price list and the exchange
 rates Cardmarket's prices are converted by. Nothing is posted to mtgban from
 here (section 7). Three things change something at a store, each on a click:
-*Update price* on Card Kingdom's sell cart, the order range TCGplayer keeps
-in its session, put back after a walk, and ManaPool's cart. What is kept between pages is kept in the store's own
-origin: Card Kingdom's price list and CSVs in IndexedDB, and ManaPool's
-set-aside cart items in localStorage.
+*Update price* on Card Kingdom's sell cart, the order range TCGplayer keeps in
+its session, put back after a walk, and ManaPool's cart. What is kept between
+pages is kept in the store's own origin: Card Kingdom's price list and CSVs in
+IndexedDB, and ManaPool's set-aside cart items in localStorage.
 
 ## 3. How it is put together
 
@@ -77,7 +77,7 @@ The last days are the orders dated on or after that many days before the
 browser's today. The picker is `core/ranges.js`'s, 92px wide in every store.
 
 A history is one line per order, and its file is `<stem>-<year>.csv`,
-`<stem>-all.csv`, or `<stem>-last-30-days-<yyyy-mm-dd>.csv`, dated since the
+`<stem>-all.csv`, or `<stem>-last-<n>-days-<yyyy-mm-dd>.csv`, dated since the
 same range holds other orders tomorrow. The stems are
 `cm-purchases-<status>`, `ck-purchases` and `ck-sales`, `tcg-orders`,
 `mp-orders` and `scg-orders`.
@@ -88,10 +88,12 @@ counted or stops the walk is each store's own.
 
 ## 6. Reading
 
-- **Requests** are one at a time, 1.2 s apart (`PACE`, each store's own), 30 s
-  each at most. A Cloudflare challenge, told by its `cf-mitigated: challenge`
-  header, stops the work and is never answered or retried. On TCGplayer a 429
-  without one is said as the store asking to slow down.
+- **Requests** are one at a time, a walk's 1.2 s apart (`PACE`, each store's
+  own), each with a deadline: 30 s, but 120 s for Card Kingdom's price list,
+  download included, and 15 s for the peek that says whether it has a newer
+  one. A Cloudflare challenge, told by its `cf-mitigated: challenge` header,
+  stops the work and is never answered or retried. On TCGplayer a 429 without
+  one is said as the store asking to slow down.
 - **Money** printed in dollars is read by its shape, to cents, never by
   `parseFloat`; a shape not known is refused. Cardmarket reads euros and
   pounds its own way.

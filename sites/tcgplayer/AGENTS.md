@@ -28,7 +28,8 @@ the variable it skips.
 email (the welcome line), name, two postal addresses, tracking numbers, the
 filter form's `__RequestVerificationToken`, and every seller it bought from.
 The fixture is cut by `scripts/cut-fixtures.mjs`, never by editing a saved
-page down; `tests/repo.test.js` scans every fixture for what a cut must never keep.
+page down; `tests/repo.test.js` scans every fixture for what a cut must never
+keep.
 
 ## Layout
 

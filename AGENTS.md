@@ -26,9 +26,8 @@ stores share and what the whole extension promises.
   move while it read, writes nothing.
 - **`core/` holds what every store shares**, as factories on `globalThis.BAN`
   that each store binds onto its own global (`MKM`, `CKB`, `TCGB`, `MPB`,
-  `SCGB`).
-  Nothing in `core/` keeps state, names a store or touches a store's global;
-  a root test holds it to that.
+  `SCGB`). Nothing in `core/` keeps state, names a store or touches a store's
+  global; a root test holds it to that.
 - **Do not guess at a price, an id or a card.** A row that cannot be
   resolved carries an empty column and the panel says how many.
 - **Do not resize the panel, or write anything under its buttons.** It sits

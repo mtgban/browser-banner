@@ -33,10 +33,10 @@ visible without one. When you change the parser, ask for a saved page
 
 **Saved pages are not committable as they are.** They carry the visitor's
 session: a `__cmtkn` cart token on every row, and a `csrftoken` and `idUser`
-in the filter component's `data-props`. To make a fixture from one, keep only the rows and
-the component, drop every `__cmtkn` input, keep only the `options` of the
-props, and call the seller `Seller`, as `tests/fixtures/offers-props.html`
-does.
+in the filter component's `data-props`. To make a fixture from one, keep only
+the rows and the component, drop every `__cmtkn` input, keep only the
+`options` of the props, and call the seller `Seller`, as
+`tests/fixtures/offers-props.html` does.
 
 ## Layout
 

@@ -205,9 +205,10 @@ None, and only one host. There is no background script, no storage, and no
 travel between the two windows directly.
 
 On Cardmarket the extension runs on sellers' offers pages and your own
-purchases, and nowhere else. It
-reaches the network once per export, for the exchange-rate feed on jsDelivr,
-and sends nothing with that request.
+purchases, and nowhere else. It asks for Cardmarket's own pages, with your
+session and one at a time, when a whole list or a purchase list is read. The
+one other request is to the exchange-rate feed on jsDelivr, once for an export
+of offers or of one purchase, and nothing is sent with it.
 
 ## Limitations
 
