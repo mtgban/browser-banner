@@ -4,7 +4,8 @@
 // made from a store's page. So nothing is posted from here: mtgban serves
 // /upload/handoff, which opens as an ordinary navigation, says when it is
 // listening, takes the rows from the window that opened it, and uploads
-// them itself.
+// them itself. A store whose pages cannot be heard from the window they
+// open sends the rows in the link instead (linkURL).
 //
 // A factory and nothing else: each store makes its own sender, with the
 // games it may send and its own words, and binds it onto its own global.
