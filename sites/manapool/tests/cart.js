@@ -10,6 +10,7 @@
 
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
+import { clock } from "../../../tests/clock.js";
 import { siteManifest } from "../../../tests/manifest.js";
 import { text } from "./panel.js";
 
@@ -17,6 +18,7 @@ const SITE = "https://manapool.com";
 
 export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut = [], stash, noSync = false, answer = 2, linger = 80 } = {}) {
   const window = new Window({ url: SITE + path });
+  const time = clock(window);
   window.document.body.innerHTML = text("cart.html");
   const doc = window.document;
   const lis = [...doc.querySelectorAll("li")];
@@ -47,7 +49,7 @@ export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut 
         if (i === 0) o.setAttribute("data-highlighted", "");
         list.appendChild(o);
       });
-      setTimeout(() => {
+      window.setTimeout(() => {
         box.setAttribute("aria-controls", list.id);
         doc.body.appendChild(list);
       }, 3);
@@ -57,10 +59,10 @@ export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut 
     } else if (event.key === "Enter" && open) {
       const highlighted = open.querySelector("[data-highlighted]");
       box.removeAttribute("aria-controls");
-      setTimeout(() => open.remove(), linger);
+      window.setTimeout(() => open.remove(), linger);
       if (highlighted.getAttribute("data-value") === "0" && !refuse.includes(listing.name)) {
-        setTimeout(() => listing.li.remove(), linger);
-        setTimeout(() => {
+        window.setTimeout(() => listing.li.remove(), linger);
+        window.setTimeout(() => {
           const s = read();
           s.cart.entries = s.cart.entries.filter((e) => e.inventoryId !== listing.id);
           write(s);
@@ -139,6 +141,7 @@ export function mountCart({ path = "/cart", refuse = [], noRemove = [], soldOut 
     stash: () => JSON.parse(window.localStorage.getItem("banner-manapool-stash") || "null"),
     escape: () => doc.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" })),
     visit: (to) => window.history.pushState({}, "", SITE + to),
-    settle: (ms = 60) => new Promise((done) => setTimeout(done, ms)),
+    settle: (ms = 60) => time.settle(ms),
+    until: time.until,
   };
 }

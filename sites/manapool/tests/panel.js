@@ -5,6 +5,7 @@
 
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
+import { clock } from "../../../tests/clock.js";
 import { siteManifest } from "../../../tests/manifest.js";
 
 const SITE = "https://manapool.com";
@@ -35,6 +36,7 @@ export function ordersAged(ages) {
 // pages of the asked limit. answer(url), when given, answers instead.
 export function mount({ path = "/settings/orders", orders = ordersAged(), order, answer, limit, page, activation = true } = {}) {
   const window = new Window({ url: SITE + path });
+  const time = clock(window);
   window.document.body.innerHTML = page || "<main><h1>Orders</h1></main>";
   Object.defineProperty(window.navigator, "userActivation", { value: activation === null ? undefined : { isActive: activation }, configurable: true, writable: true });
   const asked = [];
@@ -107,7 +109,7 @@ export function mount({ path = "/settings/orders", orders = ordersAged(), order,
     file: async () => ({ name: saved[0].name, text: await saved[0].blob.text() }),
     // visit moves the page to path as ManaPool's own links do, with no load.
     visit: (to) => window.history.pushState({}, "", SITE + to),
-    settle: (ms = 40) => new Promise((done) => setTimeout(done, ms)),
+    settle: (ms = 40) => time.settle(ms),
     close: () => window.happyDOM.abort().then(() => window.close()),
   };
 }

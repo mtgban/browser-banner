@@ -327,9 +327,11 @@ describe("not looking like a bot", () => {
   });
 
   test("a one-page seller waits for nothing", async () => {
-    const started = Date.now();
+    // Without a timer of its own, it is done before any timer set first.
+    let timed = false;
+    setTimeout(() => (timed = true), 0);
     await MKM.walkPages(pageOf({ total: 11 }), BASE, { pace: 500 });
-    expect(Date.now() - started).toBeLessThan(200);
+    expect(timed).toBe(false);
   });
 
   test("a Cloudflare challenge is told apart from an ordinary refusal", async () => {

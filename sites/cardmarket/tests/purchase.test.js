@@ -5,6 +5,7 @@ import { test, expect, describe } from "bun:test";
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
 import { MKM, text } from "./helpers.js";
+import { clock } from "../../../tests/clock.js";
 import { siteManifest } from "../../../tests/manifest.js";
 
 const ORDER = "https://www.cardmarket.com/en/Magic/Orders/1000001";
@@ -85,6 +86,7 @@ describe("reading a purchase", () => {
 // in manifest order; rates answers the exchange-rate feed or refuses it.
 function mount({ url = ORDER, body = text("purchase.html"), rates = { usd: { eur: 0.9 } } } = {}) {
   const window = new Window({ url });
+  const time = clock(window);
   window.document.body.innerHTML = body;
   const opened = [];
   window.open = (href) => {
@@ -135,7 +137,7 @@ function mount({ url = ORDER, body = text("purchase.html"), rates = { usd: { eur
     file: async () => ({ name: saved[0].name, text: await saved[0].blob.text() }),
     ready: () =>
       window.dispatchEvent(Object.assign(new window.Event("message"), { source: opened.tab, origin: "https://mtgban.com", data: { type: "mtgban-handoff-ready" } })),
-    settle: (ms = 30) => new Promise((done) => setTimeout(done, ms)),
+    settle: (ms = 30) => time.settle(ms),
   };
 }
 

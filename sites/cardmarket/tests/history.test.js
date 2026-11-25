@@ -5,6 +5,7 @@ import { test, expect, describe } from "bun:test";
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
 import { text } from "./helpers.js";
+import { clock } from "../../../tests/clock.js";
 import { siteManifest } from "../../../tests/manifest.js";
 
 const LIST = "https://www.cardmarket.com/en/Magic/Orders/Purchases/Arrived";
@@ -41,6 +42,7 @@ function page(n, pages = AGES.length) {
 
 function mount({ url = LIST, fetchPage } = {}) {
   const window = new Window({ url });
+  const time = clock(window);
   window.document.body.innerHTML = page(1);
   const asked = [];
   window.fetch = (href) => {
@@ -89,7 +91,7 @@ function mount({ url = LIST, fetchPage } = {}) {
     escape: () => window.document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" })),
     file: async () => ({ name: saved[0].name, text: await saved[0].blob.text() }),
     saved,
-    settle: (ms = 40) => new Promise((done) => setTimeout(done, ms)),
+    settle: (ms = 40) => time.settle(ms),
   };
 }
 
