@@ -4,10 +4,6 @@ What the extension does, what it reads from Card Kingdom (CK), and the rules
 it keeps. Every markup fact here was read from a saved CK page of a signed-in
 account; the numbers in examples are made up.
 
-The repository starts as a scaffold. Each section below lands with the step of
-the build order (section 15) that implements it, and this file is kept true to
-the code as it does.
-
 ## 1. What it is
 
 Content scripts on www.cardkingdom.com, sharing a small panel fixed to the
@@ -24,7 +20,7 @@ row of buttons):
 - **Either cart** can be saved as a CSV, or handed to mtgban's upload with
   *BAN* (section 11).
 - **History** (`/myaccount/order_history`, `/myaccount/selling_history`): a
-  year picker and *Download CSV*, writing every paid purchase that shipped or
+  range picker and *Download CSV*, writing every paid purchase that shipped or
   every paid sale that was completed.
 - **Invoices** (`/myaccount/po_invoice/<id>` for a sale,
   `/myaccount/invoice/<id>` for a purchase): the order's cards saved as a
@@ -445,7 +441,7 @@ orders the file holds (`34 shipped`, `12 completed`) beside a tick, and the
 tooltip names the file, the pages read, and what was left out by status,
 unpaid, or year. Nothing to save is a red cross and no file. When the file
 comes from the one kept (section 12), the button turns into *Rebuild* until
-the year changes. At these addresses a page without the history table (a
+the range changes. At these addresses a page without the history table (a
 sign-in page) gets no panel.
 
 On the carts the row is *Load prices*, then *Refresh* once the cart is
@@ -498,13 +494,13 @@ line written as the saved graded ones are; its rows are
 
 ## 15. Build order
 
-Each step is its own pull request off `master`:
+Each step was its own pull request off `master`:
 
 1. Scaffold.
 2. Shared pieces: money and dates, CSV writing, paced fetching.
 3. Read a history page.
 4. Walk the history pages, with the refusals of section 10.
-5. The year picker and *Download CSV*.
+5. The range picker and *Download CSV*.
 6. Read the sell and buy carts.
 7. Reduce and cache the price list.
 8. Compare both carts with the list.

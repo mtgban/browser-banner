@@ -30,9 +30,6 @@ pages:
   many cards the list did not have, graded ones among them; they go with
   no id.
 
-It is in development, and the features land in the order `SPECIFICATIONS.md`
-gives.
-
 ## Permissions
 
 None. The price list allows any site to read it, and everything else the
@@ -46,7 +43,7 @@ session. Nothing else leaves your browser.
 
 ## Installing it
 
-BANner is one extension for all three stores; install it from the
+BANner is one extension for every store it reads; install it from the
 repository's root, as its README says.
 
 ## Developing

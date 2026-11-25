@@ -1,7 +1,9 @@
 # One extension for Cardmarket, Card Kingdom and TCGplayer
 
-Status: plan, reviewed once (Fable, 2026-11-21) and revised. PRs 1 to 10
-are done, and so are P1, P2, P3, P4 (section 5) and section 7's cleanup.
+Status: carried out. The plan was reviewed once (Fable, 2026-11-21) and
+revised; PRs 1 to 10 are done, and so are P1, P2, P3, P4 (section 5) and
+section 7's cleanup. ManaPool and Star City Games came after it. What stands
+now is in [SPECIFICATIONS.md](../SPECIFICATIONS.md).
 
 A first version of PR 1 went to cm-banner as mtgban/cm-banner#8 and was
 closed when the home became a new repository.

@@ -38,7 +38,7 @@ will show the year until you change it back.
 
 ## Installing it
 
-BANner is one extension for all three stores; install it from the
+BANner is one extension for every store it reads; install it from the
 repository's root, as its README says. Then open your order history on
 TCGplayer; the panel is at the bottom right.
 

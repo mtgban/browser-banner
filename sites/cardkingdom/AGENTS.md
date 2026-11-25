@@ -1,8 +1,9 @@
 # AGENTS.md
 
 Guidance for AI coding agents working on Card Kingdom's part of **BANner**,
-the browser extension: it compares a Card Kingdom sell cart with Card
-Kingdom's price list and exports order and selling history as CSV. Read
+the browser extension: it compares a Card Kingdom sell or buy cart with Card
+Kingdom's price list, exports order and selling history as CSV, and saves or
+sends a cart's or an invoice's cards. Read
 `SPECIFICATIONS.md` for what it does and what is known about Card Kingdom's
 pages; this file is about how to work on it without breaking it.
 
@@ -74,8 +75,6 @@ tests/           bun + happy-dom, no browser
 
 The scripts share one global, `globalThis.CKB`, the way the browser runs
 them; `tests/helpers.js` runs them the same way.
-
-The source arrives step by step, in the order `SPECIFICATIONS.md` gives.
 
 ## Verifying
 
@@ -150,8 +149,8 @@ are go-mtgban's (`cardkingdom/utils.go`). What the endpoint does to a product
 already in the cart is not known; `SPECIFICATIONS.md`, "Update price", says
 how the extension copes with either answer. The price
 list is the one go-mtgban's CK scraper reads, at the URL go-cardkingdom
-publishes. Cardmarket's side is the sibling: share its conventions, not its
-code.
+publishes. What the stores share is in `core/`; share nothing else with
+another store's side but its conventions.
 
 Only public repositories are named in this one.
 

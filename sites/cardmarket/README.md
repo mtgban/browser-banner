@@ -4,15 +4,15 @@ A browser extension that reads the offers listed on a Cardmarket page and
 writes them out as a CSV [mtgban](https://www.mtgban.com)'s `/upload` page can
 read.
 
-The parsing happens in the browser. Your cards are not sent anywhere by this
-extension: it fills the upload form on your own tab, or hands you a file, and
-you decide whether to submit it.
+The parsing happens in the browser. Your cards go nowhere until you click:
+*Send to BAN* hands them to mtgban's upload in a tab of its own, which prices
+them, and *CSV* saves them as a file.
 
 ## What it does
 
 On a seller's offers page - `cardmarket.com/<lang>/<Game>/Users/<seller>/Offers/…` -
-a panel appears in the bottom right. It appears only for a game BAN prices; on any other there is nowhere to send the
-rows, so there is no panel either.
+a panel appears in the bottom right. On a game BAN does not price there is
+nowhere to send the rows, so it offers the file alone.
 
 On one of your own purchases - `cardmarket.com/<lang>/<Game>/Orders/<id>` -
 the panel counts the order's cards and offers *Send to BAN* and *CSV*, with
@@ -66,8 +66,8 @@ It reads singles and sealed alike: Cardmarket files boxes and bundles under
 their own product categories, and the upload tells one from the other by what
 the id resolves to.
 
-It works on all seven games Cardmarket sells: Magic, Pokemon, YuGiOh, Lorcana,
-One Piece, Flesh and Blood and Riftbound.
+It reads every game Cardmarket sells. Eight can be sent: Magic, Pokemon,
+YuGiOh, Lorcana, One Piece, Flesh and Blood, Riftbound and Gundam.
 
 ## The CSV
 
@@ -159,7 +159,7 @@ these names.
 
 ## Installing it
 
-BANner is one extension for all three stores; install it from the
+BANner is one extension for every store it reads; install it from the
 repository's root, as its README says.
 
 ## Send to BAN
@@ -204,7 +204,8 @@ None, and only one host. There is no background script, no storage, and no
 `tabs` permission - the handoff page is opened by your own click, and the rows
 travel between the two windows directly.
 
-The extension runs on Cardmarket sellers' offers pages and nowhere else. It
+On Cardmarket the extension runs on sellers' offers pages and your own
+purchases, and nowhere else. It
 reaches the network once per export, for the exchange-rate feed on jsDelivr,
 and sends nothing with that request.
 

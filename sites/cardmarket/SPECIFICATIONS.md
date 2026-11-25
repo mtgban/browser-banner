@@ -20,17 +20,7 @@ background script, no storage, and no extension API call anywhere in the
 source. The parse is a DOM read, the download is a blob and an anchor, and
 the handoff is `postMessage`.
 
-```
-src/rates.js     currency feed → multipliers
-src/parse.js     DOM → offers
-src/pages.js     one page → every page
-src/csv.js       offers → CSV text
-src/content.js   the panel, and the two things its buttons do
-src/orderpage.js one purchase's panel: CSV and Send to BAN
-src/history.js   a purchase list's orders, and their CSV
-src/historypage.js  the purchase lists' range and Download CSV
-tests/           bun + happy-dom, run in CI
-```
+`AGENTS.md` lists the files.
 
 The scripts are plain (not modules) and share `globalThis.MKM`, because
 that is what a manifest's `content_scripts` list can load.
@@ -77,7 +67,7 @@ reason in its tooltip; a panel three words wide is no place for a button
 that exists to explain itself. The file button takes the room it leaves
 and says **Download CSV** rather than **CSV**, which is both what it does
 and enough of a word to hold the row at the width it has in the other
-state - the panel is a fixed 15rem and must not resize between games.
+state - the panel is a fixed 240px and must not resize between games.
 
 `sendable()` answers off the path, `buttons()` is the one place deciding
 which are live, and `arm()` declines to write READY on a button nobody can
@@ -768,8 +758,7 @@ cursor on it, and it grows upwards and leftwards - so every pixel it gains
 in either direction drags a button out from under that cursor, during the
 one stretch when nobody is watching it.
 
-Nothing about a read changes its size. Measured across idle, reading, and
-read: **260 x 74** in all three.
+Nothing about a read changes its size: idle, reading and read are the same.
 
 That takes three things, and each is a way the panel used to change size:
 
@@ -785,13 +774,10 @@ That takes three things, and each is a way the panel used to change size:
   border, or it is taller than the text beside it and grows the heading at
   the moment a read starts.
 
-The heading also carries the BAN stroopwafel at 14px, which the line has
-room for: of the 240px available, the widest heading measured 183px -
-`CM BANner - 2000 / 2000` with the tick beside it, which is the two
-longest states put together and wider than either alone (reading a capped
-seller is 181px, and the same count with a tick is 160px). Re-measured in
-a browser after the wordmark went lowercase and the tick was added; the
-old figure was 186px. It is base64 in the
+The heading also carries the BAN stroopwafel at 12px, which the line has
+room for: of the 220px inside the panel's padding, the widest heading,
+`CM BANner - 2000 / 2000` with the tick beside it, measured 183px with the
+stroopwafel at 14px. It is base64 in the
 stylesheet rather than a relative `url()`, because that url resolves to
 the extension's own origin and serving it to somebody else's page wants a
 `web_accessible_resources` entry - which is a file exposed to every page

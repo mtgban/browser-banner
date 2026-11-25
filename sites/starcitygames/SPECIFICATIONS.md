@@ -127,7 +127,7 @@ Every card on the saved orders is found exactly.
 Left out and counted: refunded copies of anything, another game's cards, products that
 are not singles (a SKU not starting `SGL-`), and lines that do not read.
 Send to BAN opens mtgban's `/upload/handoff` and hands it the CSV; mtgban
-takes it once `https://starcitygames.com` is one of its handoff origins.
+takes it because `https://starcitygames.com` is one of its `handoff_origins`.
 
 ## 5. The panel
 

@@ -337,7 +337,7 @@ lands in whichever mode, uploader or buylist, the reader last used.
 
 The shared panel (`core/ui.js`): the stroopwafel and "TCG BANner", one word, a
 mark, a drawn tooltip, one row (the range, *Download CSV*). Until it is asked
-for something, and again when the year changes, the word is `ready` with a
+for something, and again when the range changes, the word is `ready` with a
 tick, and with no word the heading drops its dash. On a list a search has
 narrowed to one order (a search is set, the heading counts one order, and that
 order is read whole), the row is that order's instead: *Download CSV* saves
@@ -369,7 +369,7 @@ token, an address or tracking link, the welcome line and a real seller.
 2. Read a page, against the fixture and saved pages.
 3. The year walk and both CSVs.
 4. Order buttons.
-5. Send to BAN, once `handoff_origins` lists TCGplayer.
+5. Send to BAN.
 
 ## 10. Not yet
 
@@ -380,7 +380,7 @@ token, an address or tracking link, the welcome line and a real seller.
   that request alone.
 - Other games, once a page shows their slugs and sealed, once the uploader
   is known to resolve a sealed product id.
-- *All years*, and a kept file.
+- A kept file: a finished year is kept for the page's life alone.
 - Damaged, signed and the like, once a page shows how TCGplayer prints them.
 - Sending a line not in English, once the uploader reads a language.
 

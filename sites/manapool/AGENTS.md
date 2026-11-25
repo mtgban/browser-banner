@@ -2,8 +2,9 @@
 
 Guidance for AI coding agents working on ManaPool's part of **BANner**, the
 browser extension: it saves a ManaPool buyer's order history as CSV, one
-line per order, and in the cart removes a seller's items or sets the other
-sellers' aside and puts them back. Read `SPECIFICATIONS.md` for what it does
+line per order, sends an order's or a package's cards to mtgban's uploader
+or saves them as CSV, and in the cart removes a seller's items or sets the
+other sellers' aside and puts them back. Read `SPECIFICATIONS.md` for what it does
 and what is known about ManaPool; this file is about how to work on it
 without breaking it.
 
