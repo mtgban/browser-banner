@@ -10,7 +10,8 @@ A content script on `https://manapool.com/*`, with the panel every store
 shares (the "MP BANner" heading, a mark, a drawn tooltip, one row of
 controls). On the order history, `/settings/orders`, it saves the orders
 as CSV, one line per order. On an order, `/settings/orders/<id>`, it sends
-the order's cards to BAN or saves them as CSV (section 6). In the cart,
+the order's cards to BAN or saves them as CSV, and on one of its packages,
+`/settings/orders/suborder/<id>`, that seller's alone (section 6). In the cart,
 `/cart`, each seller gets Remove seller and Only this seller, and the panel
 puts back what Only this seller set aside (section 5).
 
@@ -62,9 +63,9 @@ split between sellers. The order history lists the same 61, 50 and 11.
 
 ManaPool moves between its pages without loading them, and a content script
 runs only on a load. So the script runs on every ManaPool page and looks at
-`location.pathname` twice a second: the order history and the cart get
-their panels, any other path none, and leaving takes the panel away and
-stops what it started. A redraw of ManaPool's page that takes the panel,
+`location.pathname` twice a second: the order history, an order, a package
+and the cart get their panels, any other path none, and leaving takes the
+panel away and stops what it started. A redraw of ManaPool's page that takes the panel,
 or the cart's seller buttons, puts them back.
 
 ## 5. The cart

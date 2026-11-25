@@ -13,7 +13,7 @@
   and sealed products are left out, and the panel says how many.
 - **On a package** (`manapool.com/settings/orders/suborder/<id>`) it does
   the same for that seller's cards alone.
-- **In your cart** each seller gets two buttons under its name. *Remove
+- **In your cart** each seller gets two buttons in its row. *Remove
   seller* takes all of that seller's cards out. *Only this seller* sets
   every other seller's cards aside, so you can check out from that one
   seller alone; afterwards *Put back*, on the panel, returns them from the

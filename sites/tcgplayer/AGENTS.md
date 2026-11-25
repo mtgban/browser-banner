@@ -1,8 +1,8 @@
 # AGENTS.md
 
 Guidance for AI coding agents working on TCGplayer's part of **BANner**, the
-browser extension: it handles a TCGplayer buyer's order history: a year saved
-as CSV, every order number made a search for that order, and an order's cards
+browser extension: it handles a TCGplayer buyer's order history: a year,
+every year or the last days saved as CSV, every order number made a search for that order, and an order's cards
 sent to mtgban's uploader. Read `SPECIFICATIONS.md` for what it does and what
 is known about TCGplayer's page; this file is about how to work on it without
 breaking it.
@@ -135,8 +135,8 @@ The handoff protocol is the one Cardmarket's side speaks; mtgban-website's
 `handoff_origins` (infrastructure config, not code) or the page never
 answers. When a change here needs one there, land the site side first.
 
-Card Kingdom's and Cardmarket's sides are the siblings: share their
-conventions, not their code.
+What the stores share is in `core/`; share nothing else with another store's
+side but its conventions.
 
 ## Commits
 

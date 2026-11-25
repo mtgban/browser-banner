@@ -1,8 +1,9 @@
 # AGENTS.md
 
 Guidance for AI coding agents working on Cardmarket's part of **BANner**, the
-browser extension: it reads a Cardmarket seller's offers and gets them to
-mtgban's upload. Read `SPECIFICATIONS.md` for what it does and what is known
+browser extension: it reads a Cardmarket seller's offers, or one of the
+visitor's purchases, and gets them to mtgban's upload, and saves the purchase
+lists as CSV. Read `SPECIFICATIONS.md` for what it does and what is known
 about Cardmarket's markup; this file is about how to work on it without
 breaking it.
 
