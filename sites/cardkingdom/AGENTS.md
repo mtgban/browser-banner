@@ -66,7 +66,7 @@ src/ui.js        core/ui.js's panel and download, the panel headed CK
 src/historypage.js  content script: range picker (core/ranges.js), Download CSV
 src/invoice.js   both invoices' lines, and each one's row in the price list
 src/invoicepage.js  content script: Load prices, CSV and BAN on an invoice
-src/panel.css    what this panel adds to core/panel.css; src/history.css
+src/panel.css    what this panel adds to core/panel.css
 scripts/cut-fixtures.py  cuts tests/fixtures/ from saved pages, locally only
 tests/mutations.json  each guard, the text that breaks it, the test that fails
 tests/           bun + happy-dom, no browser

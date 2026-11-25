@@ -74,6 +74,22 @@ describe("the manifest", () => {
   });
 });
 
+describe("the range picker", () => {
+  // Unstyled, it is the store's own select: on ManaPool white on white, and
+  // wide enough to push Download CSV out of the panel.
+  test("is styled by the sheet every store shares, and by no store", () => {
+    const loads = manifest.content_scripts.filter((cs) => cs.js.includes("core/ranges.js"));
+    expect(loads.filter((cs) => !cs.css.includes("core/panel.css"))).toEqual([]);
+    const rule = /\n#ban-panel \.ban-year \{([^}]*)\}/.exec(read("core/panel.css"));
+    expect(rule && rule[1]).toMatch(/\n  appearance: none;/);
+    for (const name of ["flex: none", "box-sizing: border-box", "width: \\d+px", "border: 0", "background: #", "color: #", "font: inherit"]) {
+      expect(rule[1]).toMatch(new RegExp("\\n  " + name));
+    }
+    const styled = manifest.content_scripts.flatMap((cs) => cs.css).filter((path) => path !== "core/panel.css" && /\.ban-year[^+{]*\{/.test(read(path)));
+    expect(styled).toEqual([]);
+  });
+});
+
 describe("the sites", () => {
   test("are the stores, each with its own rules and specification", () => {
     expect([...sites].sort()).toEqual(Object.keys(HOSTS).sort());
