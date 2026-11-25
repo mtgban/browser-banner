@@ -7,17 +7,18 @@ on the stores' pages, each with its own panel.
 
 | Store | Directory | What it reads |
 |---|---|---|
-| Cardmarket | [`sites/cardmarket`](sites/cardmarket) | a seller's offers |
-| Card Kingdom | [`sites/cardkingdom`](sites/cardkingdom) | the sell and buy carts, order and selling history |
+| Cardmarket | [`sites/cardmarket`](sites/cardmarket) | a seller's offers, one purchase, and the purchase lists |
+| Card Kingdom | [`sites/cardkingdom`](sites/cardkingdom) | the sell and buy carts, order and selling history, and both invoices |
 | TCGplayer | [`sites/tcgplayer`](sites/tcgplayer) | the order history, and an order to send |
 | ManaPool | [`sites/manapool`](sites/manapool) | the order history, an order or a package to send, and the cart by seller |
 | Star City Games | [`sites/starcitygames`](sites/starcitygames) | the order history, and an order to send |
 
 Each store's own README says what it does there; its SPECIFICATIONS.md
 says what is known about the store's markup.
+[SPECIFICATIONS.md](SPECIFICATIONS.md) says what every store shares.
 
 [docs/single-extension-plan.md](docs/single-extension-plan.md) is the plan
-for making the three one extension.
+that made the first three stores' extensions one, with its reasons.
 
 ## Installing it
 

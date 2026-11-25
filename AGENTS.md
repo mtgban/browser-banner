@@ -3,7 +3,8 @@
 Guidance for AI coding agents working on **browser-banner**. Each store's
 extension lives under `sites/<store>/` with its own `AGENTS.md` and
 `SPECIFICATIONS.md`: read the ones for the store you touch before changing
-it, and follow them. Their rules hold here unchanged.
+it, and follow them. Their rules hold here unchanged. `SPECIFICATIONS.md` at
+the root says what the stores share and what the whole extension promises.
 
 What holds for the whole repository:
 
@@ -23,6 +24,24 @@ What holds for the whole repository:
   resolved carries an empty column and the panel says how many.
 - **Do not write an em dash**, anywhere: `tests/repo.test.js` checks the
   root docs and `docs/`, each site's tests check its own.
+
+## Layout
+
+```
+manifest.json    the one manifest: each store's pages, scripts and styles
+core/net.js      one store's requests: the deadline, the challenge, one page
+core/csv.js      rows to CSV, as Go's csv.Writer quotes them
+core/money.js    the money a store prints, to cents and back; the calendar
+core/ranges.js   the range picker, and the name its file is saved under
+core/ui.js       the panel and the download
+core/panel.css   how the panel looks, and the range picker in it
+core/handoff.js  rows to mtgban's upload, by message or in a link
+sites/<store>/   one store: its source, docs, tests and fixtures
+scripts/mutate.mjs  breaks each guard and checks a test notices
+tests/           the repository's own tests, and the manifest they share
+```
+
+A test holds this list to `core/`'s files, and each site's to its `src/`.
 
 ## Verifying
 

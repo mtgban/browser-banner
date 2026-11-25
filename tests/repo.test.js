@@ -99,6 +99,20 @@ describe("the sites", () => {
     expect(missing).toEqual([]);
   });
 
+  test("list their source files in AGENTS.md, and the root lists core's", () => {
+    const listed = (path, dir) => [...read(path).matchAll(new RegExp("^" + dir + "/(\\S+\\.(?:js|css)) ", "gm"))].map((m) => m[1]).sort();
+    const held = (dir) => files(dir).map((path) => path.slice(dir.length + 1)).sort();
+    expect(listed("AGENTS.md", "core")).toEqual(held("core"));
+    for (const site of sites) {
+      expect([site, listed("sites/" + site + "/AGENTS.md", "src")]).toEqual([site, held("sites/" + site + "/src")]);
+    }
+  });
+
+  test("are each named in the root's README and specification", () => {
+    const unnamed = ["README.md", "SPECIFICATIONS.md"].flatMap((path) => sites.filter((site) => !read(path).includes("sites/" + site)).map((site) => path + " leaves out " + site));
+    expect(unnamed).toEqual([]);
+  });
+
   test("call no extension API", () => {
     // With no permissions there is nothing to call, and a call that slips
     // in would need one.
@@ -139,6 +153,7 @@ test("no em dash in the docs, the source or the manifest", () => {
   const names = [
     "README.md",
     "AGENTS.md",
+    "SPECIFICATIONS.md",
     "manifest.json",
     "package.json",
     ...files("docs"),
