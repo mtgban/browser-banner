@@ -32,7 +32,7 @@ src/ui.js        core/ui.js's panel and download, the panel headed MP
 src/api.js       the buyer API: one answer, and every order, PACE apart
 src/history.js   an order to its line, its sellers' suborders folded in
 src/order.js     an order's detail to one line per card received, and its CSV
-src/handoff.js   core/handoff.js's sender, Magic only, with ManaPool's words
+src/handoff.js   the link to mtgban's upload that carries an order's cards
 src/cart.js      the cart: sellers, an item taken out, listings put back
 src/cart.css     the seller buttons, in ManaPool's own page
 src/page.js      content script: follows the address, each page's panel

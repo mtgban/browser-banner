@@ -33,9 +33,10 @@ export function ordersAged(ages) {
 
 // mount opens path with orders behind the API, served oldest first in
 // pages of the asked limit. answer(url), when given, answers instead.
-export function mount({ path = "/settings/orders", orders = ordersAged(), order, answer, limit, blockPopups } = {}) {
+export function mount({ path = "/settings/orders", orders = ordersAged(), order, answer, limit, page, activation = true } = {}) {
   const window = new Window({ url: SITE + path });
-  window.document.body.innerHTML = "<main><h1>Orders</h1></main>";
+  window.document.body.innerHTML = page || "<main><h1>Orders</h1></main>";
+  Object.defineProperty(window.navigator, "userActivation", { value: activation === null ? undefined : { isActive: activation }, configurable: true, writable: true });
   const asked = [];
   window.fetch = (url) => {
     asked.push(String(url));
@@ -55,6 +56,8 @@ export function mount({ path = "/settings/orders", orders = ordersAged(), order,
     return Promise.resolve({ ok: true, status: 200, headers: { get: () => null }, json: () => Promise.resolve(JSON.parse(body)) });
   };
   const saved = [];
+  // The links clicked: mtgban's upload, with what its fragment carries.
+  const links = [];
   window.URL.createObjectURL = (blob) => {
     saved.push({ blob });
     return "blob:none";
@@ -65,18 +68,14 @@ export function mount({ path = "/settings/orders", orders = ordersAged(), order,
     const element = create(name, options);
     if (String(name).toLowerCase() === "a") {
       element.click = function () {
-        saved[saved.length - 1].name = this.download;
+        if (this.download) {
+          saved[saved.length - 1].name = this.download;
+        } else {
+          links.push({ url: this.href, target: this.target, rel: this.rel, referrer: this.referrerPolicy || this.getAttribute("referrerpolicy"), placed: this.isConnected });
+        }
       };
     }
     return element;
-  };
-  // mtgban's handoff tab: what was opened, and what was posted to it.
-  const tabs = [];
-  window.open = (url) => {
-    if (blockPopups) return null;
-    const tab = { url, closed: false, posted: [], postMessage: (data, origin) => tab.posted.push({ data, origin }), close: () => (tab.closed = true) };
-    tabs.push(tab);
-    return tab;
   };
   for (const entry of siteManifest("manapool").content_scripts) {
     for (const script of entry.js) {
@@ -91,9 +90,8 @@ export function mount({ path = "/settings/orders", orders = ordersAged(), order,
     window,
     asked,
     saved,
-    tabs,
-    ready: (i = 0) =>
-      window.dispatchEvent(new window.MessageEvent("message", { data: { type: "mtgban-handoff-ready" }, origin: "https://mtgban.com", source: tabs[i] })),
+    links,
+    sent: (i = 0) => JSON.parse(decodeURIComponent(links[i].url.split("#mtgban-handoff-rows=")[1])),
     send: () => at(".ban-send").click(),
     csv: () => at(".ban-csv").click(),
     shown: () => panel() !== null,

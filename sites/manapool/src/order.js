@@ -112,6 +112,40 @@ globalThis.MPB = globalThis.MPB || {};
     return { lines: lines, left: left };
   };
 
+  // orderLinked is the id of the order a package's page says it is part of,
+  // in the link under its heading, or null.
+  MPB.orderLinked = function (doc) {
+    var heading = doc.querySelector("h1");
+    var ids = [];
+    Array.prototype.forEach.call(heading ? heading.parentElement.querySelectorAll("a[href]") : [], function (a) {
+      var m = /\/settings\/orders\/([0-9a-f-]{36})\/?$/.exec(a.getAttribute("href"));
+      if (m && UUID.test(m[1]) && ids.indexOf(m[1]) < 0) {
+        ids.push(m[1]);
+      }
+    });
+    return ids.length === 1 ? ids[0] : null;
+  };
+
+  // packageNumber is the number in a package's heading, as the API writes
+  // it in the suborder's order_number, or null.
+  MPB.packageNumber = function (doc) {
+    var m = /#(\d+-\d+)\s*$/.exec((doc.querySelector("h1") || {}).textContent || "");
+    return m ? m[1] : null;
+  };
+
+  // packageOf is an order with the one seller whose suborder has the
+  // package's id or its number.
+  MPB.packageOf = function (order, id, number) {
+    var sellers = order && Array.isArray(order.order_seller_details) ? order.order_seller_details : [];
+    var own = sellers.filter(function (s) {
+      return s && (s.id === id || (number !== null && s.order_number === number));
+    });
+    if (own.length !== 1) {
+      throw new Error("ManaPool's order does not list this package");
+    }
+    return { order_number: own[0].order_number, order_seller_details: own };
+  };
+
   // [header, field of a line], named so mtgban's upload reads each: the id,
   // name, set, collector number, finish, condition, quantity and price.
   // Nothing else is headed with "number", which it would read as the

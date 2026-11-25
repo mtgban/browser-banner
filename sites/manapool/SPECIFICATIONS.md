@@ -165,9 +165,24 @@ replacements as received; it does not on two other orders, so no rule
 covers both, and those cards are left out and said.
 
 The panel offers Send to BAN and CSV, and asks the API on the first click,
-once. Send to BAN opens mtgban's upload on the click itself and hands it
-the CSV's rows once read; with no card to send, or an order it could not
-read, the tab closes again. CSV
-saves `mp-order-<number>.csv`. A suborder's page,
-`/settings/orders/suborder/<id>`, gets no panel. Send to BAN needs
-`https://manapool.com` in mtgban-website's `handoff_origins`.
+once. CSV saves `mp-order-<number>.csv`.
+
+A package's page, `/settings/orders/suborder/<id>`, gets the same panel for
+that seller's cards alone. The page links the order it is part of under its
+heading, and that order's detail is what is asked for; the package is the one
+suborder in it whose `id` is the page's, or whose `order_number` is the
+heading's ("Package #797863-2793044"). A page that links no order, or an
+order that does not list the package once, is said and nothing is saved. CSV
+saves `mp-package-<number>.csv`.
+
+ManaPool sends `Cross-Origin-Opener-Policy: same-origin`, so a tab its pages
+open on another site has no opener and no message reaches either way: the
+handoff the other stores use cannot work here. Send to BAN reads the cards,
+then opens mtgban's upload with them in the link's fragment, as
+`#mtgban-handoff-rows=` and the list as JSON, and mtgban's page takes them
+where the referrer's origin is in its `handoff_origins`
+(`https://manapool.com`). In Firefox a tab opened blank and sent there after
+carries no referrer, so the link is clicked whole, once the read is done; a
+browser lets a click open a tab for a few seconds, and where the read took
+longer the panel says to press again. An address past 1,000,000 characters is
+not sent, since Firefox opens none past 1 MiB.
