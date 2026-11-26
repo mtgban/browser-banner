@@ -251,6 +251,7 @@
   function order(id) {
     var panel = SCGB.panel();
     var run = null;
+    var waiting = false;
 
     function read() {
       var found = SCGB.orderIn(document, id);
@@ -289,6 +290,7 @@
     // nothing to act on.
     function got(what) {
       panel.clear();
+      waiting = false;
       var r;
       try {
         r = read();
@@ -303,8 +305,10 @@
       return r;
     }
 
+    // save answers while a send waits for its tab too: that tab has no
+    // deadline, and the send speaks for itself once it hears.
     function save() {
-      var r = run ? null : got("save");
+      var r = got("save");
       if (!r) {
         return;
       }
@@ -315,19 +319,22 @@
       panel.recap("Saved " + name + left(r));
     }
 
+    // send opens another tab even while one waits, which takes over from it.
     function send() {
-      var r = run ? null : got("send");
+      var r = got("send");
       if (!r) {
         return;
       }
       var token = {};
       run = token;
       panel.recap("Waiting for mtgban's upload page to take the order");
+      waiting = true;
       SCGB.handOff({ csv: SCGB.orderCSV(r.lines), rows: r.lines.length }, function (said) {
         if (run !== token) {
           return;
         }
         run = null;
+        waiting = false;
         if (said === SCGB.REPLACED) {
           return;
         }
@@ -347,9 +354,12 @@
 
     return {
       panel: panel,
+      // cancel stops hearing the send, and clears the panel only while it
+      // still says it is waiting: a CSV saved since keeps what it said.
       cancel: function () {
-        if (run) {
-          run = null;
+        run = null;
+        if (waiting) {
+          waiting = false;
           panel.clear();
         }
       },

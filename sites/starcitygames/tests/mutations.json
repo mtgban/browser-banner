@@ -404,5 +404,26 @@
     "find": "if (!done.rows.length && (done.unreadable || (n && !read))) {",
     "replace": "if (!done.rows.length && n && !read) {",
     "expectFailing": "a range whose orders' own pages do not read fails"
+  },
+  {
+    "guard": "CSV saves while a send waits",
+    "file": "src/page.js",
+    "find": "var r = got(\"save\");",
+    "replace": "var r = run ? null : got(\"save\");",
+    "expectFailing": "CSV saves while Send to BAN waits, and the send still says so"
+  },
+  {
+    "guard": "a second send takes over from a waiting one",
+    "file": "src/page.js",
+    "find": "var r = got(\"send\");",
+    "replace": "var r = run ? null : got(\"send\");",
+    "expectFailing": "Send to BAN again while one waits opens another tab in its place"
+  },
+  {
+    "guard": "Escape keeps what a CSV saved during a wait said",
+    "file": "src/page.js",
+    "find": "if (waiting) {\n          waiting = false;\n          panel.clear();",
+    "replace": "if (true) {\n          waiting = false;\n          panel.clear();",
+    "expectFailing": "Escape after a CSV saved during a wait keeps what the save said"
   }
 ]

@@ -208,10 +208,43 @@ describe("an order's panel", () => {
     expect(it.tip()).toBe("The upload page was blocked; allow pop-ups here and try again");
   });
 
+  test("CSV saves while Send to BAN waits, and the send still says so", async () => {
+    const it = open();
+    it.send();
+    it.csv();
+    expect((await it.file()).name).toBe("scg-order-1000001.csv");
+    expect(it.tip()).toBe("Saved scg-order-1000001.csv; left out: 3 refunded copies");
+    it.ready();
+    expect(it.tabs[0].posted[0].data.rows).toBe(4);
+    expect(it.tip()).toBe("Sent 4 cards to BAN; left out: 3 refunded copies");
+  });
+
+  test("Send to BAN again while one waits opens another tab in its place", () => {
+    const it = open();
+    it.send();
+    it.send();
+    expect(it.tabs.length).toBe(2);
+    expect(it.tabs[0].closed).toBe(true);
+    expect(it.tip()).toBe("Waiting for mtgban's upload page to take the order");
+    it.ready(1);
+    expect(it.tabs[1].posted[0].data.rows).toBe(4);
+    expect(it.tip()).toBe("Sent 4 cards to BAN; left out: 3 refunded copies");
+  });
+
   test("Escape gives up waiting for the upload page", () => {
     const it = open();
     it.send();
     it.escape();
     expect(it.tip()).toBe("Send this order's cards to BAN, or save them as CSV");
+  });
+  test("Escape after a CSV saved during a wait keeps what the save said", async () => {
+    const it = open();
+    it.send();
+    it.csv();
+    it.escape();
+    expect(it.tip()).toBe("Saved scg-order-1000001.csv; left out: 3 refunded copies");
+    expect(it.heading()).toBe("SCG BANner - 4 cards✓");
+    it.ready();
+    expect(it.tip()).toBe("Saved scg-order-1000001.csv; left out: 3 refunded copies");
   });
 });
