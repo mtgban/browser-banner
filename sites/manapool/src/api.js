@@ -16,6 +16,7 @@ globalThis.MPB = globalThis.MPB || {};
   MPB.CHALLENGE = net.CHALLENGE;
   MPB.TIMED_OUT = net.TIMED_OUT;
   MPB.SIGNED_OUT = "Sign in to ManaPool to read your orders";
+  MPB.after = net.after;
 
   var ORDERS = "/api/v1/buyer/orders";
 
@@ -35,6 +36,33 @@ globalThis.MPB = globalThis.MPB || {};
       })
       .then(function (response) {
         return response.json();
+      })
+      .catch(net.timedOut);
+  };
+
+  // getCharges reads one order's fees and refunds from the data its page
+  // loads (MPB.chargesOf), by the order's id: null when that data does not
+  // read whole.
+  MPB.getCharges = function (id) {
+    return fetch("/settings/orders/" + id + "/__data.json", {
+      credentials: "same-origin",
+      signal: net.deadline(),
+    })
+      .then(function (response) {
+        if (response.status === 401) {
+          throw new Error(MPB.SIGNED_OUT);
+        }
+        return net.check(response);
+      })
+      .then(function (response) {
+        return response.text();
+      })
+      .then(function (text) {
+        var charges = MPB.chargesOf(text);
+        if (charges === "signed out") {
+          throw new Error(MPB.SIGNED_OUT);
+        }
+        return charges;
       })
       .catch(net.timedOut);
   };

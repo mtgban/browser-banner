@@ -1,6 +1,6 @@
 // Turns the buyer API's orders into the order history's lines
 // (SPECIFICATIONS.md, section 3): one per order, its sellers' suborders
-// folded into it.
+// folded into it, and its fees and refunds from its page (section 3.1).
 
 globalThis.MPB = globalThis.MPB || {};
 
@@ -18,7 +18,7 @@ globalThis.MPB = globalThis.MPB || {};
   // orderRow reads one order into a line, or null when it is not whole: an
   // order number, a time, its four amounts in cents, and every seller's
   // name and item count. The date is the browser's own, as ManaPool's page
-  // shows it.
+  // shows it. Fees, total, refunded and net are null until charged.
   MPB.orderRow = function (o) {
     var placed = o && typeof o.created_at === "string" ? new Date(o.created_at) : null;
     var sellers = o && Array.isArray(o.order_seller_details) ? o.order_seller_details : null;
@@ -34,6 +34,7 @@ globalThis.MPB = globalThis.MPB || {};
       items += sellers[i].item_count;
     }
     return {
+      id: typeof o.id === "string" ? o.id : "",
       number: o.order_number,
       placed: placed,
       date: { year: placed.getFullYear(), month: placed.getMonth() + 1, day: placed.getDate() },
@@ -47,9 +48,27 @@ globalThis.MPB = globalThis.MPB || {};
       subtotal: o.subtotal_cents,
       shipping: o.shipping_cents,
       tax: o.tax_cents,
-      total: o.total_cents,
+      fees: null,
+      total: null,
+      refunded: null,
+      net: null,
     };
   };
+
+  // charged gives a line its order's charges, as MPB.chargesOf reads them:
+  // the total is the page's, fees in, and net is what the refunds left of
+  // it. A refund not stated leaves refunded and net empty.
+  MPB.charged = function (row, charges) {
+    row.fees = charges.fees;
+    row.total = charges.total;
+    row.refunded = charges.refunded;
+    row.net = charges.refunded === null ? null : charges.total - charges.refunded;
+    return row;
+  };
+
+  function money(n) {
+    return n === null ? "" : BAN.decimal(n);
+  }
 
   // [header, field of a line]
   var COLUMNS = [
@@ -61,7 +80,10 @@ globalThis.MPB = globalThis.MPB || {};
     ["Subtotal", function (r) { return BAN.decimal(r.subtotal); }],
     ["Shipping", function (r) { return BAN.decimal(r.shipping); }],
     ["Tax", function (r) { return BAN.decimal(r.tax); }],
-    ["Total", function (r) { return BAN.decimal(r.total); }],
+    ["Fees", function (r) { return money(r.fees); }],
+    ["Total", function (r) { return money(r.total); }],
+    ["Refunded", function (r) { return money(r.refunded); }],
+    ["Net", function (r) { return money(r.net); }],
   ];
 
   // historyCSV writes the lines in the order given.

@@ -1,0 +1,261 @@
+{
+ "8a119b9e-16bc-4732-8f7b-7676d015b0dc": {
+  "order": {
+   "id": "8a119b9e-16bc-4732-8f7b-7676d015b0dc",
+   "buyerLabelNumber": 1001,
+   "createdAt": "2024-12-30T23:10:05.123456+00:00",
+   "subtotalCents": 198,
+   "buyerFeeCents": 0,
+   "gatheredFeeCents": 0,
+   "shippingCents": 125,
+   "taxCents": 16,
+   "payment": {
+    "brand": "visa",
+    "amountCaptured": 339,
+    "payment_status": "completed",
+    "extraManaApplied": 0,
+    "userCreditTransactionId": null
+   }
+  },
+  "reports": {}
+ },
+ "a712755f-6cac-44d5-99d5-269512e74f7b": {
+  "order": {
+   "id": "a712755f-6cac-44d5-99d5-269512e74f7b",
+   "buyerLabelNumber": 1002,
+   "createdAt": "2025-03-14T18:45:11.945361+00:00",
+   "subtotalCents": 473,
+   "buyerFeeCents": 20,
+   "gatheredFeeCents": 0,
+   "shippingCents": 125,
+   "taxCents": 39,
+   "payment": {
+    "brand": "visa",
+    "amountCaptured": 657,
+    "payment_status": "completed",
+    "extraManaApplied": 0,
+    "userCreditTransactionId": null
+   }
+  },
+  "reports": {
+   "bc67ba94-637d-4efa-a09e-467ada679f81": [
+    {
+     "proposedRemediation": "refund",
+     "rescinded": false,
+     "partialValueRefundCents": null,
+     "requestedConditionRefundCents": null,
+     "itemReports": [],
+     "charges": [],
+     "proposal": null,
+     "remediations": [
+      {
+       "createdAt": "2026-01-01T00:00:00+00:00",
+       "refundCents": 150,
+       "refundExtraMana": null,
+       "remedialOrderSellerDetailsId": null,
+       "comment": "refunded the reported item",
+       "sellerAutoapproveDeductions": false
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "dd2ee150-d284-4277-b89c-1af40ce8fcc9": {
+  "order": {
+   "id": "dd2ee150-d284-4277-b89c-1af40ce8fcc9",
+   "buyerLabelNumber": 1003,
+   "createdAt": "2025-11-02T09:01:44.5+00:00",
+   "subtotalCents": 4251,
+   "buyerFeeCents": 179,
+   "gatheredFeeCents": 0,
+   "shippingCents": 500,
+   "taxCents": 0,
+   "payment": {
+    "brand": "visa",
+    "amountCaptured": 4930,
+    "payment_status": "completed",
+    "extraManaApplied": 0,
+    "userCreditTransactionId": null
+   }
+  },
+  "reports": {
+   "ac8efe12-1c59-49f1-ba2d-de83458bfed0": [
+    {
+     "proposedRemediation": "replacement",
+     "rescinded": false,
+     "partialValueRefundCents": null,
+     "requestedConditionRefundCents": null,
+     "itemReports": [],
+     "charges": [],
+     "proposal": null,
+     "remediations": [
+      {
+       "createdAt": "2026-01-01T00:00:00+00:00",
+       "refundCents": null,
+       "refundExtraMana": null,
+       "remedialOrderSellerDetailsId": "5b0e1d7c-2a4f-4c1e-9d3a-7f6e8b9c0a1d",
+       "comment": "",
+       "sellerAutoapproveDeductions": false
+      }
+     ]
+    }
+   ],
+   "0b80a255-53a1-4945-a932-58ef7777682c": [
+    {
+     "proposedRemediation": "refund",
+     "rescinded": false,
+     "partialValueRefundCents": null,
+     "requestedConditionRefundCents": null,
+     "itemReports": [],
+     "charges": [],
+     "proposal": null,
+     "remediations": [
+      {
+       "createdAt": "2026-01-01T00:00:00+00:00",
+       "refundCents": null,
+       "refundExtraMana": 3010,
+       "remedialOrderSellerDetailsId": null,
+       "comment": "refunded in Extra Mana",
+       "sellerAutoapproveDeductions": false
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "bbeeb636-1d33-4c6d-96f0-da847a2a3b87": {
+  "order": {
+   "id": "bbeeb636-1d33-4c6d-96f0-da847a2a3b87",
+   "buyerLabelNumber": 1004,
+   "createdAt": "2026-02-11T09:30:00+00:00",
+   "subtotalCents": 616,
+   "buyerFeeCents": 26,
+   "gatheredFeeCents": 0,
+   "shippingCents": 130,
+   "taxCents": 0,
+   "payment": {
+    "brand": "visa",
+    "amountCaptured": 772,
+    "payment_status": "completed",
+    "extraManaApplied": 0,
+    "userCreditTransactionId": null
+   }
+  },
+  "reports": {
+   "3c3ae353-fb14-428e-90b4-01a6c1cc0aff": [
+    {
+     "proposedRemediation": "refund",
+     "rescinded": false,
+     "partialValueRefundCents": null,
+     "requestedConditionRefundCents": null,
+     "itemReports": [],
+     "charges": [],
+     "proposal": null,
+     "remediations": [
+      {
+       "createdAt": "2026-01-01T00:00:00+00:00",
+       "refundCents": null,
+       "refundExtraMana": null,
+       "remedialOrderSellerDetailsId": null,
+       "comment": "refunded the package",
+       "sellerAutoapproveDeductions": false
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "03c472ca-4495-48b4-b8d8-89d2b47a5c1d": {
+  "order": {
+   "id": "03c472ca-4495-48b4-b8d8-89d2b47a5c1d",
+   "buyerLabelNumber": 1005,
+   "createdAt": "2026-08-14T07:16:21.020304+00:00",
+   "subtotalCents": 11341,
+   "buyerFeeCents": 476,
+   "gatheredFeeCents": 840,
+   "shippingCents": 1485,
+   "taxCents": 0,
+   "payment": {
+    "brand": "visa",
+    "amountCaptured": 14142,
+    "payment_status": "completed",
+    "extraManaApplied": 0,
+    "userCreditTransactionId": null
+   }
+  },
+  "reports": {
+   "68e58909-ccb2-4416-925a-56c9a30f4300": [
+    {
+     "proposedRemediation": "replacement",
+     "rescinded": false,
+     "partialValueRefundCents": null,
+     "requestedConditionRefundCents": null,
+     "itemReports": [],
+     "charges": [],
+     "proposal": null,
+     "remediations": [
+      {
+       "createdAt": "2026-01-01T00:00:00+00:00",
+       "refundCents": 11817,
+       "refundExtraMana": null,
+       "remedialOrderSellerDetailsId": null,
+       "comment": "refunded the reported items, no replacement available",
+       "sellerAutoapproveDeductions": false
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "8f39aaa5-729a-453c-b891-da33e83a9d40": {
+  "order": {
+   "id": "8f39aaa5-729a-453c-b891-da33e83a9d40",
+   "buyerLabelNumber": 1006,
+   "createdAt": "2026-11-21T08:00:04.589106+00:00",
+   "subtotalCents": 4857,
+   "buyerFeeCents": 204,
+   "gatheredFeeCents": 0,
+   "shippingCents": 540,
+   "taxCents": 0,
+   "payment": {
+    "brand": "visa",
+    "amountCaptured": 5601,
+    "payment_status": "completed",
+    "extraManaApplied": 0,
+    "userCreditTransactionId": null
+   }
+  },
+  "reports": {
+   "77dde229-df88-4e4d-ac23-86e5cc86ba64": [
+    {
+     "proposedRemediation": "replacement",
+     "rescinded": false,
+     "partialValueRefundCents": null,
+     "requestedConditionRefundCents": null,
+     "itemReports": [],
+     "charges": [],
+     "proposal": null,
+     "remediations": [
+      {
+       "createdAt": "2026-01-01T00:00:00+00:00",
+       "refundCents": 5601,
+       "refundExtraMana": null,
+       "remedialOrderSellerDetailsId": null,
+       "comment": "refunded the unfulfilled items",
+       "sellerAutoapproveDeductions": false
+      },
+      {
+       "createdAt": "2026-01-01T00:00:00+00:00",
+       "refundCents": 5601,
+       "refundExtraMana": null,
+       "remedialOrderSellerDetailsId": null,
+       "comment": "refunded the unfulfilled items",
+       "sellerAutoapproveDeductions": false
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

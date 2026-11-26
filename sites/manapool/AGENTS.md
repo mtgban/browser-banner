@@ -34,6 +34,7 @@ number not in 1000 to 1999.
 ```
 src/ui.js        core/ui.js's panel and download, the panel headed MP
 src/api.js       the buyer API: one answer, and every order, PACE apart
+src/charges.js   an order's fees and refunds, from its page's own data
 src/history.js   an order to its line, its sellers' suborders folded in
 src/order.js     an order's detail to one line per card received, and its CSV
 src/handoff.js   the link to mtgban's upload that carries an order's cards
@@ -52,10 +53,17 @@ tests/           bun + happy-dom, no browser
   every ManaPool page and follows `location.pathname`; a panel belongs to a
   path, and leaving the path takes it away and stops what it started.
 - **One request at a time, PACE apart.** The API answers 100 orders at once,
-  so a whole history is a request or two; it is still never fanned out.
+  so a history's list is a request or two; then each order in range has its
+  page's data asked for, one after another, never fanned out.
 - **The cart is ManaPool's.** Items go out through ManaPool's own quantity
   list, and listings come back as changes in its own stored cart, which it
   syncs. Nothing here posts to ManaPool's server; `tests/cart.js` fakes the
   page's side, so a change there is checked in a real cart first.
-- **Amounts are the API's own.** ManaPool's page adds its service fee to
-  an order's total; the API does not give it, and it is not computed here.
+- **Amounts are ManaPool's own.** The API gives subtotal, shipping and tax;
+  the fees and the refunds are read from the data the order's page loads
+  (`src/charges.js`), never computed. A refund ManaPool records without its
+  amount leaves Refunded and Net empty, and the panel says how many.
+- **Page data carries the session.** The order page's `__data.json` has the
+  visitor's session and account in its layout nodes. Only the page's own
+  node is read, and a fixture is built in `tests/pages.js` from made-up
+  values, never cut from a real answer.
