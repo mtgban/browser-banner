@@ -163,6 +163,18 @@ describe("the purchase's panel", () => {
     expect(it.tip()).toBe("Saved cm-purchase-1000001.csv");
   });
 
+  test("an order in pounds is converted at the pound's rate, not the euro's", async () => {
+    const body = text("purchase.html").replace(/(\d+),(\d{2}) €/g, "£$1.$2");
+    expect(body).not.toContain("€");
+    const it = mount({ body, rates: { usd: { eur: 0.9, gbp: 0.75 } } });
+    it.save().click();
+    await it.settle();
+    const lines = (await it.file()).text.trimEnd().split("\r\n");
+    expect(lines.length).toBe(11);
+    expect(lines[2]).toContain(",Slagwurm Armor,Mirrodin,MP,foil,1,0.52,English,");
+    expect(it.tip()).toBe("Saved cm-purchase-1000001.csv");
+  });
+
   test("with no exchange rate, saves anyway and says the prices are empty", async () => {
     const it = mount({ rates: null });
     it.save().click();
