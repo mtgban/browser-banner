@@ -134,7 +134,8 @@ mtgban takes it because `https://starcitygames.com` is one of its
 
 A range picker and Download CSV on the list; Send to BAN and CSV on an
 order. The heading counts pages, then orders, as they are read. What a
-finished read has to say is on the tooltip.
+finished read has to say is on the tooltip. While Send to BAN waits for its
+tab, CSV still saves, and Send to BAN again closes that tab and opens another.
 
 ## Not yet
 
