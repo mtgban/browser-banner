@@ -6,7 +6,7 @@ import { mount, text } from "./panel.js";
 
 const ORDER = "/settings/orders/3e28cf57-6020-47e1-89ca-f4ee167de083";
 const HEADER = "Scryfall ID,Name,Set,Number,Finish,Condition,Language,Quantity,Price";
-const LEFT = "left out: 2 refunded cards, 1 card replaced by another order, 1 card replaced with one ManaPool does not name, 1 sealed product, 1 unreadable line";
+const LEFT = "left out: 2 refunded cards, 1 card replaced by another order, 1 card ManaPool replaced or refunded without saying which, 1 sealed product, 1 unreadable line";
 
 const detail = () => JSON.parse(text("order.json")).order;
 
@@ -155,6 +155,24 @@ describe("an order's panel", () => {
     expect(it.links).toEqual([]);
     expect(it.failed()).toBe(true);
     expect(it.tip()).toMatch(/^No cards to send; left out: \d+ refunded cards/);
+  });
+
+  test("a package refunded at ManaPool's hub opens nothing and says replaced or refunded", async () => {
+    const o = detail();
+    const s = o.order_seller_details[0];
+    s.fulfillments = [{ status: "shipped" }];
+    s.refunded_items = [];
+    s.items = s.items.filter((i) => i.product && i.product.single && i.replacement == null);
+    s.items.forEach((i) => (i.replacement = { quantity: i.quantity, same_package: true, refunded_cents: null, product: null }));
+    o.order_seller_details = [s];
+    const copies = s.items.reduce((n, i) => n + i.quantity, 0);
+    expect(copies).toBeGreaterThan(1);
+    const it = mount({ path: ORDER, order: { order: o } });
+    it.send();
+    await it.settle();
+    expect(it.links).toEqual([]);
+    expect(it.failed()).toBe(true);
+    expect(it.tip()).toBe("No cards to send; left out: " + copies + " cards ManaPool replaced or refunded without saying which");
   });
 
   test("Send to BAN that cannot read the order says why and opens nothing", async () => {

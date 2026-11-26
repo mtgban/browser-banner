@@ -386,7 +386,7 @@
         out.push(plural(l.away, "card", "cards") + " replaced by another order");
       }
       if (l.unnamed) {
-        out.push(plural(l.unnamed, "card", "cards") + " replaced with one ManaPool does not name");
+        out.push(plural(l.unnamed, "card", "cards") + " ManaPool replaced or refunded without saying which");
       }
       if (l.sealed) {
         out.push(plural(l.sealed, "sealed product", "sealed products"));

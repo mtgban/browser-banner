@@ -301,7 +301,7 @@
     "expectFailing": "are one line per card received, every seller's, and what was left out is counted"
   },
   {
-    "guard": "a replacement ManaPool does not name is left out",
+    "guard": "a replacement ManaPool does not name, or a hub refund, is left out",
     "file": "src/order.js",
     "find": "} else if (swapped && !swap.product) {",
     "replace": "} else if (false) {",
