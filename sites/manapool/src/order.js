@@ -43,7 +43,7 @@ globalThis.MPB = globalThis.MPB || {};
   //   a seller whose last fulfillment says "refunded" sent nothing;
   // - away: a replacement shipped on its own is its own order's;
   // - unnamed: a replacement in the same package whose card ManaPool does
-  //   not name;
+  //   not name, which is also how it writes a card refunded at its hub;
   // - sealed, and unreadable lines.
   //
   // A replacement in the same package that names its card is that card.

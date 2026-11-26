@@ -155,7 +155,12 @@ number. Left out, and counted on the panel:
 - **Replacements shipped on their own** (`same_package` false): they come
   as an order of their own, with their own page.
 - **Replacements in the same package that do not name their card.** One
-  that names its card is that card, for the quantity it replaced.
+  that names its card is that card, for the quantity it replaced. ManaPool
+  writes a card refunded at its hub with no replacement the same way: on a
+  real Gathered order refunded whole, every item has such a replacement, its
+  fulfillment says "shipped" and nothing is in `refunded_items`; the refund
+  is only in the order page's own data. So the panel says these cards were
+  replaced or refunded, ManaPool not saying which.
 - **Sealed products**, which carry no Scryfall id, and any line that does
   not read whole.
 
