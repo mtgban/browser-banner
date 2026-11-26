@@ -2,7 +2,7 @@
 
 What the extension does on ManaPool, what it reads, and the rules it keeps.
 Every fact about ManaPool here was read off a signed-in buyer's account on
-2026-11-23.
+2026-11-23, and the order page's data (section 3.1) on 2026-11-26.
 
 ## 1. What it is
 
@@ -29,35 +29,84 @@ page already has: a same-origin request, so no permission and no token.
   ("800917-2803072"), `shipping_cents` and `item_count`.
 - Signed out, it answers 401.
 
-An order's total is its subtotal, shipping and tax and nothing else. The
-order page's total adds ManaPool's service fee on singles, which the API
-does not give: an order of $69.39 by the API is $71.42 on the page. A
-"Gathered" order, consolidated at ManaPool's hub, charges less shipping
-than its sellers' own shipping adds up to.
+An order's `total_cents` is its subtotal, shipping and tax and nothing
+else. The order page's total adds ManaPool's fee on singles, and on a
+"Gathered" order, consolidated at ManaPool's hub, its Gather fee; the API
+gives neither, nor any refund in money (section 3.1). A Gathered order
+charges less shipping than its sellers' own shipping adds up to.
 
 ## 3. The order history
 
 One line per order, its suborders folded in: Order Number, Order Date (the
 browser's own time, as ManaPool's page shows it, "2026-11-21 03:00"),
 Sellers (each seller's name, joined by "; "), Packages (the suborders),
-Items (their item counts added up), and Subtotal, Shipping, Tax and Total in
-dollars, as the API gives them. Newest first. An order missing any of those,
-or with a suborder missing its seller's name or its item count, is left out
-and counted. When no order could be read at all, the panel fails and says
-how many, rather than that there are none.
+Items (their item counts added up), Subtotal, Shipping and Tax as the API
+gives them, and Fees, Total, Refunded and Net from the order's page
+(section 3.1), all in dollars. Newest first. An order missing any of the
+API's, or with a suborder missing its seller's name or its item count, is
+left out and counted. When no order could be read at all, the panel fails
+and says how many, rather than that there are none.
 
 The range is the other stores': the last 30, 90 or 120 days, every year, or
 one year back to 2024, when ManaPool's first orders were placed. The API
 is asked from the range's first day, in the browser's time, and the lines
 are kept to the range again on arrival. It pages 100 at a time, waiting
 `PACE` before each request after the first, until an answer comes back
-short. The file is `mp-orders-<range>.csv`. A refused answer saves nothing
-and says why; a 401 says to sign in. Escape stops the read.
+short. Then each order in range has its page's data asked for, newest
+first, `PACE` before each, the heading counting them ("order 3 of 12"). The
+file is `mp-orders-<range>.csv`. A refused answer saves nothing and says
+why; a 401, or a page's data sending the visitor to sign in, says to sign
+in. Escape stops the read.
 
 Run in a signed-in account's own ManaPool page, 25 orders to a request, the
 reader took 61 orders in three requests 1.4 seconds apart, all whole, every
 order number once and every total its subtotal, shipping and tax; 14 were
 split between sellers. The order history lists the same 61, 50 and 11.
+
+### 3.1 Fees and refunds
+
+`GET /settings/orders/<id>/__data.json` is the data ManaPool's order page
+loads when it is reached without a load: SvelteKit's, one JSON line of
+nodes and then a line per promise it resolves. The first nodes are the
+layouts', with the visitor's session and account; the page's own node is the
+one whose top level has `order` and `orderReportsBySellerOrderId`, the
+fourth on every order read. Its values are flattened into one array: each
+reference is an index into it, and a Map, a Date or a promise is an array
+headed by its name (`["Map", k, v, ...]`); those three are the only kinds
+seen. Signed out, it answers `{"type":"redirect","location":"/auth?..."}`.
+
+- `order` has `subtotalCents`, `shippingCents` and `taxCents`, the API's own,
+  and `buyerFeeCents` (the fee on singles) and `gatheredFeeCents` (0 unless
+  Gathered). Fees is the two; Total is all five, which on all 62 orders of
+  the account read is what was paid, `payment.amountCaptured` on the card
+  and `payment.extraManaApplied` in Extra Mana, ten Mana to the cent. The
+  order list's own Total is the card's part alone, so on an order paid
+  partly in Extra Mana it is less: 8 of the 50 orders on one list page.
+- `orderReportsBySellerOrderId` maps each suborder to its reports, and each
+  report has `remediations`: what ManaPool did about it. A remediation's
+  `refundCents` is a refund in money and `refundExtraMana` one in Extra
+  Mana; one with neither and a `remedialOrderSellerDetailsId` opened a
+  replacement order and returned no money. Refunded is every amount added
+  up, the Mana's sum at ten to the cent, rounded once.
+
+Where the API also states a refund, as `refunded_items[].refunded_cents`
+or a replacement's `refunded_cents`, it is the same amount as the
+remediations'. The remediations also state what the API does not: a Gathered
+order refunded whole at the hub reads in the API as replacements that name
+no card (section 6), and its remediation refunds the subtotal and the singles
+fee. Refunded is left empty, and so is Net, and the panel counts the order:
+
+- when a remediation states no amount and opens no replacement order. Older
+  ones do ("refunded the package courtesy of ...", "refunded 50% of the
+  card"), and nothing else says how much: 7 of the 62 orders.
+- when the page has a Gathered order's own reports, `gatheredOrderReports`,
+  which every order read had empty.
+
+A refund recorded twice is twice in both the remediations and the API: one
+order of $141.19, charged $141.19, shows two refunds of $141.19 made 0.3
+seconds apart. Refunded is never more than Total. Net is Total less
+Refunded. A page whose data does not read leaves Fees, Total, Refunded and
+Net empty, and is counted.
 
 ## 4. Following the address
 

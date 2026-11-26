@@ -13,6 +13,7 @@
   // ManaPool's first orders were placed in 2024.
   var FIRST_YEAR = 2024;
   var RECENT = [30, 90, 120];
+  var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
   var shown = null;
 
@@ -57,6 +58,47 @@
       }
     }
 
+    // charge gives each line its order's fees and refunds, one order page
+    // at a time, PACE apart, and answers how many could not be read and how
+    // many have a refund not stated, or null once the run is stopped.
+    function charge(token, rows) {
+      var counts = { unread: 0, unstated: 0 };
+
+      function next(i) {
+        if (run !== token) {
+          return Promise.resolve(null);
+        }
+        if (i === rows.length) {
+          return Promise.resolve(counts);
+        }
+        if (!UUID.test(rows[i].id)) {
+          counts.unread++;
+          return next(i + 1);
+        }
+        panel.word("order " + (i + 1) + " of " + rows.length);
+        return MPB.after(MPB.PACE)
+          .then(function () {
+            return run === token ? MPB.getCharges(rows[i].id) : null;
+          })
+          .then(function (charges) {
+            if (run !== token) {
+              return null;
+            }
+            if (!charges) {
+              counts.unread++;
+            } else {
+              MPB.charged(rows[i], charges);
+              if (charges.unstated) {
+                counts.unstated++;
+              }
+            }
+            return next(i + 1);
+          });
+      }
+
+      return next(0);
+    }
+
     function save() {
       if (run) {
         return;
@@ -86,7 +128,6 @@
           if (run !== token || !orders) {
             return;
           }
-          stop();
           var rows = [];
           var unreadable = 0;
           for (var i = 0; i < orders.length; i++) {
@@ -101,21 +142,33 @@
             return b.placed - a.placed;
           });
           var left = unreadable ? "; " + plural(unreadable, "order", "orders") + " unreadable, left out" : "";
-          panel.mark("done");
           if (unreadable && unreadable === orders.length) {
+            stop();
+            panel.mark("done");
             panel.word(unreadable + " unreadable");
             panel.fail("Nothing saved: " + plural(unreadable, "order", "orders") + " could not be read");
             return;
           }
           if (!rows.length) {
+            stop();
+            panel.mark("done");
             panel.word("no orders");
             panel.recap("No orders in that range" + left);
             return;
           }
-          var name = BAN.rangeFile("mp-orders", c, today);
-          MPB.download(MPB.historyCSV(rows), name);
-          panel.word(plural(rows.length, "order", "orders"));
-          panel.recap("Saved " + name + ": " + plural(rows.length, "order", "orders") + left);
+          return charge(token, rows).then(function (counts) {
+            if (run !== token || !counts) {
+              return;
+            }
+            stop();
+            panel.mark("done");
+            var name = BAN.rangeFile("mp-orders", c, today);
+            MPB.download(MPB.historyCSV(rows), name);
+            panel.word(plural(rows.length, "order", "orders"));
+            panel.recap("Saved " + name + ": " + plural(rows.length, "order", "orders") + left +
+              (counts.unstated ? "; " + plural(counts.unstated, "order has", "orders have") + " a refund ManaPool does not state, left empty" : "") +
+              (counts.unread ? "; the charges of " + plural(counts.unread, "order", "orders") + " could not be read, left empty" : ""));
+          });
         })
         .catch(function (err) {
           if (run !== token) {

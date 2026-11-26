@@ -23,8 +23,8 @@
   {
     "guard": "a visitor not signed in is told to sign in",
     "file": "src/api.js",
-    "find": "if (response.status === 401) {",
-    "replace": "if (false) {",
+    "find": "if (response.status === 401) {\n          throw new Error(MPB.SIGNED_OUT);\n        }\n        return net.check(response);\n      })\n      .then(function (response) {\n        return response.json();",
+    "replace": "return net.check(response);\n      })\n      .then(function (response) {\n        return response.json();",
     "expectFailing": "a visitor ManaPool has not signed in is told to sign in"
   },
   {
@@ -488,5 +488,103 @@
     "find": "if (!page) {",
     "replace": "if (false) {",
     "expectFailing": "a game the store may not send has no link"
+  },
+  {
+    "guard": "Extra Mana is ten to the cent",
+    "file": "src/charges.js",
+    "find": "var MANA_PER_CENT = 10;",
+    "replace": "var MANA_PER_CENT = 1;",
+    "expectFailing": "add cash and Extra Mana, ten Mana to the cent"
+  },
+  {
+    "guard": "a remediation that opens a replacement order is no money",
+    "file": "src/charges.js",
+    "find": "if (!rem || !rem.remedialOrderSellerDetailsId) {",
+    "replace": "if (true) {",
+    "expectFailing": "take a remediation that opens a replacement order as no money"
+  },
+  {
+    "guard": "a remediation with no amount leaves refunded unknown",
+    "file": "src/charges.js",
+    "find": "              unstated = true;",
+    "replace": "              unstated = false;",
+    "expectFailing": "leave refunded unknown when a remediation states no amount and opens no order"
+  },
+  {
+    "guard": "a Gathered order's own reports leave refunded unknown",
+    "file": "src/charges.js",
+    "find": "var unstated = page.gathered.length > 0;",
+    "replace": "var unstated = false;",
+    "expectFailing": "leave refunded unknown when a Gathered order's own reports are there"
+  },
+  {
+    "guard": "refunds are no more than the total",
+    "file": "src/charges.js",
+    "find": "Math.min(refunded, total)",
+    "replace": "refunded",
+    "expectFailing": "refund no more than the order cost, when one refund is written twice"
+  },
+  {
+    "guard": "the page's node is found by what it holds",
+    "file": "src/charges.js",
+    "find": "\"order\" in top && \"orderReportsBySellerOrderId\" in top",
+    "replace": "i === 3 && \"order\" in top",
+    "expectFailing": "find the page's node by what it holds, not where it sits, and need no later line"
+  },
+  {
+    "guard": "a page sending the visitor to sign in is signed out",
+    "file": "src/charges.js",
+    "find": "      return \"signed out\";",
+    "replace": "      return null;",
+    "expectFailing": "answer signed out for a page that sends the visitor to sign in"
+  },
+  {
+    "guard": "net is what the refunds left of the total",
+    "file": "src/history.js",
+    "find": "charges.total - charges.refunded",
+    "replace": "charges.total",
+    "expectFailing": "writes the history's CSV, one line each, amounts in dollars"
+  },
+  {
+    "guard": "each order page waits the pace",
+    "file": "src/page.js",
+    "find": "return MPB.after(MPB.PACE)",
+    "replace": "return MPB.after(0)",
+    "expectFailing": "counts the order pages as it reads them, and waits the pace before each"
+  },
+  {
+    "guard": "Escape stops the order pages being read",
+    "file": "src/page.js",
+    "find": "return run === token ? MPB.getCharges(rows[i].id) : null;",
+    "replace": "return MPB.getCharges(rows[i].id);",
+    "expectFailing": "Escape while the order pages are read stops it, and nothing is saved"
+  },
+  {
+    "guard": "an order page signed out stops the read",
+    "file": "src/api.js",
+    "find": "        if (charges === \"signed out\") {",
+    "replace": "        if (false) {",
+    "expectFailing": "an order page that sends the visitor to sign in stops the read, and nothing is saved"
+  },
+  {
+    "guard": "an unreadable order page is counted",
+    "file": "src/page.js",
+    "find": "            if (!charges) {\n              counts.unread++;",
+    "replace": "            if (!charges) {\n              return null;",
+    "expectFailing": "an order page that does not read leaves its charges empty and is counted"
+  },
+  {
+    "guard": "an order page answered 401 asks to sign in",
+    "file": "src/api.js",
+    "find": "if (response.status === 401) {\n          throw new Error(MPB.SIGNED_OUT);\n        }\n        return net.check(response);\n      })\n      .then(function (response) {\n        return response.text();",
+    "replace": "return net.check(response);\n      })\n      .then(function (response) {\n        return response.text();",
+    "expectFailing": "an order page answered 401 asks the visitor to sign in, and nothing is saved"
+  },
+  {
+    "guard": "Extra Mana is rounded once, on its sum",
+    "file": "src/charges.js",
+    "find": "var refunded = cash + Math.round(mana / MANA_PER_CENT);",
+    "replace": "var refunded = cash + Math.round(mana / MANA_PER_CENT / 2) * 2;",
+    "expectFailing": "round the Extra Mana once, on its sum"
   }
 ]

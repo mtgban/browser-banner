@@ -48,7 +48,7 @@ describe("the fixtures", () => {
       for (const m of body.matchAll(/"seller_username":\s*"([^"]*)"/g)) {
         if (!/^Seller [A-Z]$/.test(m[1])) leaks.push(name + ": a real seller, " + m[1]);
       }
-      for (const m of body.matchAll(/"order_number":\s*"(\d+)/g)) {
+      for (const m of body.matchAll(/"(?:order_number|buyerLabelNumber)":\s*"?(\d+)/g)) {
         if (!/^1\d{3}$/.test(m[1])) leaks.push(name + ": a real order number, " + m[1]);
       }
     }

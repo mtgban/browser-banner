@@ -1,12 +1,14 @@
 // Stands ManaPool's content script up the way the browser does: one window at
 // a ManaPool address, the manifest's scripts in order, evaluated in that
 // window. The buyer API is served from the fixture, honouring limit, offset
-// and since; everything else that leaves the page is recorded.
+// and since, and each order page's data from the pages fixture; everything
+// else that leaves the page is recorded.
 
 import { Window } from "happy-dom";
 import { readFileSync } from "fs";
 import { clock } from "../../../tests/clock.js";
 import { siteManifest } from "../../../tests/manifest.js";
+import { pageBody, pages as fixturePages } from "./pages.js";
 
 const SITE = "https://manapool.com";
 
@@ -33,8 +35,10 @@ export function ordersAged(ages) {
 }
 
 // mount opens path with orders behind the API, served oldest first in
-// pages of the asked limit. answer(url), when given, answers instead.
-export function mount({ path = "/settings/orders", orders = ordersAged(), order, answer, limit, page, activation = true } = {}) {
+// pages of the asked limit, and pages, each order page's data by its id: a
+// fixture page, a body as it is, a status to refuse with, or none for a 404. answer(url), when
+// given, answers instead.
+export function mount({ path = "/settings/orders", orders = ordersAged(), order, pages = fixturePages(), answer, limit, page, activation = true } = {}) {
   const window = new Window({ url: SITE + path });
   const time = clock(window);
   window.document.body.innerHTML = page || "<main><h1>Orders</h1></main>";
@@ -44,6 +48,14 @@ export function mount({ path = "/settings/orders", orders = ordersAged(), order,
     asked.push(String(url));
     if (answer) return answer(String(url));
     const u = new URL(String(url), SITE);
+    const data = /^\/settings\/orders\/([0-9a-f-]{36})\/__data\.json$/.exec(u.pathname);
+    if (data) {
+      const got = pages[data[1]];
+      const refused = got === undefined || got === null || typeof got === "number";
+      const body = refused ? "" : typeof got === "string" ? got : pageBody(got);
+      const status = typeof got === "number" ? got : refused ? 404 : 200;
+      return Promise.resolve({ ok: status === 200, status, headers: { get: () => null }, text: () => Promise.resolve(body) });
+    }
     const one = /^\/api\/v1\/buyer\/orders\/([0-9a-f-]{36})$/.exec(u.pathname);
     if (one) {
       const body = order || JSON.parse(text("order.json"));

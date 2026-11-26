@@ -204,6 +204,7 @@
         "core/ui.js",
         "sites/manapool/src/ui.js",
         "sites/manapool/src/api.js",
+        "sites/manapool/src/charges.js",
         "sites/manapool/src/history.js",
         "sites/manapool/src/order.js",
         "core/handoff.js",
