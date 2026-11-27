@@ -19,13 +19,14 @@ function files(dir) {
   });
 }
 
-// The store each site runs on, by the host its pages are served from.
+// The store each site runs on, by the hosts its pages are served from:
+// TCGplayer serves its order history from one and its cart from another.
 const HOSTS = {
-  cardmarket: "www.cardmarket.com",
-  cardkingdom: "www.cardkingdom.com",
-  tcgplayer: "store.tcgplayer.com",
-  manapool: "manapool.com",
-  starcitygames: "starcitygames.com",
+  cardmarket: ["www.cardmarket.com"],
+  cardkingdom: ["www.cardkingdom.com"],
+  tcgplayer: ["store.tcgplayer.com", "www.tcgplayer.com"],
+  manapool: ["manapool.com"],
+  starcitygames: ["starcitygames.com"],
 };
 
 describe("the manifest", () => {
@@ -48,7 +49,7 @@ describe("the manifest", () => {
 
   test("runs on the stores' hosts and nowhere else", () => {
     const hosts = new Set(manifest.content_scripts.flatMap((cs) => cs.matches).map((match) => new URL(match.replace(/\*/g, "x")).host));
-    expect([...hosts].sort()).toEqual(Object.values(HOSTS).sort());
+    expect([...hosts].sort()).toEqual(Object.values(HOSTS).flat().sort());
   });
 
   // A manifest is what the browsers read; a typo in a path it names is a
@@ -68,7 +69,7 @@ describe("the manifest", () => {
       );
       if (owners.size !== 1) return true;
       const site = [...owners][0].replace(/^sites\//, "");
-      return !cs.matches.every((match) => new URL(match.replace(/\*/g, "x")).host === HOSTS[site]);
+      return !cs.matches.every((match) => HOSTS[site].includes(new URL(match.replace(/\*/g, "x")).host));
     });
     expect(mixed).toEqual([]);
   });
@@ -131,7 +132,7 @@ describe("the sites", () => {
   });
 
   test("core names no store", () => {
-    const names = [...Object.values(HOSTS).map((host) => host.replace(/^(www|store)\./, "")), "Cardmarket", "Card Kingdom", "TCGplayer", "ManaPool", "Mana Pool", "Star City Games"];
+    const names = [...Object.values(HOSTS).flat().map((host) => host.replace(/^(www|store)\./, "")), "Cardmarket", "Card Kingdom", "TCGplayer", "ManaPool", "Mana Pool", "Star City Games"];
     const naming = files("core").flatMap((path) => names.filter((name) => read(path).includes(name)).map((name) => path + " names " + name));
     expect(naming).toEqual([]);
   });
@@ -141,7 +142,7 @@ describe("the sites", () => {
       files("sites/" + site + "/src").flatMap((path) =>
         Object.entries(HOSTS)
           .filter(([other]) => other !== site)
-          .filter(([, host]) => read(path).includes(host.replace(/^(www|store)\./, "")))
+          .filter(([, hosts]) => hosts.some((host) => read(path).includes(host.replace(/^(www|store)\./, ""))))
           .map(([other]) => path + " names " + other),
       ),
     );

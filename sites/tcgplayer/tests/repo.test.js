@@ -39,9 +39,9 @@ describe("the manifest", () => {
     expect(named.filter((name) => !existsSync(new URL(name, root)))).toEqual([]);
   });
 
-  test("runs on TCGplayer's store alone", () => {
-    // The page script decides the path itself (page.test.js).
-    expect(manifest.content_scripts.flatMap((cs) => cs.matches)).toEqual(["https://store.tcgplayer.com/*"]);
+  test("runs on TCGplayer's store and its cart alone", () => {
+    // The page scripts decide the path themselves (page.test.js, cart.test.js).
+    expect(manifest.content_scripts.flatMap((cs) => cs.matches)).toEqual(["https://store.tcgplayer.com/*", "https://www.tcgplayer.com/*"]);
   });
 
 });
@@ -56,7 +56,7 @@ describe("the source", () => {
     const urls = files("src").flatMap((name) =>
       [...read(name).matchAll(/https?:\/\/[^/"'\s)\\]+/g)].map((m) => name + ": " + m[0])
     );
-    expect(urls.filter((url) => !/: https:\/\/(store\.tcgplayer\.com|tcgplayer-cdn\.tcgplayer\.com)$/.test(url))).toEqual([]);
+    expect(urls.filter((url) => !/: https:\/\/(store\.tcgplayer\.com|mpgateway\.tcgplayer\.com|mp-search-api\.tcgplayer\.com|tcgplayer-cdn\.tcgplayer\.com)$/.test(url))).toEqual([]);
   });
 });
 

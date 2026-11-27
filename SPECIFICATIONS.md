@@ -14,7 +14,7 @@ upload. There is no build step: the repository's root is the extension.
 |---|---|---|---|---|
 | Cardmarket | `www.cardmarket.com` | CM | `MKM` | [`sites/cardmarket`](sites/cardmarket/SPECIFICATIONS.md) |
 | Card Kingdom | `www.cardkingdom.com` | CK | `CKB` | [`sites/cardkingdom`](sites/cardkingdom/SPECIFICATIONS.md) |
-| TCGplayer | `store.tcgplayer.com` | TCG | `TCGB` | [`sites/tcgplayer`](sites/tcgplayer/SPECIFICATIONS.md) |
+| TCGplayer | `store.tcgplayer.com`, `www.tcgplayer.com` | TCG | `TCGB` | [`sites/tcgplayer`](sites/tcgplayer/SPECIFICATIONS.md) |
 | ManaPool | `manapool.com` | MP | `MPB` | [`sites/manapool`](sites/manapool/SPECIFICATIONS.md) |
 | Star City Games | `starcitygames.com` | SCG | `SCGB` | [`sites/starcitygames`](sites/starcitygames/SPECIFICATIONS.md) |
 
@@ -22,7 +22,7 @@ upload. There is no build step: the repository's root is the extension.
 |---|---|---|---|
 | Cardmarket | purchases, one list per status | CSV, Send to BAN | a seller's offers: CSV, Send to BAN |
 | Card Kingdom | purchases and sales | an invoice: CSV, BAN | sell and buy carts: prices compared, *Update price* on the sell cart, CSV, BAN |
-| TCGplayer | orders | CSV, Send to BAN | |
+| TCGplayer | orders | CSV, Send to BAN | the cart: *Only this seller*, *Put back* |
 | ManaPool | orders | an order or a package: CSV, Send to BAN | the cart: *Remove seller*, *Only this seller*, *Put back* |
 | Star City Games | orders | CSV, Send to BAN | |
 
@@ -30,17 +30,21 @@ upload. There is no build step: the repository's root is the extension.
 
 Nothing: no `permissions`, no host or optional permissions, no background
 script, no web-accessible files, and no call to an extension API. Each
-content script entry names one store's host and loads that store's files and
-`core/`'s alone. Root tests hold all of it.
+content script entry names hosts of one store and loads that store's files
+and `core/`'s alone. Root tests hold all of it.
 
 Requests go to the store's own origin, with the session the page has, but for
-two public files read without it: Card Kingdom's price list and the exchange
-rates Cardmarket's prices are converted by. Nothing is posted to mtgban from
-here (section 7). Three things change something at a store, each on a click:
-*Update price* on Card Kingdom's sell cart, the order range TCGplayer keeps in
-its session, put back after a walk, and ManaPool's cart. What is kept between
+TCGplayer's cart, which asks the store's cart service and catalogue
+(`mpgateway.tcgplayer.com`, `mp-search-api.tcgplayer.com`) as its own page
+does, and two public files read
+without it: Card Kingdom's price list and the exchange rates Cardmarket's
+prices are converted by. Nothing is posted to mtgban from here (section 7).
+Four things change something at a store, each on a click: *Update price* on
+Card Kingdom's sell cart, the order range TCGplayer keeps in its session, put
+back after a walk, and ManaPool's and TCGplayer's carts. What is kept between
 pages is kept in the store's own origin: Card Kingdom's price list and CSVs in
-IndexedDB, and ManaPool's set-aside cart items in localStorage.
+IndexedDB, and ManaPool's and TCGplayer's set-aside cart items in
+localStorage.
 
 ## 3. How it is put together
 

@@ -425,5 +425,180 @@
     "find": "if (opts.slowDown && response.status === 429) {",
     "replace": "if (false) {",
     "expectFailing": "a 429 says to slow down"
+  },
+  {
+    "guard": "TCGplayer Direct's package is its own",
+    "file": "src/cart.js",
+    "find": "return item.isDirect ? \"direct\" : item.sellerKey;",
+    "replace": "return item.sellerKey;",
+    "expectFailing": "TCGplayer Direct's package keeps the items Direct ships, and no other seller's"
+  },
+  {
+    "guard": "a gift card is not set aside",
+    "file": "src/cartpage.js",
+    "find": "return TCGB.packageOf(item) !== pkg.key && !item.giftCardKey;",
+    "replace": "return TCGB.packageOf(item) !== pkg.key;",
+    "expectFailing": "a gift card stays in the cart"
+  },
+  {
+    "guard": "an item still in the cart is not kept aside",
+    "file": "src/cartpage.js",
+    "find": "TCGB.unsetAside(stash, TCGB.kept(item, {}));",
+    "replace": "",
+    "expectFailing": "an item TCGplayer keeps in the cart is not kept aside too"
+  },
+  {
+    "guard": "a refused removal is reported",
+    "file": "src/cartpage.js",
+    "find": "                return item.cartItemId;\n              }));\n            })\n            .catch(function (err) {\n              refused = err;",
+    "replace": "                return item.cartItemId;\n              }));\n            })\n            .catch(function (err) {\n              refused = null;",
+    "expectFailing": "a refused removal keeps nothing aside, says so, and leaves the page as it is"
+  },
+  {
+    "guard": "the removal waits its pace",
+    "file": "src/cartpage.js",
+    "find": "          return TCGB.after(TCGB.PACE)\n            .then(function () {\n              return TCGB.removeItems(",
+    "replace": "          return TCGB.after(0)\n            .then(function () {\n              return TCGB.removeItems(",
+    "expectFailing": "asks one request at a time, a pace apart, with the visitor's session"
+  },
+  {
+    "guard": "the cart is asked with the visitor's session",
+    "file": "src/cart.js",
+    "find": "var options = { credentials: \"include\", signal: net.deadline() };",
+    "replace": "var options = { signal: net.deadline() };",
+    "expectFailing": "asks one request at a time, a pace apart, with the visitor's session"
+  },
+  {
+    "guard": "Put back leaves out what the cart holds",
+    "file": "src/cartpage.js",
+    "find": "          missing = stash.items.filter(function (s) {\n            return !TCGB.holds(items, s);",
+    "replace": "          missing = stash.items.filter(function (s) {\n            return true;",
+    "expectFailing": "leaves out a listing the cart already holds"
+  },
+  {
+    "guard": "a listing put back comes from its seller at its price",
+    "file": "src/cart.js",
+    "find": "            price: s.price,\n",
+    "replace": "",
+    "expectFailing": "adds each set-aside listing back from its seller at its price, and empties the list"
+  },
+  {
+    "guard": "a refused Put back keeps the list",
+    "file": "src/cartpage.js",
+    "find": "TCGB.keepStash({ items: refused ? gone : [] });",
+    "replace": "TCGB.keepStash({ items: [] });",
+    "expectFailing": "refused, keeps everything set aside to try again"
+  },
+  {
+    "guard": "a listing gone is named",
+    "file": "src/cartpage.js",
+    "find": "(gone.length && !refused ? \"; no longer for sale: \"",
+    "replace": "(false ? \"; no longer for sale: \"",
+    "expectFailing": "names a listing that did not come back as no longer for sale"
+  },
+  {
+    "guard": "a changed price is named",
+    "file": "src/cartpage.js",
+    "find": "            if (now && Math.round(now.currentPrice * 100) !== Math.round(s.price * 100)) {",
+    "replace": "            if (false) {",
+    "expectFailing": "names a listing whose price changed"
+  },
+  {
+    "guard": "a run that changed nothing does not reload",
+    "file": "src/cartpage.js",
+    "find": "      if (changed) {\n        keepSaid(text, failed);",
+    "replace": "      if (true) {\n        keepSaid(text, failed);",
+    "expectFailing": "a package alone in the cart sets nothing aside and leaves the page as it is"
+  },
+  {
+    "guard": "what a run did is shown after the reload",
+    "file": "src/cartpage.js",
+    "find": "      panel.recap(last.text);",
+    "replace": "",
+    "expectFailing": "what a run did is shown again once the page is back"
+  },
+  {
+    "guard": "a redraw gets its button back",
+    "file": "src/cartpage.js",
+    "find": "if (pkg.actions.querySelector(\".ban-only\")) {",
+    "replace": "if (pkg.actions.querySelector(\"button\")) {",
+    "expectFailing": "puts Only this seller after each package's Remove all items and Save all items, and back after a redraw"
+  },
+  {
+    "guard": "one run at a time",
+    "file": "src/cartpage.js",
+    "find": "      if (run) {\n        return \"\";\n      }",
+    "replace": "",
+    "expectFailing": "is not pressed twice while it runs"
+  },
+  {
+    "guard": "no cart key, no request",
+    "file": "src/cartpage.js",
+    "find": "      if (!key) {\n        panel.fail(TCGB.NO_CART);",
+    "replace": "      if (false) {\n        panel.fail(TCGB.NO_CART);",
+    "expectFailing": "with no cart key it says so and asks nothing"
+  },
+  {
+    "guard": "the panel leaves with the cart",
+    "file": "src/cartpage.js",
+    "find": "    if (shown && !onCart) {",
+    "replace": "    if (false) {",
+    "expectFailing": "shows on the cart alone, and leaves with it"
+  },
+  {
+    "guard": "an answer with no body is no error",
+    "file": "src/cart.js",
+    "find": "return text ? JSON.parse(text) : {};",
+    "replace": "return JSON.parse(text);",
+    "expectFailing": "Only this seller takes every other package's items out, and keeps each with its seller and price"
+  },
+  {
+    "guard": "a package is named by its test id, not its heading",
+    "file": "src/cart.js",
+    "find": "var title = article ? (article.getAttribute(\"data-testid\") || \"\").replace(/^packageContainerFor-/, \"\") : \"\";",
+    "replace": "var title = article ? article.querySelector(\".tab-title\").textContent.trim() : \"\";",
+    "expectFailing": "TCGplayer Direct's package keeps the items Direct ships, and no other seller's"
+  },
+  {
+    "guard": "a set-aside listing keeps its package's name",
+    "file": "src/cart.js",
+    "find": "sellerName: sellers[TCGB.packageOf(item)] || \"\",",
+    "replace": "sellerName: \"\",",
+    "expectFailing": "Only this seller takes every other package's items out, and keeps each with its seller and price"
+  },
+  {
+    "guard": "cards are named only when there is something to tell",
+    "file": "src/cartpage.js",
+    "find": "var names = !told.length",
+    "replace": "var names = false",
+    "expectFailing": "adds each set-aside listing back from its seller at its price, and empties the list"
+  },
+  {
+    "guard": "a catalogue that does not answer still lets Put back report",
+    "file": "src/cartpage.js",
+    "find": "              .catch(function () {\n                return {};\n              });",
+    "replace": ";",
+    "expectFailing": "a card the catalogue does not name is told by its SKU"
+  },
+  {
+    "guard": "an entry the cart holds again is dropped before setting aside",
+    "file": "src/cartpage.js",
+    "find": "          stash.items = stash.items.filter(function (s) {\n            return !TCGB.holds(items, s);\n          });\n",
+    "replace": "",
+    "expectFailing": "a listing back in the cart and set aside again is one entry, and is put back as many as it was"
+  },
+  {
+    "guard": "what TCGplayer kept is this run's items alone",
+    "file": "src/cartpage.js",
+    "find": "return now.cartItemId === item.cartItemId;",
+    "replace": "return now.sku === item.sku;",
+    "expectFailing": "the same card from the package kept does not count as one TCGplayer kept"
+  },
+  {
+    "guard": "a listing set aside again joins its entry",
+    "file": "src/cart.js",
+    "find": "    if (!had) {\n      stash.items.push(kept);",
+    "replace": "    if (true) {\n      stash.items.push(kept);",
+    "expectFailing": "a listing set aside again while some of it still is adds to its entry"
   }
 ]

@@ -9,7 +9,7 @@ on the stores' pages, each with its own panel.
 |---|---|---|
 | Cardmarket | [`sites/cardmarket`](sites/cardmarket) | a seller's offers, one purchase, and the purchase lists |
 | Card Kingdom | [`sites/cardkingdom`](sites/cardkingdom) | the sell and buy carts, order and selling history, and both invoices |
-| TCGplayer | [`sites/tcgplayer`](sites/tcgplayer) | the order history, and an order to send |
+| TCGplayer | [`sites/tcgplayer`](sites/tcgplayer) | the order history, an order to send, and the cart |
 | ManaPool | [`sites/manapool`](sites/manapool) | the order history, an order or a package to send, and the cart by seller |
 | Star City Games | [`sites/starcitygames`](sites/starcitygames) | the order history, and an order to send |
 
