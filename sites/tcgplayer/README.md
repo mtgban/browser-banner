@@ -21,13 +21,24 @@
   uploader in a new tab and hands it the order's cards, each by its TCGplayer
   product id, so every card resolves to its exact printing.
 
+On your cart (`www.tcgplayer.com/cart`) it adds one button to each seller's
+package, beside *Remove all items* and *Save all items*:
+
+- **Only this seller** takes every other seller's items out of the cart and
+  keeps them, each with its seller and price, so only that seller is left to
+  check out. *Put back*, on the panel, adds them again from the same sellers,
+  and names any that are no longer for sale or now cost something else.
+  TCGplayer's own *Save for later* would keep the card but not the seller.
+
 Magic only, for now: a line of another game, or one whose condition the
 extension cannot read whole, is left out of a send and counted.
 
 ## Permissions
 
 None. Everything the extension reads or sends goes to the TCGplayer page it
-runs on, as you, one request at a time with a pause before each. *Send to BAN*
+runs on, or on the cart to TCGplayer's own cart service and catalogue the page
+itself asks,
+as you, one request at a time with a pause before each. *Send to BAN*
 opens mtgban's `/upload/handoff` in a tab of its own and passes it the cards
 with `postMessage`; that page uploads them with your mtgban session. Nothing
 else leaves your browser.

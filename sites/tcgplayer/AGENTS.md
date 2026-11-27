@@ -43,9 +43,13 @@ src/handoff.js   core/handoff.js's sender, Magic only, with TCGplayer's words
 src/ui.js        core/ui.js's panel and download, the panel headed TCG
 src/page.js      content script: order buttons, Send to BAN, the panel
 src/orders.css   the order headers' controls; the panel's are core/panel.css
+src/cart.js      the cart's key, its packages, its API, and what is set aside
+src/cartpage.js  content script on the cart: Only this seller, Put back
+src/cart.css     Only this seller, beside a package's own actions
 scripts/cut-fixtures.mjs  cuts tests/fixtures/ from a saved page, locally only
 tests/mutations.json      each guard, what breaks it, the test that fails
 tests/panel.js   stands the content script up in a window; clicks are real
+tests/cart.js    stands the cart up: the page, its cookie, TCGplayer's cart API
 tests/           bun + happy-dom, no browser
 ```
 

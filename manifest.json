@@ -194,6 +194,24 @@
     },
     {
       "matches": [
+        "https://www.tcgplayer.com/*"
+      ],
+      "js": [
+        "core/net.js",
+        "core/ui.js",
+        "sites/tcgplayer/src/ui.js",
+        "sites/tcgplayer/src/net.js",
+        "sites/tcgplayer/src/cart.js",
+        "sites/tcgplayer/src/cartpage.js"
+      ],
+      "css": [
+        "core/panel.css",
+        "sites/tcgplayer/src/cart.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
         "https://manapool.com/*"
       ],
       "js": [

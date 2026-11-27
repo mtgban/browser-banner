@@ -4,7 +4,8 @@
 // The history's filter lives in the session, not the URL (SPECIFICATIONS.md
 // section 1.1), so there are two requests: setFilter POSTs a range and a
 // search the way the page's own dropdown does, and fetchPage GETs a page of
-// whatever the session then holds.
+// whatever the session then holds. The cart's requests (cart.js) are made
+// with the same net and PACE.
 
 globalThis.TCGB = globalThis.TCGB || {};
 
@@ -22,6 +23,7 @@ globalThis.TCGB = globalThis.TCGB || {};
   TCGB.BUSY = net.BUSY;
   TCGB.TIMED_OUT = net.TIMED_OUT;
   TCGB.after = net.after;
+  TCGB.net = net;
 
   var PATH = "/myaccount/orderhistory";
 

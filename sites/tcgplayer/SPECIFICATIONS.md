@@ -146,15 +146,17 @@ is refused, never exported short.
 
 Manifest V3, no `permissions`, `host_permissions`, `background` or
 `web_accessible_resources`; a test pins their absence. One content script on
-`https://store.tcgplayer.com/*`, the host alone. The path is decided in
+`https://store.tcgplayer.com/*`, the host alone, for the history, and one on
+`https://www.tcgplayer.com/*` for the cart (section 12). The history's path is decided in
 `page.js`, the way the server reads it: `/myaccount/orderhistory` in any
 letter case, with slashes doubled or not, and a trailing one or not. The
 server answers `//myaccount/orderhistory` alike, a visitor was found there
 (2026-11-21), and a match pattern for one spelling misses the others. On any
 other path the script returns before it touches the page, and on the history
 it gets no panel where the page has no filter form or heading (a sign-in
-page). Every request
-is same-origin with the visitor's session.
+page). The history's requests are same-origin with the visitor's session; the
+cart's go to `mpgateway.tcgplayer.com` and `mp-search-api.tcgplayer.com`, as
+the cart page's own do.
 
 ## 3. Order numbers
 
@@ -419,3 +421,103 @@ stopped): 48 full refunds, 183 partial and 5 of shipping cost; tax rows of
 859 `Sales Tax (XX)`, 203 plain `Sales Tax` and 2 `CA GST`; 7 sealed lines
 and 5 not in English (4 Japanese, 1 Spanish). In the first pass every line
 was Magic.
+
+## 12. The cart
+
+`https://www.tcgplayer.com/cart` is a page of TCGplayer's own app, reached
+with or without a load and drawn after it, so the script on
+`www.tcgplayer.com` looks at the path every half second and draws its
+buttons wherever a redraw has left none.
+
+### 12.1 The page
+
+Each seller's items are one package (read 2026-11-27 on a saved cart of 30,
+and 2026-11-28 on a signed-in one):
+
+```
+<div id="package-0723a9ff" class="package">
+  <article class="package-tab-container" data-testid="packageContainerFor-<seller>">
+    <section class="tab-header non-direct-package">
+      <a href="https://www.tcgplayer.com/sellers/<Seller>/0723a9ff"><span class="tab-title"><seller></span></a>
+    <section class="tab-content non-direct-package" data-testid="nonDirectPackage-0723a9ff">
+      <ul><li> ... Remove | Save for later </li> ...
+      <div class="all-items-actions">
+        <button data-testid="btnRemoveAllItems">Remove all items</button>
+        <button data-testid="btnSaveAllItems">Save all items</button>
+```
+
+The eight hex digits are the seller's key. TCGplayer Direct's package is
+`<div id="package-UZyqerwO">`, its content `data-testid="directPackage"`,
+with the same row of actions; its `.tab-title` also holds a tooltip's
+sentence, so a package is named by its article's `packageContainerFor-`
+test id. A gift card's package is `giftCardPackage`, by TCGplayer's script,
+not yet seen on a page.
+
+### 12.2 The API
+
+Read from the cart page's own script (2026-11-27) and run on a signed-in
+cart (2026-11-28). The cart's key is the
+`CK` in the `StoreCart_PRODUCTION` cookie, `CK=<32 hex>&Ignore=false`,
+which the page can read; every call is to
+`https://mpgateway.tcgplayer.com/v1/cart/<key>/` with the visitor's cookies:
+
+| Call | What |
+|---|---|
+| `POST validatecart?validateForCheckout=false&countryCode=US` | the cart: `results[0].cartItems` |
+| `DELETE items/bulkdelete`, `{items: [cartItemId]}` | takes items out; answers with no body |
+| `POST items/bulkadd`, `{items: [{sku, sellerId, channelId: 0, requestedQuantity, price, isDirect, customListingKey}]}` | adds listings, each from its seller |
+
+A cart item carries `cartItemId`, `sku`, `sellerId`, `sellerKey`,
+`quantity`, `currentPrice`, `savedPrice`, `sellerOriginalPrice`,
+`sellerQuantityAvailable`, `resultingQuantity`, `isDirect`,
+`isConsignment`, `isSYP`, `customListingKey`, `giftCardKey` and `status`:
+no names. An item with `isDirect` is in Direct's package whoever sells it,
+and every other item in its seller's, as the page's own script sorts them.
+The page names cards from `POST
+https://mp-search-api.tcgplayer.com/v1/product/getProductForSkus` with a
+list of skus, which answers `results[0]` with each sku's `productName`,
+`setName`, `condition` and more, and sellers from its own shipping data.
+The page itself loads the cart with
+`validatecartandautosaveforlater`, which also moves what is no longer for
+sale to Save for later; the extension asks `validatecart`, which moves
+nothing.
+
+Save for later (`v1/cart/movetosaveforlater`, and back with
+`v1/wishlist/movesaveforlatertocart`) keeps a card's `sku` and quantity but
+not its seller: a saved item comes back from whichever seller TCGplayer
+picks. So the extension does not use it. `bulkadd` with a seller and a price
+is what the page's own undo of a removed package sends.
+
+### 12.3 Only this seller and Put back
+
+**Only this seller** follows *Save all items* in each package's own row. It
+reads the cart, keeps every item in another package (a gift card stays)
+with its seller, the name the page heads its package with, its price and
+quantity in localStorage,
+`banner-tcgplayer-stash`, takes them out in one `bulkdelete`, and reads the
+cart again: an item of this run still there, by its `cartItemId`, comes off
+the set-aside list and is counted. Only that package is left to check out.
+An entry the cart already holds again before the run, put back by hand, is
+dropped first, and a listing set aside again joins its entry (the same sku,
+seller and Direct) rather than standing twice.
+
+**Put back**, on the panel, reads the cart, adds in one `bulkadd` what is
+set aside and not in the cart already (the same card from the same seller,
+as many), and reads the cart again. What came back is off the list; what
+did not is no longer for sale and is named, and a price TCGplayer now asks
+that is not the one set aside is named with both. Only then, and only for
+those, does it ask the catalogue for the cards' names; a card it does not
+name is told by its SKU. If the add is refused, everything that did not
+come back stays set aside to try again.
+
+Requests go one at a time, `PACE` apart. TCGplayer's page does not hear of a
+change made through the API, so a run that changed the cart reloads it, and
+the panel shows what was done again once the page is back (sessionStorage,
+`banner-tcgplayer-said`). A run that changed nothing leaves the page as it
+is.
+
+Run on a signed-in cart of six items from five packages, Direct's among
+them, and on one of 52 items from 37 packages (2026-11-28): both buttons in
+each direction, Direct's package kept and set aside, every listing back
+from its seller at its price, and the panel's word kept across the reload. A listing that sold out or changed price while
+set aside has not come up live.

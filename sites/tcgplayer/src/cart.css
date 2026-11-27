@@ -1,0 +1,25 @@
+/* Only this seller, after a package's Remove all items and Save all items,
+   in the panel's blue and TCGplayer's own font. */
+.ban-only {
+  margin-left: 12px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: #2d67c4;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ban-only:hover {
+  background: #23529d;
+}
+
+.ban-only:focus-visible {
+  outline: 2px solid #8ab4f8;
+  outline-offset: 2px;
+}
