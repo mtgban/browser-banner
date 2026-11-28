@@ -465,7 +465,7 @@ which the page can read; every call is to
 |---|---|
 | `POST validatecart?validateForCheckout=false&countryCode=US` | the cart: `results[0].cartItems` |
 | `DELETE items/bulkdelete`, `{items: [cartItemId]}` | takes items out; answers with no body |
-| `POST items/bulkadd`, `{items: [{sku, sellerId, channelId: 0, requestedQuantity, price, isDirect, customListingKey}]}` | adds listings, each from its seller |
+| `POST items/bulkadd`, `{items: [{sku, sellerId, channelId: 0, requestedQuantity, price, isDirect, customListingKey}]}` | adds listings, each from its seller, Direct or not as `isDirect` says |
 
 A cart item carries `cartItemId`, `sku`, `sellerId`, `sellerKey`,
 `quantity`, `currentPrice`, `savedPrice`, `sellerOriginalPrice`,
@@ -488,9 +488,24 @@ not its seller: a saved item comes back from whichever seller TCGplayer
 picks. So the extension does not use it. `bulkadd` with a seller and a price
 is what the page's own undo of a removed package sends.
 
+Direct's stock comes from `POST
+https://mp-search-api.tcgplayer.com/v1/search/directQuantitiesAtPrice`,
+`{items: [{sku, productId, price}], nonDirectSellersInCart: [sellerId]}`,
+which the page asks for its Direct items. It answers `results[0]`, one entry
+per card and price: `sellerQuantities`, each Direct seller's `{sellerId,
+quantity, isConsignment}` at that price, and `directInventoryAvailable`. The
+page counts what Direct can ship as the sellers' quantities not on
+consignment, no more than `directInventoryAvailable`, and the consigned ones
+on top. A seller named in `nonDirectSellersInCart` is left out of the
+answer, so the extension names none. A listing's quantity counts what the
+cart already holds of it. A seller's listing can ship by Direct and still be
+in the cart as not Direct, when it was added with `isDirect: false`; adding
+it again with `isDirect: true` puts it in Direct's package (read 2026-11-28).
+
 ### 12.3 Only this seller and Put back
 
-**Only this seller** follows *Save all items* in each package's own row. It
+**Only this seller** sits in a row of its own above each package's *Remove
+all items* and *Save all items*. It
 reads the cart, keeps every item in another package (a gift card stays)
 with its seller, the name the page heads its package with, its price and
 quantity in localStorage,
@@ -510,6 +525,25 @@ those, does it ask the catalogue for the cards' names; a card it does not
 name is told by its SKU. If the add is refused, everything that did not
 come back stays set aside to try again.
 
+**Consolidate**, in green, follows *Only this seller* on Direct's package
+alone.
+It reads the cart, asks the catalogue for the product id of each card not
+in Direct, and asks Direct's stock for each of those cards at the price it
+is in the cart. For each card and price it plans Direct listings for as
+many as the cart holds there, Direct's and the others together, no more
+than Direct can ship: from the non-Direct items' own sellers first, then
+the other Direct sellers, each no more than its listing has beyond what
+Direct's package already holds of it. Then it keeps every non-Direct item
+set aside, as Only this seller does, takes them out in one `bulkdelete`,
+adds the plan in one `bulkadd`, and reads the cart again. What Direct
+gained of a card at a price comes off the set-aside list; the rest stays
+there, named with how many of how many, for Put back. Nothing is taken out
+before the catalogue and the stock have answered.
+
+A set-aside listing is held again only Direct or not as it was set aside,
+so a card set aside from a seller whose Direct listing is in the cart is
+still put back.
+
 Requests go one at a time, `PACE` apart. TCGplayer's page does not hear of a
 change made through the API, so a run that changed the cart reloads it, and
 the panel shows what was done again once the page is back (sessionStorage,
@@ -520,4 +554,8 @@ Run on a signed-in cart of six items from five packages, Direct's among
 them, and on one of 52 items from 37 packages (2026-11-28): both buttons in
 each direction, Direct's package kept and set aside, every listing back
 from its seller at its price, and the panel's word kept across the reload. A listing that sold out or changed price while
-set aside has not come up live.
+set aside has not come up live. Consolidate was run on a cart of 110
+items, 13 of them from six sellers outside Direct (2026-11-28): 37 of their
+47 cards moved into Direct from their own sellers at their own prices, and
+the 10 Direct had no room for were set aside, each as the stock answer
+said.

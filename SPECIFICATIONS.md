@@ -22,7 +22,7 @@ upload. There is no build step: the repository's root is the extension.
 |---|---|---|---|
 | Cardmarket | purchases, one list per status | CSV, Send to BAN | a seller's offers: CSV, Send to BAN |
 | Card Kingdom | purchases and sales | an invoice: CSV, BAN | sell and buy carts: prices compared, *Update price* on the sell cart, CSV, BAN |
-| TCGplayer | orders | CSV, Send to BAN | the cart: *Only this seller*, *Put back* |
+| TCGplayer | orders | CSV, Send to BAN | the cart: *Only this seller*, *Consolidate*, *Put back* |
 | ManaPool | orders | an order or a package: CSV, Send to BAN | the cart: *Remove seller*, *Only this seller*, *Put back* |
 | Star City Games | orders | CSV, Send to BAN | |
 

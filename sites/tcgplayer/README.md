@@ -22,13 +22,17 @@
   product id, so every card resolves to its exact printing.
 
 On your cart (`www.tcgplayer.com/cart`) it adds one button to each seller's
-package, beside *Remove all items* and *Save all items*:
+package, in a row above *Remove all items* and *Save all items*:
 
 - **Only this seller** takes every other seller's items out of the cart and
   keeps them, each with its seller and price, so only that seller is left to
   check out. *Put back*, on the panel, adds them again from the same sellers,
   and names any that are no longer for sale or now cost something else.
   TCGplayer's own *Save for later* would keep the card but not the seller.
+- **Consolidate**, on TCGplayer Direct's package alone, moves every
+  item from outside Direct into it, at the same price and from the same
+  seller where it can, as many as Direct has room for. What Direct cannot
+  take is set aside and named, and *Put back* adds it again.
 
 Magic only, for now: a line of another game, or one whose condition the
 extension cannot read whole, is left out of a send and counted.
