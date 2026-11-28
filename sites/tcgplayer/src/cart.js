@@ -16,6 +16,7 @@ globalThis.TCGB = globalThis.TCGB || {};
 
   var GATEWAY = "https://mpgateway.tcgplayer.com/v1/cart/";
   var PRODUCTS = "https://mp-search-api.tcgplayer.com/v1/product/getProductForSkus";
+  var DIRECT = "https://mp-search-api.tcgplayer.com/v1/search/directQuantitiesAtPrice";
   TCGB.STASH_KEY = "banner-tcgplayer-stash";
   TCGB.NO_CART = "TCGplayer's cart could not be found; reload the page";
 
@@ -102,22 +103,131 @@ globalThis.TCGB = globalThis.TCGB || {};
     });
   };
 
-  // productNames answers { sku: "name (condition)" } for the skus asked,
-  // from the catalogue TCGplayer's page names its cart's cards from.
-  TCGB.productNames = function (skus) {
+  // products answers { sku: { productId, name } } for the skus asked, name
+  // as "name (condition)", from the catalogue TCGplayer's page names its
+  // cart's cards from.
+  TCGB.products = function (skus) {
     return send(PRODUCTS, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(skus),
     }).then(function (body) {
-      var names = {};
+      var found = {};
       ((body && body.results && body.results[0]) || []).forEach(function (p) {
         if (p && p.sku && p.productName) {
-          names[p.sku] = p.productName + (p.condition ? " (" + p.condition + ")" : "");
+          found[p.sku] = { productId: p.productId, name: p.productName + (p.condition ? " (" + p.condition + ")" : "") };
         }
+      });
+      return found;
+    });
+  };
+
+  // productNames answers { sku: "name (condition)" } for the skus asked.
+  TCGB.productNames = function (skus) {
+    return TCGB.products(skus).then(function (found) {
+      var names = {};
+      Object.keys(found).forEach(function (sku) {
+        names[sku] = found[sku].name;
       });
       return names;
     });
+  };
+
+  // priceKey is how a card at a price is filed, as the page files Direct's
+  // stock: "<sku>-<price>".
+  TCGB.priceKey = function (sku, price) {
+    return sku + "-" + Number(Number(price).toFixed(2));
+  };
+
+  // directStock answers what Direct has of each card at each price asked,
+  // lines [{ sku, productId, price }], as { "<sku>-<price>": { free,
+  // sellers } }: sellers each Direct seller's { sellerId, quantity,
+  // isConsignment }, and free directInventoryAvailable, how many of the
+  // listings not on consignment Direct can ship, or null where it is not
+  // given; consigned listings count in full, as the page counts them. No
+  // seller in the cart is left out of it.
+  TCGB.directStock = function (lines) {
+    return send(DIRECT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: lines, nonDirectSellersInCart: [] }),
+    }).then(function (body) {
+      var stock = {};
+      ((body && body.results && body.results[0]) || []).forEach(function (d) {
+        stock[TCGB.priceKey(d.sku, d.price)] = {
+          free: typeof d.directInventoryAvailable === "number" ? d.directInventoryAvailable : null,
+          sellers: d.sellerQuantities || [],
+        };
+      });
+      return stock;
+    });
+  };
+
+  function count(items) {
+    return items.reduce(function (n, item) {
+      return n + item.quantity;
+    }, 0);
+  }
+
+  // directPlan is what Consolidate adds back, from the cart's items and
+  // directStock's answer: for each card and price a non-Direct item is at,
+  // Direct listings for as many as its non-Direct items there come to, from
+  // their own sellers first: each seller no more than its listing has beyond
+  // what Direct's package holds of it, and those not on consignment
+  // together no more than Direct's free stock less what the package holds
+  // of theirs. Each add is { sku, sellerId, quantity, price, isDirect: true,
+  // customListingKey: null }.
+  TCGB.directPlan = function (items, stock) {
+    var groups = {};
+    var order = [];
+    items.forEach(function (item) {
+      if (item.giftCardKey) {
+        return;
+      }
+      var key = TCGB.priceKey(item.sku, item.currentPrice);
+      if (!groups[key]) {
+        groups[key] = { key: key, sku: item.sku, price: item.currentPrice, direct: [], others: [] };
+        order.push(key);
+      }
+      groups[key][item.isDirect ? "direct" : "others"].push(item);
+    });
+    var adds = [];
+    order.forEach(function (key) {
+      var g = groups[key];
+      var d = stock[key];
+      if (!g.others.length || !d) {
+        return;
+      }
+      var left = count(g.others);
+      var own = g.others.map(function (item) {
+        return item.sellerId;
+      });
+      var held = function (q) {
+        return count(g.direct.filter(function (item) {
+          return item.sellerId === q.sellerId;
+        }));
+      };
+      var free = d.sellers.reduce(function (n, q) {
+        return q.isConsignment ? n : n - held(q);
+      }, d.free === null ? Infinity : d.free);
+      var first = d.sellers.filter(function (q) {
+        return own.indexOf(q.sellerId) >= 0;
+      });
+      first.concat(d.sellers.filter(function (q) {
+        return own.indexOf(q.sellerId) < 0;
+      })).forEach(function (q) {
+        var n = Math.min(left, q.quantity - held(q));
+        if (!q.isConsignment) {
+          n = Math.min(n, free);
+        }
+        if (n > 0) {
+          adds.push({ sku: g.sku, sellerId: q.sellerId, quantity: n, price: g.price, isDirect: true, customListingKey: null });
+          left -= n;
+          free -= q.isConsignment ? 0 : n;
+        }
+      });
+    });
+    return adds;
   };
 
   // packageOf is which package of the page an item is in, as TCGplayer's
@@ -167,11 +277,11 @@ globalThis.TCGB = globalThis.TCGB || {};
   };
 
   // holds says whether the cart holds a set-aside listing again: its card
-  // from its seller, at least as many.
+  // from its seller, Direct or not as it was, at least as many.
   TCGB.holds = function (items, s) {
     var n = 0;
     items.forEach(function (item) {
-      if (item.sku === s.sku && item.sellerKey === s.sellerKey) {
+      if (item.sku === s.sku && item.sellerKey === s.sellerKey && !!item.isDirect === !!s.isDirect) {
         n += item.quantity;
       }
     });
@@ -210,7 +320,8 @@ globalThis.TCGB = globalThis.TCGB || {};
     });
   };
 
-  // stash is what Only this seller set aside, { items: [kept] }, in
+  // stash is what Only this seller and Consolidate set aside,
+  // { items: [kept] }, in
   // TCGplayer's own localStorage.
   TCGB.stash = function () {
     try {

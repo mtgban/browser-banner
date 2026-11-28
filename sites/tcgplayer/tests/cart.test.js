@@ -23,19 +23,20 @@ const stashed = (it) => it.stash().items.map((s) => CARDS[s.sku].productName);
 const SET_ASIDE = ["Llanowar Elves", "Giant Growth", "Lightning Bolt"];
 
 describe("the cart", () => {
-  test("puts Only this seller after each package's Remove all items and Save all items, and back after a redraw", async () => {
+  test("puts Only this seller in a row above each package's Remove all items and Save all items, and back after a redraw", async () => {
     const it = mountCart();
     expect(it.buttons()).toBe(3);
     for (const b of it.doc.querySelectorAll(".ban-only")) {
       expect(b.textContent).toBe("Only this seller");
-      expect(b.parentElement.className).toBe("all-items-actions");
-      expect([...b.parentElement.children].map((c) => c.textContent)).toEqual(["Remove all items", "Save all items", "Only this seller"]);
+      expect(b.parentElement.className).toBe("ban-row");
+      expect(b.parentElement.firstElementChild).toBe(b);
+      expect([...b.parentElement.nextElementSibling.children].map((c) => c.textContent)).toEqual(["Remove all items", "Save all items"]);
     }
-    it.only("Seller A").remove();
+    it.only("Seller A").parentElement.remove();
     await it.settle(600);
     expect(it.buttons()).toBe(3);
     expect(it.back().disabled).toBe(true);
-    expect(it.tip()).toBe("Beside each seller: Only this seller, to set the others aside");
+    expect(it.tip()).toBe("Beside each seller: Only this seller, to set the others aside; beside Direct: Consolidate");
     expect(it.asked).toEqual([]);
   });
 
@@ -117,7 +118,7 @@ describe("the cart", () => {
     expect(it.cart().length).toBe(4);
     expect(it.stash()).toBe(null);
     expect(it.failed()).toBe(true);
-    expect(it.tip()).toBe("TCGplayer answered 500; 0 items set aside");
+    expect(it.tip()).toBe("TCGplayer answered 500; 0 in stash");
     expect(it.reloads()).toBe(0);
   });
 
@@ -128,7 +129,7 @@ describe("the cart", () => {
     expect(it.cart()).toEqual(["Giant Growth", "Counterspell"]);
     expect(stashed(it)).toEqual(["Llanowar Elves", "Lightning Bolt"]);
     expect(it.failed()).toBe(true);
-    expect(it.tip()).toBe("TCGplayer kept 1 item in the cart; 2 items set aside");
+    expect(it.tip()).toBe("TCGplayer kept 1 item in the cart; 2 in stash");
     expect(it.reloads()).toBe(1);
   });
 
@@ -137,7 +138,7 @@ describe("the cart", () => {
     it.press("Seller B");
     await it.idle();
     expect(it.stash()).toEqual(stashOf(SET_ASIDE));
-    expect(it.word()).toBe("3 items set aside");
+    expect(it.word()).toBe("3 in stash");
   });
 
   test("a listing set aside earlier and back in the cart is no longer set aside, nor counted as kept", async () => {
@@ -199,8 +200,8 @@ describe("Put back", () => {
   test("adds each set-aside listing back from its seller at its price, and empties the list", async () => {
     const it = mountCart({ items: kept(["Counterspell"]), stash: stashOf(SET_ASIDE) });
     expect(it.back().disabled).toBe(false);
-    expect(it.word()).toBe("3 items set aside");
-    expect(it.tip()).toBe("Put back the items Only this seller set aside, from the sellers they came from");
+    expect(it.word()).toBe("3 in stash");
+    expect(it.tip()).toBe("Put back what is in stash, from the sellers it came from");
     it.back().click();
     await it.idle();
     expect(it.cart().sort()).toEqual(["Counterspell", "Giant Growth", "Lightning Bolt", "Llanowar Elves"]);
@@ -281,5 +282,162 @@ describe("Put back", () => {
     it.press("Seller A");
     await it.idle();
     expect(it.asked.length).toBe(3);
+  });
+});
+
+describe("Consolidate", () => {
+  const seller = (sellerId, sellerKey, quantity, isConsignment = false) => ({ sellerId, sellerKey, quantity, isConsignment });
+  const ELVES = seller(11, "0a1b2c3d", 2);
+  const STOCK = {
+    "1001-0.5": { dia: 10, sellers: [ELVES] },
+    "1003-2": { dia: 5, sellers: [seller(22, "4e5f6a7b", 1)] },
+  };
+  const ELVES_AND_BOLT = () => kept(["Llanowar Elves", "Lightning Bolt"]);
+  const route = (it) => it.asked.map((a) => a.method + " " + a.path.replace(/\?.*$/, ""));
+  const added = (it) => it.asked.filter((a) => a.path === "items/bulkadd").map((a) => a.body.items.map((i) => i.sellerId + " x" + i.requestedQuantity + (i.isDirect ? " Direct" : "")));
+
+  test("sits after Only this seller on Direct's package alone", () => {
+    const it = mountCart();
+    expect(it.doc.querySelectorAll(".ban-consolidate").length).toBe(1);
+    expect(it.consolidate().closest("article").getAttribute("data-testid")).toBe("packageContainerFor-TCGplayer Direct");
+    expect([...it.consolidate().parentElement.children].map((c) => c.textContent)).toEqual(["Only this seller", "Consolidate"]);
+    expect(it.consolidate().parentElement.nextElementSibling.className).toBe("all-items-actions");
+  });
+
+  test("moves every other item into Direct from its own seller at its price, and sets aside what Direct has none of", async () => {
+    const it = mountCart({ direct: STOCK });
+    it.consolidate().click();
+    await it.idle();
+    expect(route(it)).toEqual([
+      "POST validatecart",
+      "POST getProductForSkus",
+      "POST directQuantitiesAtPrice",
+      "DELETE items/bulkdelete",
+      "POST items/bulkadd",
+      "POST validatecart",
+    ]);
+    expect(it.asked[1].body).toEqual([1001, 1002, 1003]);
+    expect(it.asked[2].body).toEqual({
+      items: [
+        { sku: 1001, productId: 501, price: 0.5 },
+        { sku: 1002, productId: 502, price: 0.25 },
+        { sku: 1003, productId: 503, price: 2 },
+      ],
+      nonDirectSellersInCart: [],
+    });
+    expect(it.asked[3].body).toEqual({ items: [101, 102, 103] });
+    expect(it.asked[4].body).toEqual({
+      items: [
+        { sku: 1001, sellerId: 11, channelId: 0, requestedQuantity: 2, price: 0.5, isDirect: true, customListingKey: null },
+        { sku: 1003, sellerId: 22, channelId: 0, requestedQuantity: 1, price: 2, isDirect: true, customListingKey: null },
+      ],
+    });
+    expect(it.lines()).toEqual(["Lightning Bolt 33 x1 Direct", "Llanowar Elves 11 x2 Direct", "Counterspell 22 x1 Direct"]);
+    expect(it.stash()).toEqual(stashOf(["Giant Growth"]));
+    expect(it.tip()).toBe("Consolidated 3 cards into Direct; 1 card in stash that Direct has no room for: Giant Growth (Lightly Played), 1 of 1");
+    expect(it.done()).toBe(true);
+    expect(it.reloads()).toBe(1);
+    for (let i = 1; i < it.asked.length; i++) {
+      expect(it.asked[i].at - it.asked[i - 1].at).toBeGreaterThanOrEqual(100);
+    }
+  });
+
+  test("takes no more than Direct has room for, and Put back adds the rest as it was", async () => {
+    const it = mountCart({ items: ELVES_AND_BOLT(), direct: { "1001-0.5": { dia: 1, sellers: [ELVES] } } });
+    it.consolidate().click();
+    await it.idle();
+    expect(it.lines()).toEqual(["Lightning Bolt 33 x1 Direct", "Llanowar Elves 11 x1 Direct"]);
+    expect(it.tip()).toBe("Consolidated 1 card into Direct; 1 card in stash that Direct has no room for: Llanowar Elves (Near Mint), 1 of 2");
+    expect(it.stash().items).toEqual([{ ...stashOf(["Llanowar Elves"]).items[0], quantity: 1 }]);
+    await it.settle(600);
+    it.back().click();
+    await it.idle();
+    expect(added(it)).toEqual([["11 x1 Direct"], ["11 x1"]]);
+    expect(it.lines()).toEqual(["Lightning Bolt 33 x1 Direct", "Llanowar Elves 11 x1 Direct", "Llanowar Elves 11 x1"]);
+    expect(it.stash()).toBe(null);
+  });
+
+  test("counts what Direct already ships of a card against its room", async () => {
+    const bolt = { ...ITEMS[3], cartItemId: 105, sellerId: 44, sellerKey: "9a9b9c9d", isDirect: false };
+    const it = mountCart({ items: [ITEMS[3], bolt], direct: { "1004-1": { dia: 1, sellers: [seller(33, "8c9d0e1f", 1), seller(44, "9a9b9c9d", 1)] } } });
+    it.consolidate().click();
+    await it.idle();
+    expect(added(it)).toEqual([]);
+    expect(it.lines()).toEqual(["Lightning Bolt 33 x1 Direct"]);
+    expect(it.tip()).toBe("Consolidated 0 cards into Direct; 1 card in stash that Direct has no room for: Lightning Bolt (Near Mint), 1 of 1");
+  });
+
+  test("takes from the item's own seller first, then from other Direct sellers", async () => {
+    const own = mountCart({ items: ELVES_AND_BOLT(), direct: { "1001-0.5": { dia: 10, sellers: [seller(99, "99999999", 5), ELVES] } } });
+    own.consolidate().click();
+    await own.idle();
+    expect(added(own)).toEqual([["11 x2 Direct"]]);
+    const short = mountCart({ items: ELVES_AND_BOLT(), direct: { "1001-0.5": { dia: 10, sellers: [seller(99, "99999999", 5), seller(11, "0a1b2c3d", 1)] } } });
+    short.consolidate().click();
+    await short.idle();
+    expect(added(short)).toEqual([["11 x1 Direct", "99 x1 Direct"]]);
+    expect(short.tip()).toBe("Consolidated 2 cards into Direct");
+    expect(short.stash()).toBe(null);
+  });
+
+  test("counts consigned stock past Direct's cap, as the page does", async () => {
+    const it = mountCart({ items: ELVES_AND_BOLT(), direct: { "1001-0.5": { dia: 1, sellers: [seller(11, "0a1b2c3d", 1), seller(77, "77777777", 1, true)] } } });
+    it.consolidate().click();
+    await it.idle();
+    expect(added(it)).toEqual([["11 x1 Direct", "77 x1 Direct"]]);
+  });
+
+  test("asks sellers not on consignment for no more than Direct's cap, and consigned ones for the rest", async () => {
+    const five = { ...ITEMS[0], quantity: 5 };
+    const it = mountCart({ items: [five, ITEMS[3]], direct: { "1001-0.5": { dia: 2, sellers: [seller(11, "0a1b2c3d", 5), seller(77, "77777777", 3, true)] } } });
+    it.consolidate().click();
+    await it.idle();
+    expect(added(it)).toEqual([["11 x2 Direct", "77 x3 Direct"]]);
+    expect(it.tip()).toBe("Consolidated 5 cards into Direct");
+  });
+
+  test("changes nothing when the catalogue or Direct's stock does not answer", async () => {
+    for (const refusal of [{ unnamed: true }, { refuseStock: true }]) {
+      const it = mountCart({ direct: STOCK, ...refusal });
+      it.consolidate().click();
+      await it.idle();
+      expect(it.asked.some((a) => a.method === "DELETE")).toBe(false);
+      expect(it.cart().length).toBe(4);
+      expect(it.stash()).toBe(null);
+      expect(it.failed()).toBe(true);
+      expect(it.tip()).toBe("TCGplayer answered 503");
+      expect(it.reloads()).toBe(0);
+    }
+  });
+
+  test("a refused add keeps everything taken out set aside, for Put back", async () => {
+    const it = mountCart({ direct: STOCK, refuseAdd: true });
+    it.consolidate().click();
+    await it.idle();
+    expect(it.lines()).toEqual(["Lightning Bolt 33 x1 Direct"]);
+    expect(it.stash()).toEqual(stashOf(["Llanowar Elves", "Giant Growth", "Counterspell"]));
+    expect(it.failed()).toBe(true);
+    expect(it.tip()).toBe("TCGplayer answered 500; consolidated 0 cards into Direct; 4 cards in stash");
+    expect(it.reloads()).toBe(1);
+  });
+
+  test("a refused removal adds nothing and sets nothing aside", async () => {
+    const it = mountCart({ direct: STOCK, refuseDelete: true });
+    it.consolidate().click();
+    await it.idle();
+    expect(added(it)).toEqual([]);
+    expect(it.cart().length).toBe(4);
+    expect(it.stash()).toBe(null);
+    expect(it.tip()).toBe("TCGplayer answered 500; consolidated 0 cards into Direct; 0 cards in stash");
+    expect(it.reloads()).toBe(0);
+  });
+
+  test("with Direct alone in the cart it says so and changes nothing", async () => {
+    const it = mountCart({ items: kept(["Lightning Bolt"]), direct: STOCK });
+    it.consolidate().click();
+    await it.idle();
+    expect(it.asked.length).toBe(1);
+    expect(it.tip()).toBe("Only TCGplayer Direct is in the cart");
+    expect(it.reloads()).toBe(0);
   });
 });

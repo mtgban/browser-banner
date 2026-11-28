@@ -5,9 +5,12 @@
 // - validatecart answers with the cart's items, which carry no names;
 // - bulkdelete takes items out by cartItemId, unless told to refuse, and
 //   answers with no body;
-// - bulkadd adds a listing back under a new cartItemId, at the seller's
-//   price now, unless the listing is sold out or the add is refused;
-// - mp-search-api's getProductForSkus names cards by sku, unless told not to.
+// - bulkadd adds a listing back under a new cartItemId, Direct or not as
+//   asked and onto the cart's own line of it, at the seller's price now,
+//   unless the listing is sold out or the add is refused;
+// - mp-search-api's getProductForSkus names cards by sku, unless told not to;
+// - its directQuantitiesAtPrice answers from `direct`, Direct's stock by
+//   "<sku>-<price>", unless told to refuse.
 //
 // Every request is recorded with the time it went, and a reload is counted
 // rather than done.
@@ -21,6 +24,7 @@ const SITE = "https://www.tcgplayer.com";
 export const KEY = "5c4c773f372945139271f4fab1f1572e";
 const GATEWAY = "https://mpgateway.tcgplayer.com/v1/cart/" + KEY + "/";
 const CATALOGUE = "https://mp-search-api.tcgplayer.com/v1/product/getProductForSkus";
+const STOCK = "https://mp-search-api.tcgplayer.com/v1/search/directQuantitiesAtPrice";
 
 // ITEMS is the cart as the fixture draws it, in validatecart's shape: an
 // item Direct ships is in Direct's package, whoever sells it.
@@ -37,14 +41,14 @@ export const ITEMS = [
 
 // CARDS is the catalogue, by sku.
 export const CARDS = {
-  1001: { productName: "Llanowar Elves", condition: "Near Mint" },
-  1002: { productName: "Giant Growth", condition: "Lightly Played" },
-  1003: { productName: "Counterspell", condition: "Near Mint Foil" },
-  1004: { productName: "Lightning Bolt", condition: "Near Mint" },
+  1001: { productId: 501, productName: "Llanowar Elves", condition: "Near Mint" },
+  1002: { productId: 502, productName: "Giant Growth", condition: "Lightly Played" },
+  1003: { productId: 503, productName: "Counterspell", condition: "Near Mint Foil" },
+  1004: { productId: 504, productName: "Lightning Bolt", condition: "Near Mint" },
 };
 export const nameOf = (i) => (CARDS[i.sku] ? CARDS[i.sku].productName : i.productName);
 
-export function mountCart({ path = "/cart", items = ITEMS, cookie = "StoreCart_PRODUCTION=CK%3D" + KEY + "%26Ignore%3Dfalse", stash, said, refuseDelete = false, keep = [], refuseAdd = false, soldOut = [], priceNow = {}, unnamed = false } = {}) {
+export function mountCart({ path = "/cart", items = ITEMS, cookie = "StoreCart_PRODUCTION=CK%3D" + KEY + "%26Ignore%3Dfalse", stash, said, refuseDelete = false, keep = [], refuseAdd = false, soldOut = [], priceNow = {}, unnamed = false, direct = {}, refuseStock = false } = {}) {
   const window = new Window({
     url: SITE + path,
     settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true, disableIframePageLoading: true },
@@ -63,7 +67,15 @@ export function mountCart({ path = "/cart", items = ITEMS, cookie = "StoreCart_P
   window.fetch = (url, init = {}) => {
     const u = String(url);
     const body = init.body ? JSON.parse(init.body) : null;
-    asked.push({ at: window.Date.now(), method: init.method, path: u.replace(GATEWAY, "").replace(CATALOGUE, "getProductForSkus"), body, credentials: init.credentials });
+    asked.push({ at: window.Date.now(), method: init.method, path: u.replace(GATEWAY, "").replace(CATALOGUE, "getProductForSkus").replace(STOCK, "directQuantitiesAtPrice"), body, credentials: init.credentials });
+    if (u === STOCK && init.method === "POST") {
+      if (refuseStock) return Promise.resolve(json(503, {}));
+      const found = body.items.filter((i) => direct[i.sku + "-" + i.price]).map((i) => {
+        const d = direct[i.sku + "-" + i.price];
+        return { sku: i.sku, price: i.price, directInventoryAvailable: d.dia, sellerQuantities: d.sellers.map(({ sellerKey, ...q }) => ({ isConsignment: false, ...q })) };
+      });
+      return Promise.resolve(json(200, { errors: [], results: [found] }));
+    }
     if (u === CATALOGUE && init.method === "POST") {
       if (unnamed) return Promise.resolve(json(503, {}));
       return Promise.resolve(json(200, { errors: [], results: [body.filter((sku) => CARDS[sku]).map((sku) => ({ sku, ...CARDS[sku], setName: "Test Set" }))] }));
@@ -81,9 +93,16 @@ export function mountCart({ path = "/cart", items = ITEMS, cookie = "StoreCart_P
     if (what === "items/bulkadd" && init.method === "POST") {
       if (refuseAdd) return Promise.resolve(json(500, {}));
       for (const add of body.items) {
-        const was = ITEMS.find((i) => i.sku === add.sku && i.sellerId === add.sellerId);
+        const seller = Object.values(direct).flatMap((d) => d.sellers).find((q) => q.sellerId === add.sellerId);
+        const listed = ITEMS.find((i) => i.sku === add.sku && i.sellerId === add.sellerId);
+        const was = listed || (seller && { ...ITEMS.find((i) => i.sku === add.sku), sellerId: add.sellerId, sellerKey: seller.sellerKey });
         if (!was || soldOut.includes(nameOf(was))) continue;
-        cart.push({ ...was, cartItemId: ++next, quantity: add.requestedQuantity, currentPrice: priceNow[nameOf(was)] ?? add.price });
+        const line = cart.find((i) => i.sku === add.sku && i.sellerId === add.sellerId && i.isDirect === add.isDirect && i.currentPrice === add.price);
+        if (line) {
+          line.quantity += add.requestedQuantity;
+          continue;
+        }
+        cart.push({ ...was, cartItemId: ++next, quantity: add.requestedQuantity, currentPrice: priceNow[nameOf(was)] ?? add.price, isDirect: add.isDirect });
       }
       return Promise.resolve(json(200, { errors: [], results: [{ items: [] }] }));
     }
@@ -108,6 +127,8 @@ export function mountCart({ path = "/cart", items = ITEMS, cookie = "StoreCart_P
     doc,
     asked,
     cart: () => cart.map(nameOf),
+    lines: () => cart.map((i) => nameOf(i) + " " + i.sellerId + " x" + i.quantity + (i.isDirect ? " Direct" : "")),
+    consolidate: () => doc.querySelector(".ban-consolidate"),
     reloads: () => reloads,
     shown: () => panel() !== null,
     word: () => at(".ban-word").textContent,

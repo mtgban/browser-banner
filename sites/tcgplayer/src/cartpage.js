@@ -1,8 +1,11 @@
-// The content script on TCGplayer's cart: Only this seller beside each
-// package's Remove all items and Save all items, and Put back on the panel.
+// The content script on TCGplayer's cart: Only this seller in a row above
+// each package's Remove all items and Save all items, Consolidate
+// beside it on Direct's, and Put back on the panel.
 //
 // Only this seller takes every other package's items out of the cart and
-// keeps them, each with its seller and price; Put back adds them again.
+// keeps them, each with its seller and price; Consolidate does the same
+// with every item Direct does not ship and adds back from Direct what it
+// can at the same price; Put back adds again what is kept.
 // TCGplayer's page does not hear of a change made through its API, so each
 // ends by reloading it, and the panel says what was done once it is back.
 
@@ -26,6 +29,12 @@ globalThis.TCGB = globalThis.TCGB || {};
 
   function plural(n, one, many) {
     return n + " " + (n === 1 ? one : many);
+  }
+
+  function count(items) {
+    return items.reduce(function (n, item) {
+      return n + item.quantity;
+    }, 0);
   }
 
   function dollars(n) {
@@ -72,10 +81,10 @@ globalThis.TCGB = globalThis.TCGB || {};
     function idle() {
       var n = TCGB.stash().items.length;
       back.disabled = !n || !!run;
-      panel.word(n ? plural(n, "item", "items") + " set aside" : "");
+      panel.word(n ? n + " in stash" : "");
       panel.hint(n
-        ? "Put back the items Only this seller set aside, from the sellers they came from"
-        : "Beside each seller: Only this seller, to set the others aside");
+        ? "Put back what is in stash, from the sellers it came from"
+        : "Beside each seller: Only this seller, to set the others aside; beside Direct: Consolidate");
     }
 
     function start(what) {
@@ -134,19 +143,7 @@ globalThis.TCGB = globalThis.TCGB || {};
           if (!others.length) {
             return null;
           }
-          var sellers = {};
-          TCGB.packages(document).forEach(function (p) {
-            sellers[p.key] = p.name;
-          });
-          // An entry the cart holds again was put back by other means.
-          var stash = TCGB.stash();
-          stash.items = stash.items.filter(function (s) {
-            return !TCGB.holds(items, s);
-          });
-          others.forEach(function (item) {
-            TCGB.setAside(stash, TCGB.kept(item, sellers));
-          });
-          TCGB.keepStash(stash);
+          setAsideAll(others, items);
           panel.word("setting aside " + plural(others.length, "item", "items"));
           return TCGB.after(TCGB.PACE)
             .then(function () {
@@ -170,15 +167,8 @@ globalThis.TCGB = globalThis.TCGB || {};
             say("Only " + pkg.name + " is in the cart");
             return;
           }
-          var still = others.filter(function (item) {
-            return after.some(function (now) {
-              return now.cartItemId === item.cartItemId;
-            });
-          });
           var stash = TCGB.stash();
-          still.forEach(function (item) {
-            TCGB.unsetAside(stash, TCGB.kept(item, {}));
-          });
+          var still = keptBack(others, after, stash);
           TCGB.keepStash(stash);
           var taken = others.length - still.length;
           var sellers = [];
@@ -189,11 +179,184 @@ globalThis.TCGB = globalThis.TCGB || {};
           });
           if (refused || still.length) {
             say((refused ? refused.message + "; " : "TCGplayer kept " + plural(still.length, "item", "items") + " in the cart; ") +
-              plural(taken, "item", "items") + " set aside", true, taken > 0);
+              taken + " in stash", true, taken > 0);
             return;
           }
           say("Set aside " + plural(taken, "item", "items") + " from " + plural(sellers.length, "other seller", "other sellers") +
             "; only " + pkg.name + " is left to check out", false, true);
+        })
+        .catch(failed);
+    }
+
+    // setAsideAll keeps items in the stash before they are taken out, with
+    // the name the page heads each one's package with; an earlier entry the
+    // cart holds again was put back by other means and is dropped.
+    function setAsideAll(items, all) {
+      var sellers = {};
+      TCGB.packages(document).forEach(function (p) {
+        sellers[p.key] = p.name;
+      });
+      var stash = TCGB.stash();
+      stash.items = stash.items.filter(function (s) {
+        return !TCGB.holds(all, s);
+      });
+      items.forEach(function (item) {
+        TCGB.setAside(stash, TCGB.kept(item, sellers));
+      });
+      TCGB.keepStash(stash);
+    }
+
+    // keptBack is the run's items the cart still holds, by cartItemId, each
+    // taken off the stash again: TCGplayer kept them.
+    function keptBack(others, after, stash) {
+      var still = others.filter(function (item) {
+        return after.some(function (now) {
+          return now.cartItemId === item.cartItemId;
+        });
+      });
+      still.forEach(function (item) {
+        TCGB.unsetAside(stash, TCGB.kept(item, {}));
+      });
+      return still;
+    }
+
+    function cards(n) {
+      return plural(n, "card", "cards");
+    }
+
+    function directAt(items, key) {
+      return items.reduce(function (n, item) {
+        return n + (item.isDirect && TCGB.priceKey(item.sku, item.currentPrice) === key ? item.quantity : 0);
+      }, 0);
+    }
+
+    // consolidate sets aside every item Direct does not ship and adds back
+    // from Direct, at the same price, as many of each card as Direct has
+    // room for; what Direct gained comes off the set-aside list again.
+    function consolidate() {
+      var key = start("reading the cart");
+      if (!key) {
+        return;
+      }
+      var before;
+      var others;
+      var products = {};
+      var refused = null;
+      TCGB.readCart(key)
+        .then(function (items) {
+          before = items;
+          others = items.filter(function (item) {
+            return !item.isDirect && !item.giftCardKey;
+          });
+          if (!others.length) {
+            return null;
+          }
+          var skus = [];
+          others.forEach(function (item) {
+            if (skus.indexOf(item.sku) < 0) {
+              skus.push(item.sku);
+            }
+          });
+          panel.word("asking for Direct's stock");
+          return TCGB.after(TCGB.PACE)
+            .then(function () {
+              return TCGB.products(skus);
+            })
+            .then(function (found) {
+              products = found;
+              var lines = [];
+              var seen = [];
+              others.forEach(function (item) {
+                var at = TCGB.priceKey(item.sku, item.currentPrice);
+                if (seen.indexOf(at) < 0 && products[item.sku]) {
+                  seen.push(at);
+                  lines.push({ sku: item.sku, productId: products[item.sku].productId, price: item.currentPrice });
+                }
+              });
+              return TCGB.after(TCGB.PACE).then(function () {
+                return TCGB.directStock(lines);
+              });
+            })
+            .then(function (stock) {
+              var adds = TCGB.directPlan(items, stock);
+              setAsideAll(others, items);
+              panel.word("consolidating " + cards(count(others)) + " into Direct");
+              return TCGB.after(TCGB.PACE)
+                .then(function () {
+                  return TCGB.removeItems(key, others.map(function (item) {
+                    return item.cartItemId;
+                  }));
+                })
+                .then(function () {
+                  if (!adds.length) {
+                    return null;
+                  }
+                  return TCGB.after(TCGB.PACE).then(function () {
+                    return TCGB.addItems(key, adds);
+                  });
+                })
+                .catch(function (err) {
+                  refused = err;
+                })
+                .then(function () {
+                  panel.word("checking the cart");
+                  return TCGB.after(TCGB.PACE);
+                })
+                .then(function () {
+                  return TCGB.readCart(key);
+                });
+            });
+        })
+        .then(function (after) {
+          if (!after) {
+            say("Only TCGplayer Direct is in the cart");
+            return;
+          }
+          var stash = TCGB.stash();
+          var still = keptBack(others, after, stash);
+          // What Direct gained of a card at a price stands for as many of
+          // the items set aside there.
+          var moved = 0;
+          var short = [];
+          var groups = [];
+          others.forEach(function (item) {
+            var at = TCGB.priceKey(item.sku, item.currentPrice);
+            if (groups.indexOf(at) < 0) {
+              groups.push(at);
+            }
+          });
+          groups.forEach(function (at) {
+            var here = others.filter(function (item) {
+              return TCGB.priceKey(item.sku, item.currentPrice) === at && still.indexOf(item) < 0;
+            });
+            var wanted = count(here);
+            var gained = Math.min(wanted, Math.max(0, directAt(after, at) - directAt(before, at)));
+            moved += gained;
+            var left = gained;
+            here.forEach(function (item) {
+              var n = Math.min(left, item.quantity);
+              if (n > 0) {
+                var kept = TCGB.kept(item, {});
+                kept.quantity = n;
+                TCGB.unsetAside(stash, kept);
+                left -= n;
+              }
+            });
+            if (gained < wanted && here.length) {
+              var sku = here[0].sku;
+              short.push((products[sku] ? products[sku].name : "SKU " + sku) + ", " + (wanted - gained) + " of " + wanted);
+            }
+          });
+          TCGB.keepStash(stash);
+          var aside = count(others) - count(still) - moved;
+          var changed = aside > 0 || moved > 0;
+          if (refused || still.length) {
+            say((refused ? refused.message + "; " : "TCGplayer kept " + plural(still.length, "item", "items") + " out of Direct; ") +
+              "consolidated " + cards(moved) + " into Direct; " + cards(aside) + " in stash", true, changed);
+            return;
+          }
+          say("Consolidated " + cards(moved) + " into Direct" +
+            (aside ? "; " + cards(aside) + " in stash that Direct has no room for: " + short.join("; ") : ""), false, changed);
         })
         .catch(failed);
     }
@@ -242,7 +405,7 @@ globalThis.TCGB = globalThis.TCGB || {};
               return;
             }
             var now = after.filter(function (item) {
-              return item.sku === s.sku && item.sellerKey === s.sellerKey;
+              return item.sku === s.sku && item.sellerKey === s.sellerKey && !!item.isDirect === !!s.isDirect;
             })[0];
             if (now && Math.round(now.currentPrice * 100) !== Math.round(s.price * 100)) {
               changed.push({ s: s, now: now.currentPrice });
@@ -291,13 +454,17 @@ globalThis.TCGB = globalThis.TCGB || {};
       panel.recap(last.text);
     }
 
-    // buttons puts Only this seller beside each package's own actions, where
-    // TCGplayer's redraw has not left it already.
+    // buttons puts a row with Only this seller, and Consolidate on Direct's,
+    // above each package's own actions, where TCGplayer's redraw has not
+    // left one already.
     function buttons() {
       TCGB.packages(document).forEach(function (pkg) {
-        if (pkg.actions.querySelector(".ban-only")) {
+        var above = pkg.actions.previousElementSibling;
+        if (above && above.classList.contains("ban-row")) {
           return;
         }
+        var row = document.createElement("div");
+        row.className = "ban-row";
         var made = document.createElement("button");
         made.type = "button";
         made.className = "ban-only";
@@ -305,7 +472,16 @@ globalThis.TCGB = globalThis.TCGB || {};
         made.addEventListener("click", function () {
           onlySeller(pkg);
         });
-        pkg.actions.appendChild(made);
+        row.appendChild(made);
+        if (pkg.key === "direct") {
+          var merge = document.createElement("button");
+          merge.type = "button";
+          merge.className = "ban-consolidate";
+          merge.textContent = "Consolidate";
+          merge.addEventListener("click", consolidate);
+          row.appendChild(merge);
+        }
+        pkg.actions.parentNode.insertBefore(row, pkg.actions);
       });
     }
 
@@ -314,7 +490,7 @@ globalThis.TCGB = globalThis.TCGB || {};
       refresh: buttons,
       leave: function () {
         panel.root.remove();
-        Array.prototype.forEach.call(document.querySelectorAll(".ban-only"), function (b) {
+        Array.prototype.forEach.call(document.querySelectorAll(".ban-row"), function (b) {
           b.remove();
         });
       },

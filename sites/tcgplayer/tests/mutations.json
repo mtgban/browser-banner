@@ -520,9 +520,9 @@
   {
     "guard": "a redraw gets its button back",
     "file": "src/cartpage.js",
-    "find": "if (pkg.actions.querySelector(\".ban-only\")) {",
-    "replace": "if (pkg.actions.querySelector(\"button\")) {",
-    "expectFailing": "puts Only this seller after each package's Remove all items and Save all items, and back after a redraw"
+    "find": "if (above && above.classList.contains(\"ban-row\")) {",
+    "replace": "if (document.querySelector(\".ban-row\")) {",
+    "expectFailing": "puts Only this seller in a row above each package's Remove all items and Save all items, and back after a redraw"
   },
   {
     "guard": "one run at a time",
@@ -583,7 +583,7 @@
   {
     "guard": "an entry the cart holds again is dropped before setting aside",
     "file": "src/cartpage.js",
-    "find": "          stash.items = stash.items.filter(function (s) {\n            return !TCGB.holds(items, s);\n          });\n",
+    "find": "      stash.items = stash.items.filter(function (s) {\n        return !TCGB.holds(all, s);\n      });\n",
     "replace": "",
     "expectFailing": "a listing back in the cart and set aside again is one entry, and is put back as many as it was"
   },
@@ -600,5 +600,75 @@
     "find": "    if (!had) {\n      stash.items.push(kept);",
     "replace": "    if (true) {\n      stash.items.push(kept);",
     "expectFailing": "a listing set aside again while some of it still is adds to its entry"
+  },
+  {
+    "guard": "the item's own seller comes first",
+    "file": "src/cart.js",
+    "find": "first.concat(d.sellers.filter(function (q) {\n        return own.indexOf(q.sellerId) < 0;\n      })).forEach(",
+    "replace": "d.sellers.forEach(",
+    "expectFailing": "takes from the item's own seller first, then from other Direct sellers"
+  },
+  {
+    "guard": "consigned stock is counted past Direct's cap",
+    "file": "src/cart.js",
+    "find": "        if (!q.isConsignment) {\n          n = Math.min(n, free);",
+    "replace": "        if (true) {\n          n = Math.min(n, free);",
+    "expectFailing": "counts consigned stock past Direct's cap, as the page does"
+  },
+  {
+    "guard": "Direct's stock counts the cart's own sellers",
+    "file": "src/cart.js",
+    "find": "body: JSON.stringify({ items: lines, nonDirectSellersInCart: [] }),",
+    "replace": "body: JSON.stringify({ items: lines }),",
+    "expectFailing": "moves every other item into Direct from its own seller at its price, and sets aside what Direct has none of"
+  },
+  {
+    "guard": "only what Direct gained comes off the list",
+    "file": "src/cartpage.js",
+    "find": "var gained = Math.min(wanted, Math.max(0, directAt(after, at) - directAt(before, at)));",
+    "replace": "var gained = wanted;",
+    "expectFailing": "counts what Direct already ships of a card against its room"
+  },
+  {
+    "guard": "a set-aside listing is held only Direct or not as it was",
+    "file": "src/cart.js",
+    "find": " && !!item.isDirect === !!s.isDirect) {\n        n += item.quantity;",
+    "replace": ") {\n        n += item.quantity;",
+    "expectFailing": "takes no more than Direct has room for, and Put back adds the rest as it was"
+  },
+  {
+    "guard": "Consolidate is on Direct's package alone",
+    "file": "src/cartpage.js",
+    "find": "if (pkg.key === \"direct\") {",
+    "replace": "if (true) {",
+    "expectFailing": "sits after Only this seller on Direct's package alone"
+  },
+  {
+    "guard": "nothing is taken out before Direct's stock is known",
+    "file": "src/cartpage.js",
+    "find": "              return TCGB.after(TCGB.PACE).then(function () {\n                return TCGB.directStock(lines);\n              });",
+    "replace": "              return TCGB.directStock(lines).catch(function () {\n                return {};\n              });",
+    "expectFailing": "changes nothing when the catalogue or Direct's stock does not answer"
+  },
+  {
+    "guard": "Direct's cap holds seller by seller, not only in total",
+    "file": "src/cart.js",
+    "find": "        if (!q.isConsignment) {\n          n = Math.min(n, free);\n        }\n",
+    "replace": "",
+    "expectFailing": "asks sellers not on consignment for no more than Direct's cap, and consigned ones for the rest"
+  },
+  {
+    "guard": "what Direct already ships counts against its free stock",
+    "file": "src/cart.js",
+    "find": "return q.isConsignment ? n : n - held(q);",
+    "replace": "return n;",
+    "expectFailing": "counts what Direct already ships of a card against its room"
+  },
+  {
+    "guard": "a seller is asked for no more than its listing has",
+    "file": "src/cart.js",
+    "find": "var n = Math.min(left, q.quantity - held(q));",
+    "replace": "var n = left;",
+    "expectFailing": "takes from the item's own seller first, then from other Direct sellers"
   }
 ]
