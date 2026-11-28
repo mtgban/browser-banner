@@ -1,40 +1,39 @@
-/* Only this seller, and Consolidate beside it on Direct's package, in
-   a row of their own above a package's Remove all items and Save all items:
-   the panel's blue, and its green for Consolidate, in TCGplayer's
-   own font. */
+/* Only this seller, and Consolidate beside it on Direct's package, in a row
+   of their own above a package's Remove all items and Save all items: text
+   links drawn as TCGplayer draws those two, in the panel's blue, and its
+   green for Consolidate. */
 .ban-row {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin: 12px 0 8px;
+  justify-content: flex-end;
+  gap: 24px;
+  margin-top: 16px;
 }
 
 .ban-only,
 .ban-consolidate {
-  padding: 6px 12px;
+  padding: 0;
   border: 0;
-  border-radius: 6px;
-  background: #2d67c4;
-  color: #fff;
+  background: none;
+  color: #2d67c4;
   font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 18px;
+  font-size: 13.3333px;
+  font-weight: 400;
+  text-decoration: underline;
   white-space: nowrap;
   cursor: pointer;
 }
 
 .ban-only:hover {
-  background: #23529d;
+  color: #23529d;
 }
 
 .ban-consolidate {
-  background: #30915a;
+  color: #30915a;
 }
 
 .ban-consolidate:hover {
-  background: #38a869;
+  color: #26734a;
 }
 
 .ban-only:focus-visible,
